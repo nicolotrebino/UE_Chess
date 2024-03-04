@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ChessPiece.h"
+#include "Chess_Piece.h"
 #include "Tile.h"
 #include "GameFramework/Actor.h"
 #include "Chessboard.generated.h"
@@ -38,7 +38,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ATile> TileClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<TSubclassOf<AChessPiece>> PieceClass;
+	TArray<TSubclassOf<AChess_Piece>> PieceClass;
 
 	/*
 	 * Chessboard size information

@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+class AChess_Piece;
+
 USTRUCT()
 struct FChessPosition
 {
@@ -45,8 +47,8 @@ public:
 	EPieceTeam GetTileTeam() const;
 
 	// Manage Piece on Tile
-	void SetPieceOnTile(AChessPiece* ChessPiece);
-	AChessPiece* GetPieceOnTile() const;
+	void SetPieceOnTile(AChess_Piece* ChessPiece);
+	AChess_Piece* GetPieceOnTile() const;
 
 	/*
 	 * Manage Tile material and its Status in game
@@ -97,7 +99,7 @@ protected:
 	FChessPosition ChessPosition; // Position with Algebraic Notation
 
 	UPROPERTY(VisibleAnywhere, Category = "Information")
-	AChessPiece* CurrentPieceOnTile; // Piece on Tile
+	AChess_Piece* CurrentPieceOnTile; // Piece on Tile
 	
 	UFUNCTION()
 	void SelfDestroy();

@@ -21,8 +21,8 @@ ATile::ATile()
 	Status = ETileStatus::EMPTY;
 	Team = EPieceTeam::NONE;
 	ChessPosition = {'A', 0};
-	// CurrentPieceOnTile = nullptr; // Nullptr as a default value and used also for the empty Tiles
-	// TileLocation = FVector(0, 0, 0);
+	CurrentPieceOnTile = nullptr; // Nullptr as a default value and used also for the empty Tiles
+	TileLocation = FVector(0, 0, 0);
 }
 
 void ATile::SetTileLocation(const FVector& Location)
@@ -72,17 +72,17 @@ EPieceTeam ATile::GetTileTeam() const
 {
 	return Team;
 }
-/*
-void ATile::SetPieceOnTile(AChessPiece* ChessPiece)
+
+void ATile::SetPieceOnTile(AChess_Piece* ChessPiece)
 {
 	CurrentPieceOnTile = ChessPiece;
 }
 
-AChessPiece* ATile::GetPieceOnTile() const
+AChess_Piece* ATile::GetPieceOnTile() const
 {
 	return CurrentPieceOnTile;
 }
-*/
+
 
 // Set the proper Tile material
 void ATile::SetMaterial(const uint8 Index)

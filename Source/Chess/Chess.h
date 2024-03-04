@@ -14,7 +14,7 @@ enum class ETileStatus : uint8
 };
 
 UENUM()
-enum class EPieceTeam: uint8
+enum EPieceTeam: uint8
 {
 	WHITE		UMETA(DisplayName = "White"),
 	BLACK		UMETA(DisplayName = "Black"),
@@ -22,7 +22,7 @@ enum class EPieceTeam: uint8
 };
 
 UENUM()
-enum class EPieceType: uint8
+enum EPieceType: uint8
 {
 	PAWN		UMETA(DisplayName = "Pawm"),
 	KNIGHT		UMETA(DisplayName = "Knight"),
@@ -30,6 +30,5 @@ enum class EPieceType: uint8
 	ROOK		UMETA(DisplayName = "Rook"),
 	QUEEN		UMETA(DisplayName = "Queen"),
 	KING		UMETA(DisplayName = "King"),
-	NONE		UMETA(DisplayName = "None"),
 };
 
