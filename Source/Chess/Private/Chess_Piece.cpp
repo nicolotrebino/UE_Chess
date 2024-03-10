@@ -5,6 +5,7 @@
 
 #include "BlueprintEditor.h"
 #include "Chess_GameMode.h"
+#include "Utility.h"
 
 // Sets default values
 AChess_Piece::AChess_Piece()
@@ -14,9 +15,9 @@ AChess_Piece::AChess_Piece()
 
 	// Set defaults value
 	GameMode = nullptr;
-	Nomenclature = '';
-	PieceTeam = ETeam::NONE;
-	PieceType = EPieceType::NONE;
+	// Nomenclature = '';
+	// PieceTeam = ETeam::NONE;
+	// PieceType = EPieceType::NONE;
 	CurrentTile = nullptr;
 }
 
@@ -89,7 +90,8 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 			// If the king is now/still in check with the move just made
 			if (GameMode->IsKingInCheck(PieceTeam))
 			{
-				NewArray.Remove(NextTile); // Avoid doing this move and remove it from the new array of possible moves created
+				// Avoid doing this move and remove it from the new array of possible moves created
+				NewArray.Remove(NextTile);
 			}
 		
 			// Restores Tiles to how they originally were
@@ -109,10 +111,12 @@ TArray<ATile*> AChess_Piece::GetLegalMoves()
 	// Make an array of possible Tiles to move through
 	TArray<ATile*> LegalMoves = GetPossibleMoves();
 
+	/*****************************
 	if (this->IsA(AChess_King::StaticClass()))
 	{
 		return LegalMoves;
 	}
+	*/////////////////////
 	
 	// Controls and modifies the array of possible Tiles to avoid a check
 	PossibleMovesCheckControl(LegalMoves);
@@ -173,7 +177,6 @@ void AChess_Piece::BeginPlay()
 	Super::BeginPlay();
 	GameMode = AChess_GameMode::GetChessGameMode(); // Get the Chess_GameMode instance with Singleton pattern
 	GameMode->OnResetEvent.AddDynamic(this, &AChess_Piece::SelfDestroy);
-	
 }
 
 /*

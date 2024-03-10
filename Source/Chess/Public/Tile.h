@@ -94,9 +94,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Information")
 	ETileStatus Status; // Tile Status
 	UPROPERTY(VisibleAnywhere, Category = "Information")
-	ETeam Team; // Team of the Piece on Tile
-	UPROPERTY(VisibleAnywhere, Category = "Information")
 	FAlgebraicPosition ChessPosition; // Position with Algebraic Notation
+
+	ETeam Team; // Team of the Piece on Tile
 
 	UPROPERTY(VisibleAnywhere, Category = "Information")
 	AChess_Piece* CurrentPieceOnTile; // Piece on Tile

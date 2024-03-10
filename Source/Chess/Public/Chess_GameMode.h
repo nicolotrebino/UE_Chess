@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Chessboard.h"
+#include "PlayerInterface.h"
 #include "GameFramework/GameModeBase.h"
 #include "Chess_GameMode.generated.h"
 
@@ -21,9 +22,6 @@ class CHESS_API AChess_GameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-
-	AChess_GameMode();
-
 	// Static method to obtain singleton instance
 	UFUNCTION(BlueprintCallable, Category = "Chess_GameMode")
 	static AChess_GameMode* GetChessGameMode();
@@ -33,6 +31,7 @@ protected:
 	static AChess_GameMode* ChessGameModeInstance;
 
 public:
+	AChess_GameMode();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -42,7 +41,8 @@ public:
 	 */
 	bool bIsGameOver; // Tracks if the game is over
 	int32 MoveCounter; // Tracks the number of moves in order to signal a drawn game
-	bool bIsCheckMate;
+	bool bIsWhiteKingInCheckMate;
+	bool bIsBlackKingInCheckMate;
 	bool bIsDraw;
 
 	/*
@@ -52,6 +52,7 @@ public:
 	AChess_Piece* Checker; // Piece that is in check
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
+	bool bIsPromotion;
 	
 	// Array of player interfaces
 	TArray<IPlayerInterface*> Players;
@@ -98,8 +99,23 @@ public:
 	void ResetTargetedAndKillableTiles();
 	void ResetSelectedPiece() const;
 	bool IsKingInCheck(const int32 KingTeam);
-	bool IsCheckMate(const TArray<AChess_Piece*>& Team);
+	bool IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
+
+	/*
+	 * Score manager
+	 */
+	UFUNCTION(BlueprintCallable)
+	FString GetScoreWhiteTeam();
+	UFUNCTION(BlueprintCallable)
+	FString GetScoreBlackTeam();
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Chess")
+	int32 ScoreWhiteTeam;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Chess")
+	int32 ScoreBlackTeam;
+	
+	void UpdateScores();
 
 	// BlueprintAssignable Usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
 	// declare a variable of type FOnReset (delegate)

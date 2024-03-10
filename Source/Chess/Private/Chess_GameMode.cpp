@@ -1,36 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Chess_GameMode.h"
 
-#include "Kismet/GameplayStatics.h"
+#include "Chess_PlayerController.h"
+#include "HumanPlayer.h"
+#include "RandomPlayer.h"
+#include "EngineUtils.h"
 
-AChess_GameMode::AChess_GameMode()
-{
-	PlayerControllerClass = AChess_PlayerController::StaticClass();
-	DefaultPawnClass = AHumanPlayer::StaticClass();
-
-	// Set default values
-	bIsGameOver = false; // Tracks if the game is over
-	MoveCounter = 0; // Tracks the number of moves in order to signal a drawn game
-	Checker = nullptr; // Piece that is in check
-	bIsBlackKingInCheck = false;
-	bIsWhiteKingInCheck = false;
-	bIsCheckMate = false;
-	bIsDraw = false;
-	bIsKill = false;
-
-	CurrentPlayer = 0;
-
-	CBoard = nullptr;
-
-	SelectedPiece = nullptr;
-
-	Kings.SetNum(2); // Create space for two elements in the array
-	Kings[WHITE] = nullptr;
-	Kings[BLACK] = nullptr;
-}
-
+/*
+ * Singleton pattern implementation
+ */ 
 AChess_GameMode* AChess_GameMode::GetChessGameMode()
 {
 	if (!ChessGameModeInstance)
@@ -44,6 +23,34 @@ AChess_GameMode* AChess_GameMode::GetChessGameMode()
 
 // Static variable initialization
 AChess_GameMode* AChess_GameMode::ChessGameModeInstance = nullptr;
+
+/*
+ * Chess_GameMode methods implementation
+ */
+AChess_GameMode::AChess_GameMode()
+{
+	PlayerControllerClass = AChess_PlayerController::StaticClass();
+	DefaultPawnClass = AHumanPlayer::StaticClass();
+
+	// Set default values
+	bIsGameOver = false; // Tracks if the game is over
+	MoveCounter = 0; // Tracks the number of moves in order to signal a drawn game
+	Checker = nullptr; // Piece that is in check
+	bIsBlackKingInCheck = false;
+	bIsWhiteKingInCheck = false;
+	bIsDraw = false;
+	bIsKill = false;
+
+	CurrentPlayer = 0;
+
+	CBoard = nullptr;
+
+	SelectedPiece = nullptr;
+
+	Kings.SetNum(2); // Create space for two elements in the array
+	Kings[WHITE] = nullptr;
+	Kings[BLACK] = nullptr;
+}
 
 void AChess_GameMode::BeginPlay()
 {
@@ -142,7 +149,7 @@ void AChess_GameMode::ResetSelectedPiece() const
 bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 {
 	// Get the Tile under the King of the particular team
-	const ATile* KingTile = Kings[KingTeam]->GetPieceTile();
+	//////////////////////////////////// const ATile* KingTile = Kings[KingTeam]->GetPieceTile();
 
 	// If the Current Player is the AI (1)
 	if (KingTeam)
@@ -156,7 +163,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
 				// If the array of the possible moves of the enemy piece
 				// contains the Tile under the King
-				if (EnemyMoves.Contains(KingTile))
+				//////////////////////////////////// if (EnemyMoves.Contains(KingTile))
 				{
 					Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
@@ -177,7 +184,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
 				// If the array of possible moves of the enemy piece
 				// contains the Tile under the King
-				if (EnemyMoves.Contains(KingTile))
+				//////////////////////////////////// if (EnemyMoves.Contains(KingTile))
 				{
 					Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
@@ -191,14 +198,14 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 	return false; // The King of the CurrentPlayer is not in Check
 }
 
-bool AChess_GameMode::IsCheckMate(const TArray<AChess_Piece*>& Team)
+bool AChess_GameMode::IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team)
 {
-	// For each Chess Piece of the current team
+	// For each Chess Piece of the team
 	for (AChess_Piece* Piece : Team)
 	{
 		ATile* CurrentTile = Piece->GetPieceTile();
 		
-		// Get the legit moves of the piece
+		// Get the legal moves of the piece
 		TArray<ATile*> PossibleMoves = Piece->GetLegalMoves();
 
 		for (ATile* NextTile : PossibleMoves)
@@ -207,7 +214,7 @@ bool AChess_GameMode::IsCheckMate(const TArray<AChess_Piece*>& Team)
 			{
 				ATile* CurrentKingTile = Piece->GetPieceTile();
 				Piece->SetPieceTile(NextTile);
-				if (!IsKingInCheck(CurrentPlayer) || NextTile->GetPieceOnTile() == Checker)
+				if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == Checker)
 				{
 					Piece->SetPieceTile(CurrentKingTile);
 					return false;
@@ -220,7 +227,7 @@ bool AChess_GameMode::IsCheckMate(const TArray<AChess_Piece*>& Team)
 			NextTile->SetTileTeam(Piece->GetTeam());
 			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
 			CurrentTile->SetTileTeam(NONE);
-			if (!IsKingInCheck(CurrentPlayer) || NextTile->GetPieceOnTile() == Checker)
+			if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == Checker)
 			{
 				NextTile->SetTileStatus(NextStatus);
 				NextTile->SetTileTeam(NextTeam);
@@ -234,7 +241,9 @@ bool AChess_GameMode::IsCheckMate(const TArray<AChess_Piece*>& Team)
 			CurrentTile->SetTileTeam(Piece->GetTeam());
 		}
 	}
-	bIsCheckMate = true;
+	
+	KingTeam ? bIsBlackKingInCheckMate = true : bIsWhiteKingInCheckMate = true;
+	bIsGameOver = true;
 	return true;
 }
 
@@ -274,4 +283,35 @@ ATile* AChess_GameMode::GetTileAtPosition(const TCHAR Letter, const uint8 Number
 
 	// Return nullptr if the Tile isn't in the array
 	return nullptr;
+}
+
+void AChess_GameMode::ResetField()
+{
+	// send broadcast event to registered objects 
+	OnResetEvent.Broadcast();
+
+	TileArray.Empty();
+	WhiteTeam.Empty();
+	BlackTeam.Empty();
+	ResetSelectedPiece();
+	ResetSelectedPiece();
+	Kings[WHITE] = nullptr;
+	Kings[BLACK] = nullptr;
+
+	bIsGameOver = false;
+	MoveCounter = 0;
+	
+	////////////////////////// AChess_PlayerController* CPC = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	////////////////////////// CPC->UserInterfaceWidget->DestroyMoveHistory();
+
+	if (ChessboardClass != nullptr)
+	{
+		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Game Field is null"));
+	}
+	
+	ChoosePlayerAndStartGame();
 }

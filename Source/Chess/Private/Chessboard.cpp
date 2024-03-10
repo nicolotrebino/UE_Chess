@@ -1,10 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Chessboard.h"
 
-#include "ChessGameMode.h"
-#include "ChessKing.h"
+#include "Chess_GameMode.h"
+//////////////////////////////////// #include "Chess_King.h"
 
 // Sets default values
 AChessboard::AChessboard()
@@ -33,7 +32,8 @@ float AChessboard::GetTileSize() const
 
 void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
 {
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	// Get the Chess_GameMode instance with Singleton pattern
+	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode(); 
 
 	const FVector SpawnLocation = CurrentTile->GetTileLocation() + FVector (0,0,0.1);
 	const FRotator SpawnRotation = FRotator(0.0f, 90.0f, 0.0f);
@@ -57,14 +57,14 @@ void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const E
 		GameMode->WhiteTeam.Add(Piece);
 		if (Type == EPieceType::KING)
 		{
-			GameMode->Kings[ETeam::WHITE] = Cast<AChess_King>(Piece);
+			//////////////////////////////////// GameMode->Kings[ETeam::WHITE] = Cast<AChess_King>(Piece);
 		}
 		break;
 	case ETeam::BLACK:
 		GameMode->BlackTeam.Add(Piece);
 		if (Type == EPieceType::KING)
 		{
-			GameMode->Kings[ETeam::BLACK] = Cast<AChess_King>(Piece);
+			//////////////////////////////////// GameMode->Kings[ETeam::BLACK] = Cast<AChess_King>(Piece);
 		}
 		break;
 	default:
@@ -77,9 +77,10 @@ void AChessboard::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Get the Chess_GameMode instance with Singleton pattern
+	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
 	// Add SelfDestroy method to the broadcast OnResetEvent delegate
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	GameMode->OnResetEvent.AddDynamic(this, &AChessboard::SelfDestroy);
+	GameMode->OnResetEvent.AddDynamic(this, &AChessboard::SelfDestroy); 
 
 	// Generate the board and spawn each piece
 	GenerateChessBoard();
@@ -91,7 +92,8 @@ void AChessboard::BeginPlay()
  */
 void AChessboard::GenerateChessBoard() const
 {
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	// Get the Chess_GameMode instance with Singleton pattern
+	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
 	
 	for (int x = 0; x < FieldSize; x++)
 	{
@@ -130,7 +132,8 @@ void AChessboard::GenerateChessBoard() const
  */
 void AChessboard::SpawnPieces()
 {
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	// Get the Chess_GameMode instance with Singleton pattern
+	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
 	
 	for (ATile* CurrentTile: GameMode->TileArray)
 	{
