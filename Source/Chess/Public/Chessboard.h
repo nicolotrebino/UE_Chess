@@ -26,7 +26,7 @@ public:
 
 	// Public function to spawn a single Piece, used also for the Pawn promotion
 	UFUNCTION()
-	void SpawnSinglePiece(ATile* CurrentTile, const EPieceTeam Team, const EPieceType Type);
+	void SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type);
 
 protected:
 	// Called when the game starts or when spawned
@@ -52,6 +52,7 @@ protected:
 	void GenerateChessBoard() const; // Spawn Chessboard
 	UFUNCTION()
 	void SpawnPieces(); // Spawn all the Pieces on the Chessboard
+	
 	UFUNCTION()
 	void SelfDestroy();
 

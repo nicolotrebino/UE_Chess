@@ -31,7 +31,7 @@ float AChessboard::GetTileSize() const
 	return TileSize;
 }
 
-void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const EPieceTeam Team, const EPieceType Type)
+void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
@@ -53,18 +53,18 @@ void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const EPieceTeam Team, co
 	
 	switch (Team)
 	{
-	case EPieceTeam::WHITE:
+	case ETeam::WHITE:
 		GameMode->WhiteTeam.Add(Piece);
 		if (Type == EPieceType::KING)
 		{
-			GameMode->Kings[EPieceTeam::WHITE] = Cast<AChess_King>(Piece);
+			GameMode->Kings[ETeam::WHITE] = Cast<AChess_King>(Piece);
 		}
 		break;
-	case EPieceTeam::BLACK:
+	case ETeam::BLACK:
 		GameMode->BlackTeam.Add(Piece);
 		if (Type == EPieceType::KING)
 		{
-			GameMode->Kings[EPieceTeam::BLACK] = Cast<AChess_King>(Piece);
+			GameMode->Kings[ETeam::BLACK] = Cast<AChess_King>(Piece);
 		}
 		break;
 	default:
@@ -116,8 +116,8 @@ void AChessboard::GenerateChessBoard() const
 			}
 
 			TileObject->SetTileStatus(ETileStatus::EMPTY);
-			TileObject->SetTileTeam(EPieceTeam::NONE);
-			TileObject->SetChessPosition(y, x);
+			TileObject->SetTileTeam(ETeam::NONE);
+			TileObject->SetAlgebraicPosition(y, x);
 			TileObject->SetTileLocation(SpawnLocation);
 			GameMode->TileArray.Add(TileObject);
 		}
@@ -134,76 +134,76 @@ void AChessboard::SpawnPieces()
 	
 	for (ATile* CurrentTile: GameMode->TileArray)
 	{
-		if (CurrentTile->GetChessPosition().TileNumber == 1)
+		if (CurrentTile->GetAlgebraicPosition().TileNumber == 1)
 		{
-			switch (CurrentTile->GetChessPosition().TileLetter)
+			switch (CurrentTile->GetAlgebraicPosition().TileLetter)
 			{
 			case 'a':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::ROOK);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::ROOK);
 				break;
 			case 'b':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::KNIGHT);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::KNIGHT);
 				break;
 			case 'c':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::BISHOP);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::BISHOP);
 				break;
 			case 'd':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::QUEEN);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::QUEEN);
 				break;
 			case 'e':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::KING);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::KING);
 				break;
 			case 'f':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::BISHOP);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::BISHOP);
 				break;
 			case 'g':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::KNIGHT);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::KNIGHT);
 				break;
 			case 'h':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::ROOK);
+				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::ROOK);
 				break;
 			default:
 				break;
 			}
 		}
 		
-		if (CurrentTile->GetChessPosition().TileNumber == 2)
+		if (CurrentTile->GetAlgebraicPosition().TileNumber == 2)
 		{
-			SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::PAWN);
+			SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::PAWN);
 		}
 
-		if (CurrentTile->GetChessPosition().TileNumber == 7)
+		if (CurrentTile->GetAlgebraicPosition().TileNumber == 7)
 		{
-			SpawnSinglePiece(CurrentTile, EPieceTeam::WHITE, EPieceType::PAWN);
+			SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::PAWN);
 		}
 
-		if (CurrentTile->GetChessPosition().TileNumber == 8)
+		if (CurrentTile->GetAlgebraicPosition().TileNumber == 8)
 		{
-			switch (CurrentTile->GetChessPosition().TileLetter)
+			switch (CurrentTile->GetAlgebraicPosition().TileLetter)
 			{
 			case 'a':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::ROOK);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::ROOK);
 				break;
 			case 'b':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::KNIGHT);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::KNIGHT);
 				break;
 			case 'c':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::BISHOP);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::BISHOP);
 				break;
 			case 'd':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::QUEEN);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::QUEEN);
 				break;
 			case 'e':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::KING);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::KING);
 				break;
 			case 'f':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::BISHOP);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::BISHOP);
 				break;
 			case 'g':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::KNIGHT);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::KNIGHT);
 				break;
 			case 'h':
-				SpawnSinglePiece(CurrentTile, EPieceTeam::BLACK, EPieceType::ROOK);
+				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::ROOK);
 				break;
 			default:
 				break;

@@ -24,13 +24,23 @@ public:
 
 	AChess_GameMode();
 
+	// Static method to obtain singleton instance
+	UFUNCTION(BlueprintCallable, Category = "Chess_GameMode")
+	static AChess_GameMode* GetChessGameMode();
+
+protected:
+	// Static variable for the singleton instance
+	static AChess_GameMode* ChessGameModeInstance;
+
+public:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/*
 	 * Game variable
 	 */
-	bool IsGameOver; // Tracks if the game is over
+	bool bIsGameOver; // Tracks if the game is over
 	int32 MoveCounter; // Tracks the number of moves in order to signal a drawn game
 	bool bIsCheckMate;
 	bool bIsDraw;
@@ -67,6 +77,10 @@ public:
 	TArray<AChess_Piece*> WhiteTeam; // Keeps track of White Pieces
 	UPROPERTY(Transient)
 	TArray<AChess_Piece*> BlackTeam; // Keeps track of Black Pieces
+	UPROPERTY(Transient)
+	TArray<AChess_Piece*> KilledWhiteTeam; // Keeps track of Black Pieces
+	UPROPERTY(Transient)
+	TArray<AChess_Piece*> KilledBlackTeam; // Keeps track of Black Pieces
 	
 	UPROPERTY(Transient)
 	TArray<ATile*> TargetedTiles; // Keeps track of Targeted Tiles
@@ -83,13 +97,9 @@ public:
 	void TurnNextPlayer(); // Called at the end of the game turn
 	void ResetTargetedAndKillableTiles();
 	void ResetSelectedPiece() const;
-	void SetGamePaused(bool bPaused) const;
 	bool IsKingInCheck(const int32 KingTeam);
 	bool IsCheckMate(const TArray<AChess_Piece*>& Team);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
-
-	// UFUNCTION(BlueprintPure, Category="CurrentPlayer")
-	// EPieceTeam PrintCurrentPlayer();
 
 	// BlueprintAssignable Usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
 	// declare a variable of type FOnReset (delegate)

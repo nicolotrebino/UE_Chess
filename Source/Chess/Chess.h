@@ -14,7 +14,7 @@ enum class ETileStatus : uint8
 };
 
 UENUM()
-enum EPieceTeam: uint8
+enum ETeam: uint8
 {
 	WHITE		UMETA(DisplayName = "White"),
 	BLACK		UMETA(DisplayName = "Black"),

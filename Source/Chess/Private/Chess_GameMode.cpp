@@ -11,7 +11,7 @@ AChess_GameMode::AChess_GameMode()
 	DefaultPawnClass = AHumanPlayer::StaticClass();
 
 	// Set default values
-	IsGameOver = false; // Tracks if the game is over
+	bIsGameOver = false; // Tracks if the game is over
 	MoveCounter = 0; // Tracks the number of moves in order to signal a drawn game
 	Checker = nullptr; // Piece that is in check
 	bIsBlackKingInCheck = false;
@@ -30,6 +30,20 @@ AChess_GameMode::AChess_GameMode()
 	Kings[WHITE] = nullptr;
 	Kings[BLACK] = nullptr;
 }
+
+AChess_GameMode* AChess_GameMode::GetChessGameMode()
+{
+	if (!ChessGameModeInstance)
+	{
+		// If the instance doesn't exist, make it
+		ChessGameModeInstance = NewObject<AChess_GameMode>();
+	}
+
+	return ChessGameModeInstance;
+}
+
+// Static variable initialization
+AChess_GameMode* AChess_GameMode::ChessGameModeInstance = nullptr;
 
 void AChess_GameMode::BeginPlay()
 {
@@ -125,21 +139,6 @@ void AChess_GameMode::ResetSelectedPiece() const
 	}
 }
 
-void AChess_GameMode::SetGamePaused(bool bPaused) const
-{
-	// Ottieni un riferimento al proprio PlayerController
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
-	if (PlayerController)
-	{
-		// Metti in pausa o riprendi il gioco utilizzando il PlayerController
-		PlayerController->SetPause(bPaused);
-
-		// Puoi anche nascondere o mostrare il mouse, a seconda delle tue esigenze
-		// PlayerController->bShowMouseCursor = bPaused;
-	}
-}
-
 bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 {
 	// Get the Tile under the King of the particular team
@@ -216,7 +215,7 @@ bool AChess_GameMode::IsCheckMate(const TArray<AChess_Piece*>& Team)
 				Piece->SetPieceTile(CurrentKingTile);
 			}
 			const ETileStatus NextStatus = NextTile->GetTileStatus();
-			const EPieceTeam NextTeam = NextTile->GetTileTeam();
+			const ETeam NextTeam = NextTile->GetTileTeam();
 			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
 			NextTile->SetTileTeam(Piece->GetTeam());
 			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
@@ -254,7 +253,7 @@ ATile* AChess_GameMode::GetTileAtPosition(const TCHAR Letter, const uint8 Number
 		const int32 MiddleIndex = (StartIndex + EndIndex) / 2;
 
 		// Obtain the ChessPosition from the Current Tile
-		const FChessPosition& CurrentPosition = TileArray[MiddleIndex]->GetChessPosition();
+		const FAlgebraicPosition& CurrentPosition = TileArray[MiddleIndex]->GetAlgebraicPosition();
 
 		if (CurrentPosition.TileLetter == Letter && CurrentPosition.TileNumber == Number)
 		{

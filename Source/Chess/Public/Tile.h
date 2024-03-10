@@ -10,7 +10,7 @@
 class AChess_Piece;
 
 USTRUCT()
-struct FChessPosition
+struct FAlgebraicPosition
 {
 	GENERATED_BODY()
 
@@ -37,14 +37,14 @@ public:
 	/* 
 	 * Setter and getter for Tile information
 	 */
-	void SetChessPosition(const int X, const int Y);
-	FChessPosition GetChessPosition() const;
+	void SetAlgebraicPosition(const int X, const int Y);
+	FAlgebraicPosition GetAlgebraicPosition() const;
 	
 	void SetTileStatus(const ETileStatus TileStatus);
 	ETileStatus GetTileStatus() const;
 	
-	void SetTileTeam(const EPieceTeam TileTeam);
-	EPieceTeam GetTileTeam() const;
+	void SetTileTeam(const ETeam TileTeam);
+	ETeam GetTileTeam() const;
 
 	// Manage Piece on Tile
 	void SetPieceOnTile(AChess_Piece* ChessPiece);
@@ -94,9 +94,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Information")
 	ETileStatus Status; // Tile Status
 	UPROPERTY(VisibleAnywhere, Category = "Information")
-	EPieceTeam Team; // Team of the Piece on Tile
+	ETeam Team; // Team of the Piece on Tile
 	UPROPERTY(VisibleAnywhere, Category = "Information")
-	FChessPosition ChessPosition; // Position with Algebraic Notation
+	FAlgebraicPosition ChessPosition; // Position with Algebraic Notation
 
 	UPROPERTY(VisibleAnywhere, Category = "Information")
 	AChess_Piece* CurrentPieceOnTile; // Piece on Tile

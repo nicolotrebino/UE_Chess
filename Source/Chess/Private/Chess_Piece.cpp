@@ -4,6 +4,7 @@
 #include "Chess_Piece.h"
 
 #include "BlueprintEditor.h"
+#include "Chess_GameMode.h"
 
 // Sets default values
 AChess_Piece::AChess_Piece()
@@ -14,7 +15,7 @@ AChess_Piece::AChess_Piece()
 	// Set defaults value
 	GameMode = nullptr;
 	Nomenclature = '';
-	PieceTeam = EPieceTeam::NONE;
+	PieceTeam = ETeam::NONE;
 	PieceType = EPieceType::NONE;
 	CurrentTile = nullptr;
 }
@@ -24,12 +25,12 @@ TCHAR AChess_Piece::GetNomenclature() const
 	return Nomenclature;
 }
 
-void AChess_Piece::SetTeam(const EPieceTeam Team)
+void AChess_Piece::SetTeam(const ETeam Team)
 {
 	PieceTeam = Team;
 }
 
-EPieceTeam AChess_Piece::GetTeam()
+ETeam AChess_Piece::GetTeam() const
 {
 	return PieceTeam;
 }
@@ -72,7 +73,7 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 	{
 		// Save the current Status and Team of the Next Tile
 		const ETileStatus Status = NextTile->GetTileStatus();
-		const EPieceTeam Team = NextTile->GetTileTeam();
+		const ETeam Team = NextTile->GetTileTeam();
 		
 		// *** *** *** *** *** GameMode->IsMyKingInCheck(); // Control if the King is in check and set the Checker
 		
@@ -83,7 +84,7 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
 			NextTile->SetTileTeam(PieceTeam);
 			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
-			CurrentTile->SetTileTeam(EPieceTeam::NONE);
+			CurrentTile->SetTileTeam(ETeam::NONE);
 		
 			// If the king is now/still in check with the move just made
 			if (GameMode->IsKingInCheck(PieceTeam))
@@ -108,7 +109,7 @@ TArray<ATile*> AChess_Piece::GetLegalMoves()
 	// Make an array of possible Tiles to move through
 	TArray<ATile*> LegalMoves = GetPossibleMoves();
 
-	if (this->IsA(AChessKing::StaticClass()))
+	if (this->IsA(AChess_King::StaticClass()))
 	{
 		return LegalMoves;
 	}
@@ -123,7 +124,7 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 {
 	// UnSelect the Tile under the selected piece
 	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
-	this->GetPieceTile()->SetTileTeam(EPieceTeam::NONE);
+	this->GetPieceTile()->SetTileTeam(ETeam::NONE);
 	this->GetPieceTile()->UnsetSelectedTile();
 	
 	// Set the next Location and Rotation of the ChessPiece
@@ -142,27 +143,36 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	NextTile->SetPieceOnTile(this);
 }
 
-void AChess_Piece::Kill(const EPieceTeam Team, AChessPiece* Enemy) const
+void AChess_Piece::Kill(const ETeam Team, AChess_Piece* Enemy) const
 {
 	// Non dovrebbe esserci bisogno di cambiare il puntatore dalla Tile al Piece e metterlo a nullptr
 	// perché intanto lo sovrascrivo con la Move() e faccio puntare la Tile direttamente al nuovo pezzo
 	// sopra di essa
-	if (Team == EPieceTeam::WHITE)
+	if (Team == ETeam::WHITE)
 	{
 		GameMode->WhiteTeam.Remove(Enemy);
+		GameMode->KilledWhiteTeam.Add(Enemy);
 	}
 	else
 	{
 		GameMode->BlackTeam.Remove(Enemy);
+		GameMode->KilledBlackTeam.Add(Enemy);
 	}
 	Enemy->SelfDestroy();
 	GameMode->bIsKill = true;
+}
+
+void AChess_Piece::SelfDestroy()
+{
+	Destroy();
 }
 
 // Called when the game starts or when spawned
 void AChess_Piece::BeginPlay()
 {
 	Super::BeginPlay();
+	GameMode = AChess_GameMode::GetChessGameMode(); // Get the Chess_GameMode instance with Singleton pattern
+	GameMode->OnResetEvent.AddDynamic(this, &AChess_Piece::SelfDestroy);
 	
 }
 
@@ -183,9 +193,9 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 	for (int i = 1; i < 8; i++)
 	{
 		// Calculate and save the new positions for each direction
-		const int32 NewNumberUp = CurrentTile->GetChessPosition().TileNumber + i;
-		const int32 NewNumberDown = CurrentTile->GetChessPosition().TileNumber - i;
-		const int32 ConstLetter = CurrentTile->GetChessPosition().TileLetter;
+		const int32 NewNumberUp = CurrentTile->GetAlgebraicPosition().TileNumber + i;
+		const int32 NewNumberDown = CurrentTile->GetAlgebraicPosition().TileNumber - i;
+		const int32 ConstLetter = CurrentTile->GetAlgebraicPosition().TileLetter;
 
 		// Proceed upwards
 		// Check if the new positions are valid and add corresponding tiles to the array
@@ -242,9 +252,9 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 	for (int i = 1; i < 8; i++)
 	{
 		// Calculate and save the new positions for each direction
-		const int32 NewLetterRight = CurrentTile->GetChessPosition().TileLetter + i;
-		const int32 NewLetterLeft = CurrentTile->GetChessPosition().TileLetter - i;
-		const int32 ConstNumber = CurrentTile->GetChessPosition().TileNumber;
+		const int32 NewLetterRight = CurrentTile->GetAlgebraicPosition().TileLetter + i;
+		const int32 NewLetterLeft = CurrentTile->GetAlgebraicPosition().TileLetter - i;
+		const int32 ConstNumber = CurrentTile->GetAlgebraicPosition().TileNumber;
 
 		// Proceed to the right
 		// Check if the new positions are valid and add corresponding tiles to the array
@@ -302,10 +312,10 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 	for (int i = 1; i < 8; i++)
 	{
 		// Calculate and save the new positions for each direction
-		const int32 NewLetterRight = CurrentTile->GetChessPosition().TileLetter + i;
-		const int32 NewNumberUp = CurrentTile->GetChessPosition().TileNumber + i;
-		const int32 NewLetterLeft = CurrentTile->GetChessPosition().TileLetter - i;
-		const int32 NewNumberDown = CurrentTile->GetChessPosition().TileNumber - i;
+		const int32 NewLetterRight = CurrentTile->GetAlgebraicPosition().TileLetter + i;
+		const int32 NewNumberUp = CurrentTile->GetAlgebraicPosition().TileNumber + i;
+		const int32 NewLetterLeft = CurrentTile->GetAlgebraicPosition().TileLetter - i;
+		const int32 NewNumberDown = CurrentTile->GetAlgebraicPosition().TileNumber - i;
 
 		// Proceed towards the diagonal at the top right
 		// Check if the new positions are valid and add corresponding tiles to the array

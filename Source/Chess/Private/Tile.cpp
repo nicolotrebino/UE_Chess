@@ -19,7 +19,7 @@ ATile::ATile()
 
 	// Set default values
 	Status = ETileStatus::EMPTY;
-	Team = EPieceTeam::NONE;
+	Team = ETeam::NONE;
 	ChessPosition = {'A', 0};
 	CurrentPieceOnTile = nullptr; // Nullptr as a default value and used also for the empty Tiles
 	TileLocation = FVector(0, 0, 0);
@@ -37,7 +37,7 @@ FVector ATile::GetTileLocation() const
 
 // Set the Tile position based on the chess Algebraic notation,
 // with a letter and a number
-void ATile::SetChessPosition(const int X, const int Y)
+void ATile::SetAlgebraicPosition(const int X, const int Y)
 {
 	if ((X >= 0 && X < 8) && (Y >= 0 && Y < 8))
 	{
@@ -48,7 +48,7 @@ void ATile::SetChessPosition(const int X, const int Y)
 	}
 }
 
-FChessPosition ATile::GetChessPosition() const
+FAlgebraicPosition ATile::GetAlgebraicPosition() const
 {
 	return ChessPosition;
 }
@@ -63,12 +63,12 @@ ETileStatus ATile::GetTileStatus() const
 	return Status;
 }
 
-void ATile::SetTileTeam(const EPieceTeam TileTeam)
+void ATile::SetTileTeam(const ETeam TileTeam)
 {
 	Team = TileTeam;
 }
 
-EPieceTeam ATile::GetTileTeam() const
+ETeam ATile::GetTileTeam() const
 {
 	return Team;
 }

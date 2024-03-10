@@ -8,6 +8,8 @@
 #include "GameFramework/Actor.h"
 #include "Chess_Piece.generated.h"
 
+class AChess_GameMode;
+
 UCLASS()
 class CHESS_API AChess_Piece : public AActor
 {
@@ -21,8 +23,8 @@ public:
 	 * Setter and getter for the Piece information
 	 */
 	TCHAR GetNomenclature() const;
-	void SetTeam(const EPieceTeam Team);
-	EPieceTeam GetTeam();
+	void SetTeam(const ETeam Team);
+	ETeam GetTeam() const;
 	void SetType(const EPieceType Type);
 	EPieceType GetType() const;
 	void SetPieceTile(ATile* Tile);
@@ -41,7 +43,7 @@ public:
 	 * Functions to move the piece and "eat" opponents
 	 */
 	virtual void MovePiece(ATile* NextTile);
-	void Kill(const EPieceTeam Team, AChessPiece* Enemy) const;
+	void Kill(const ETeam Team, AChess_Piece* Enemy) const;
 
 	// Set the right material for the Piece
 	virtual void SetMaterial(const int32 Index) {};
@@ -54,13 +56,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Reference to the Chess_GameMode
-	AChessGameMode* GameMode;
+	AChess_GameMode* GameMode;
 	
 	/*
 	 * Piece information
 	 */
 	TCHAR Nomenclature; // Capital letter to indicate the Piece for the Algebraic notation
-	EPieceTeam PieceTeam;
+	ETeam PieceTeam;
 	EPieceType PieceType;
 	ATile* CurrentTile; // Tile under the Piece
 	FVector PieceLocation; // Piece location in the map
@@ -78,8 +80,3 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 };
-
-inline void AChess_Piece::SelfDestroy()
-{
-	Destroy();
-}
