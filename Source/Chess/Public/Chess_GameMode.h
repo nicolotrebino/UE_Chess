@@ -21,6 +21,9 @@ class CHESS_API AChess_GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+/*
+ * Singleton for the class
+ */ 
 public:
 	// Static method to obtain singleton instance
 	UFUNCTION(BlueprintCallable, Category = "Chess_GameMode")
@@ -30,6 +33,9 @@ protected:
 	// Static variable for the singleton instance
 	static AChess_GameMode* ChessGameModeInstance;
 
+/*
+ * Chess_GameMode class
+ */ 
 public:
 	AChess_GameMode();
 
@@ -97,7 +103,7 @@ public:
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index
 	void TurnNextPlayer(); // Called at the end of the game turn
 	void ResetTargetedAndKillableTiles();
-	void ResetSelectedPiece() const;
+	void ResetSelectedPiece();
 	bool IsKingInCheck(const int32 KingTeam);
 	bool IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
@@ -106,9 +112,9 @@ public:
 	 * Score manager
 	 */
 	UFUNCTION(BlueprintCallable)
-	FString GetScoreWhiteTeam();
+	FString GetScoreWhiteTeam() const;
 	UFUNCTION(BlueprintCallable)
-	FString GetScoreBlackTeam();
+	FString GetScoreBlackTeam() const;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Chess")
 	int32 ScoreWhiteTeam;

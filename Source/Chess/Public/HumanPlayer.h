@@ -19,21 +19,15 @@ public:
 	// Sets default values for this pawn's properties
 	AHumanPlayer();
 
-	// camera component attached to player pawn
-	UCameraComponent* Camera;
-
-	// Game instance reference
-	UChess_GameInstance* GameInstance;
+	UCameraComponent* Camera; // Camera component attached to player pawn
+	UChess_GameInstance* GameInstance; // Game instance reference
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Keeps track of turn
-	bool IsMyTurn = false;
-
-	// Current piece selected
-	AChess_Piece* SelectedPiece;
+	bool IsMyTurn = false; // Keeps track of my turn
+	AChess_Piece* SelectedPiece; // Current piece selected
 
 public:	
 	// Called every frame
@@ -46,7 +40,7 @@ public:
 	virtual void OnWin() override;
 	virtual void OnLose() override;
 
-	// called on left mouse click (binding)
+	// Called on left mouse click (binding)
 	UFUNCTION()
 	void OnClick();
 };

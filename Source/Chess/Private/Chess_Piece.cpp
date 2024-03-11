@@ -66,6 +66,11 @@ FVector AChess_Piece::GetPieceLocation() const
 	return PieceLocation;
 }
 
+int32 AChess_Piece::GetPieceValue() const
+{
+	return PieceValue;
+}
+
 void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 {
 	// Create a temporary new array same as the PossibleMoves array

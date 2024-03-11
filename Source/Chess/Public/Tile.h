@@ -39,10 +39,8 @@ public:
 	 */
 	void SetAlgebraicPosition(const int X, const int Y);
 	FAlgebraicPosition GetAlgebraicPosition() const;
-	
 	void SetTileStatus(const ETileStatus TileStatus);
 	ETileStatus GetTileStatus() const;
-	
 	void SetTileTeam(const ETeam TileTeam);
 	ETeam GetTileTeam() const;
 

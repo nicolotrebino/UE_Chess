@@ -26,7 +26,7 @@ public:
 
 	// Public function to spawn a single Piece, used also for the Pawn promotion
 	UFUNCTION()
-	void SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type);
+	AChess_Piece* SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type);
 
 protected:
 	// Called when the game starts or when spawned

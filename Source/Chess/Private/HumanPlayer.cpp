@@ -12,40 +12,33 @@ AHumanPlayer::AHumanPlayer()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Set this pawn to be controlled by the lowest-numbered player
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
-	// Create a camera component
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	// Set the camera as RootComponent
-	SetRootComponent(Camera);
+	AutoPossessPlayer = EAutoReceiveInput::Player0; // Set this pawn to be controlled by the lowest-numbered player
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera")); // Create a camera component
+	SetRootComponent(Camera); // Set the camera as RootComponent
 	
-	// Get the game instance reference with the Singleton pattern
-	GameInstance = UChess_GameInstance::GetChessGameInstance();
+	GameInstance = UChess_GameInstance::GetChessGameInstance(); // Get the game instance reference with the Singleton pattern
 
 	// Default init values
 	PlayerNumber = -1;
-	Team = WHITE; // Empty?
+	Team = WHITE;
 }
 
 // Called when the game starts or when spawned
 void AHumanPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AHumanPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
 void AHumanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AHumanPlayer::OnTurn()
@@ -53,24 +46,11 @@ void AHumanPlayer::OnTurn()
 	IsMyTurn = true;
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
-
-	/*
-	AChessGameMode* GameMode = Cast<AChessGameMode>(GetWorld()->GetAuthGameMode());
-
-	if (GameMode->IsKingInCheck(WHITE))
-	{
-		if (GameMode->IsCheckMate(WHITE, GameMode->BlackTeam))
-		{
-			OnLose();
-			return;
-		}
-	}
-	*/
 }
 
 void AHumanPlayer::OnWin()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
 	GameInstance->SetTurnMessage(TEXT("Human Wins!"));
 	GameInstance->IncrementScoreHumanPlayer();
 }
@@ -85,7 +65,7 @@ void AHumanPlayer::OnClick()
 {
 	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode(); // Get the Chess_GameMode instance with Singleton pattern
 	
-	//Structure containing information about one hit of a trace, such as point of impact and surface normal at that point
+	// Structure containing information about one hit of a trace, such as point of impact and surface normal at that point
 	FHitResult Hit = FHitResult(ForceInit);
 	// GetHitResultUnderCursor function sends a ray from the mouse position and gives the corresponding hit results
 	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, true, Hit);
@@ -133,21 +113,11 @@ void AHumanPlayer::OnClick()
 
 				// Move the selected piece
 				SelectedPiece->MovePiece(NextTile);
-
-				/*
-				GameMode->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
-				if (GameMode->bIsBlackKingInCheck)
-				{
-					GameMode->IsCheckMate(BLACK, GameMode->BlackTeam);
-				}
-				*/
-
-				/******************
+				
 				if (GameMode->bIsPromotion)
 				{
 					return;
 				}
-				**********/
 					
 				// Change the turn to Random Player
 				IsMyTurn = false;
@@ -174,21 +144,10 @@ void AHumanPlayer::OnClick()
 					// Move the selected piece
 					SelectedPiece->MovePiece(NextTile);
 
-					/*
-					GameMode->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
-					if (GameMode->bIsBlackKingInCheck)
-					{
-						GameMode->IsCheckMate(BLACK, GameMode->BlackTeam);
-					}
-					*/
-
 					if (GameMode->bIsPromotion)
 					{
 						return;
 					}
-					
-					// AChessPlayerController* CPC = Cast<AChessPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-					// CPC->UserInterfaceWidget->SaveMove(CPC->UserInterfaceWidget->ComputeNomenclature(NextTile, SelectedPiece));
 					
 					// Change the turn to Random Player
 					IsMyTurn = false;

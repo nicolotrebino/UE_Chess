@@ -31,6 +31,7 @@ public:
 	ATile* GetPieceTile() const;
 	void SetPieceLocation(const FVector& Location);
 	FVector GetPieceLocation() const;
+	int32 GetPieceValue() const;
 
 	/*
 	 * Functions that return legal moves
@@ -66,6 +67,7 @@ protected:
 	EPieceType PieceType;
 	ATile* CurrentTile; // Tile under the Piece
 	FVector PieceLocation; // Piece location in the map
+	int32 PieceValue;
 
 	/*
 	 * Get all the possible moves in the vertical,

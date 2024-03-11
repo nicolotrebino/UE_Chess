@@ -30,10 +30,9 @@ float AChessboard::GetTileSize() const
 	return TileSize;
 }
 
-void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
+AChess_Piece* AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
 {
-	// Get the Chess_GameMode instance with Singleton pattern
-	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode(); 
+	// AChessGameMode* GameMode = Cast<AChessGameMode>(GetWorld()->GetAuthGameMode());
 
 	const FVector SpawnLocation = CurrentTile->GetTileLocation() + FVector (0,0,0.1);
 	const FRotator SpawnRotation = FRotator(0.0f, 90.0f, 0.0f);
@@ -50,26 +49,8 @@ void AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const E
 
 	// Set the reference of the Piece above the Tile
 	CurrentTile->SetPieceOnTile(Piece);
-	
-	switch (Team)
-	{
-	case ETeam::WHITE:
-		GameMode->WhiteTeam.Add(Piece);
-		if (Type == EPieceType::KING)
-		{
-			//////////////////////////////////// GameMode->Kings[ETeam::WHITE] = Cast<AChess_King>(Piece);
-		}
-		break;
-	case ETeam::BLACK:
-		GameMode->BlackTeam.Add(Piece);
-		if (Type == EPieceType::KING)
-		{
-			//////////////////////////////////// GameMode->Kings[ETeam::BLACK] = Cast<AChess_King>(Piece);
-		}
-		break;
-	default:
-		break;
-	}
+
+	return Piece;
 }
 
 // Called when the game starts or when spawned

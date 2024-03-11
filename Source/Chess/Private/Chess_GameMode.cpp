@@ -2,6 +2,7 @@
 
 #include "Chess_GameMode.h"
 
+#include "Chess_King.h"
 #include "Chess_PlayerController.h"
 #include "HumanPlayer.h"
 #include "RandomPlayer.h"
@@ -29,8 +30,8 @@ AChess_GameMode* AChess_GameMode::ChessGameModeInstance = nullptr;
  */
 AChess_GameMode::AChess_GameMode()
 {
-	PlayerControllerClass = AChess_PlayerController::StaticClass();
-	DefaultPawnClass = AHumanPlayer::StaticClass();
+	PlayerControllerClass = AChess_PlayerController::StaticClass(); // Associate the Cpc as the Player Controller for to this GameMode
+	DefaultPawnClass = AHumanPlayer::StaticClass(); // Associate the HumaPlayer as the default pawn class for this GameMode
 
 	// Set default values
 	bIsGameOver = false; // Tracks if the game is over
@@ -38,8 +39,14 @@ AChess_GameMode::AChess_GameMode()
 	Checker = nullptr; // Piece that is in check
 	bIsBlackKingInCheck = false;
 	bIsWhiteKingInCheck = false;
+	bIsWhiteKingInCheckMate = false;
+	bIsBlackKingInCheckMate = false;
 	bIsDraw = false;
 	bIsKill = false;
+	bIsPromotion = false;
+
+	ScoreWhiteTeam = 0;
+	ScoreBlackTeam = 0;
 
 	CurrentPlayer = 0;
 
@@ -62,9 +69,9 @@ void AChess_GameMode::BeginPlay()
 	{
 		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
 	}
-	
-	float CameraPosX = (CBoard->GetTileSize() * CBoard->GetFieldSize() / 2);
-	FVector CameraPos(CameraPosX, 0.0f, 1000.0f);
+
+	const float CameraPosX = (CBoard->GetTileSize() * CBoard->GetFieldSize() / 2);
+	const FVector CameraPos(CameraPosX, 0.0f, 1000.0f);
 	HumanPlayer->SetActorLocationAndRotation(CameraPos, FRotationMatrix::MakeFromX(FVector(0, 0, -1)).Rotator());
 
 	Players.Add(HumanPlayer); // Human player = 0
@@ -138,18 +145,19 @@ void AChess_GameMode::ResetTargetedAndKillableTiles()
  * Bring back to the default color the Tile
  * of the SelectedPiece
  */
-void AChess_GameMode::ResetSelectedPiece() const
+void AChess_GameMode::ResetSelectedPiece()
 {
 	if (SelectedPiece)
 	{
 		SelectedPiece->GetPieceTile()->UnsetSelectedTile();
 	}
+	SelectedPiece = nullptr;
 }
 
 bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 {
 	// Get the Tile under the King of the particular team
-	//////////////////////////////////// const ATile* KingTile = Kings[KingTeam]->GetPieceTile();
+	const ATile* KingTile = Kings[KingTeam]->GetPieceTile();
 
 	// If the Current Player is the AI (1)
 	if (KingTeam)
@@ -163,7 +171,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
 				// If the array of the possible moves of the enemy piece
 				// contains the Tile under the King
-				//////////////////////////////////// if (EnemyMoves.Contains(KingTile))
+				if (EnemyMoves.Contains(KingTile))
 				{
 					Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
@@ -184,7 +192,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
 				// If the array of possible moves of the enemy piece
 				// contains the Tile under the King
-				//////////////////////////////////// if (EnemyMoves.Contains(KingTile))
+				if (EnemyMoves.Contains(KingTile))
 				{
 					Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
@@ -285,6 +293,40 @@ ATile* AChess_GameMode::GetTileAtPosition(const TCHAR Letter, const uint8 Number
 	return nullptr;
 }
 
+void AChess_GameMode::UpdateScores()
+{
+	ScoreWhiteTeam = 0;
+	ScoreBlackTeam = 0;
+	for (const AChess_Piece* WhitePiece: WhiteTeam)
+	{
+		ScoreWhiteTeam += WhitePiece->GetPieceValue();
+	}
+	for (const AChess_Piece* BlackPiece: BlackTeam)
+	{
+		ScoreBlackTeam += BlackPiece->GetPieceValue();
+	}
+}
+
+FString AChess_GameMode::GetScoreWhiteTeam() const
+{
+	const int32 NewScore = ScoreWhiteTeam - ScoreBlackTeam;
+	if (NewScore > 0)
+	{
+		return "+" + FString::FromInt(NewScore);
+	}
+	return "0";
+}
+
+FString AChess_GameMode::GetScoreBlackTeam() const
+{
+	const int32 NewScore = ScoreBlackTeam - ScoreWhiteTeam;
+	if (NewScore > 0)
+	{
+		return "+" + FString::FromInt(NewScore);
+	}
+	return "0";
+}
+
 void AChess_GameMode::ResetField()
 {
 	// send broadcast event to registered objects 
@@ -301,8 +343,8 @@ void AChess_GameMode::ResetField()
 	bIsGameOver = false;
 	MoveCounter = 0;
 	
-	////////////////////////// AChess_PlayerController* CPC = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	////////////////////////// CPC->UserInterfaceWidget->DestroyMoveHistory();
+	AChess_PlayerController* Cpc = AChess_PlayerController::GetChessPlayerController();
+	Cpc->UserInterfaceWidget->DestroyMoveHistory();
 
 	if (ChessboardClass != nullptr)
 	{

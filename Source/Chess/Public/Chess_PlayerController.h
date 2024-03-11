@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputActionValue.h"
-#include "EnhancedInputComponent.h"
+#include "HUD_UserInterface.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/PlayerController.h"
 #include "Chess_PlayerController.generated.h"
@@ -18,6 +17,15 @@ class CHESS_API AChess_PlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	// Static method to obtain singleton instance
+	UFUNCTION(BlueprintCallable, Category = "Chess_GameMode")
+	static AChess_PlayerController* GetChessPlayerController();
+
+protected:
+	// Static variable for the singleton instance
+	static AChess_PlayerController* ChessPlayerControllerInstance;
+
+public:
 	AChess_PlayerController();
 
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -28,11 +36,11 @@ public:
 
 	void ClickOnGrid();
 
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	// TSubclassOf<UHUD_UserInterface> UserInterfaceWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UHUD_UserInterface> UserInterfaceWidgetClass;
 
-	// UPROPERTY(BlueprintReadOnly, Category = "UI")
-	// UHUD_UserInterface* UserInterfaceWidget;
+	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	UHUD_UserInterface* UserInterfaceWidget;
 
 protected:
 	virtual void BeginPlay() override;

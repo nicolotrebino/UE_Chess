@@ -3,7 +3,29 @@
 #include "Chess_PlayerController.h"
 
 #include "HumanPlayer.h"
+#include "Blueprint/UserWidget.h"
+#include "EnhancedInputComponent.h"
 
+/*
+ * Singleton pattern implementation
+ */ 
+AChess_PlayerController* AChess_PlayerController::GetChessPlayerController()
+{
+	if (!ChessPlayerControllerInstance)
+	{
+		// If the instance doesn't exist, make it
+		ChessPlayerControllerInstance = NewObject<AChess_PlayerController>();
+	}
+
+	return ChessPlayerControllerInstance;
+}
+
+// Static variable initialization
+AChess_PlayerController* AChess_PlayerController::ChessPlayerControllerInstance = nullptr;
+
+/*
+ * Chess_GameMode methods implementation
+ */
 AChess_PlayerController::AChess_PlayerController()
 {
 	bShowMouseCursor = true; // Allows the mouse not to be captured but to be visible during gameplay
@@ -29,8 +51,8 @@ void AChess_PlayerController::BeginPlay()
 		Subsystem->AddMappingContext(ChessContext, 0);
 	}
 
-	// UserInterfaceWidget = CreateWidget<UHUD_UserInterface>(this, UserInterfaceWidgetClass);
-	// UserInterfaceWidget->AddToViewport();
+	UserInterfaceWidget = CreateWidget<UHUD_UserInterface>(this, UserInterfaceWidgetClass);
+	UserInterfaceWidget->AddToViewport();
 }
 
 void AChess_PlayerController::SetupInputComponent()
