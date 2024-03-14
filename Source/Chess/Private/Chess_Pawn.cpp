@@ -8,6 +8,7 @@
 #include "Chess_PlayerController.h"
 #include "HUD_PawnPromotion.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 AChess_Pawn::AChess_Pawn()
 {
@@ -167,7 +168,7 @@ void AChess_Pawn::StartPromotion()
 {
 	if (GameMode)
 	{
-		AChess_PlayerController* Cpc = AChess_PlayerController::GetChessPlayerController();
+		AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		
 		PromotionWidget = CreateWidget<UHUD_PawnPromotion>(Cpc, PromotionWidgetClass);
 		PromotionWidget->SetCurrentPawn(this);
@@ -177,7 +178,7 @@ void AChess_Pawn::StartPromotion()
 
 void AChess_Pawn::HandleButtonClicked(const int32 SelectedPieceIndex)
 {
-	AChess_PlayerController* Cpc = AChess_PlayerController::GetChessPlayerController();
+	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	AChess_Piece* NewPiece;
 	
 	switch (SelectedPieceIndex)

@@ -61,7 +61,7 @@ EPieceType UHUD_UserInterface::GetPieceToKillType() const
 
 void UHUD_UserInterface::SaveMove(const FString& Nomenclature)
 {
-	const AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
+	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	
 	// If it is the Human
 	if (!GameMode->CurrentPlayer)
@@ -133,7 +133,7 @@ void UHUD_UserInterface::SaveEndGame(const FString& EndGame) const
 
 FString UHUD_UserInterface::ComputeNomenclature() const
 {
-	const AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
+	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	if (!(NextTile || PieceToMove))
 	{
 		return ""; // Gestione errore
@@ -190,7 +190,7 @@ void UHUD_UserInterface::Backtrack()
 		MhButtons[i].MovedPiece->MovePiece(NextTile);
 		if(MhButtons[i].KilledPieceTeam && MhButtons[i].KilledPieceType)
 		{
-			const AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
+			const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 			GameMode->CBoard->SpawnSinglePiece(NextTile, MhButtons[i].KilledPieceTeam, MhButtons[i].KilledPieceType);
 		}
 		i--;

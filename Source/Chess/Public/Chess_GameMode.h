@@ -20,19 +20,7 @@ UCLASS()
 class CHESS_API AChess_GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-
-/*
- * Singleton for the class
- */ 
-public:
-	// Static method to obtain singleton instance
-	UFUNCTION(BlueprintCallable, Category = "Chess_GameMode")
-	static AChess_GameMode* GetChessGameMode();
-
-protected:
-	// Static variable for the singleton instance
-	static AChess_GameMode* ChessGameModeInstance;
-
+	
 /*
  * Chess_GameMode class
  */ 
@@ -41,6 +29,12 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/*
+	 * PROVA
+	 */
+	TArray<ATile*> MossePossibili;
+	TArray<ATile*> GetAllLegalMovesForPlayer(const int32 CurrentPlayer);
 
 	/*
 	 * Game variable
@@ -70,7 +64,7 @@ public:
 	AChessboard* CBoard;
 
 	/*
-	 * Array to store important stuff
+	 * Array to store important stuff for the game
 	 */
 	
 	// Array with the two kings on the Chessboard

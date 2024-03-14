@@ -3,7 +3,7 @@
 #include "Chessboard.h"
 
 #include "Chess_GameMode.h"
-//////////////////////////////////// #include "Chess_King.h"
+#include "Chess_King.h"
 
 // Sets default values
 AChessboard::AChessboard()
@@ -32,7 +32,7 @@ float AChessboard::GetTileSize() const
 
 AChess_Piece* AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
 {
-	// AChessGameMode* GameMode = Cast<AChessGameMode>(GetWorld()->GetAuthGameMode());
+	// AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
 	const FVector SpawnLocation = CurrentTile->GetTileLocation() + FVector (0,0,0.1);
 	const FRotator SpawnRotation = FRotator(0.0f, 90.0f, 0.0f);
@@ -59,7 +59,7 @@ void AChessboard::BeginPlay()
 	Super::BeginPlay();
 
 	// Get the Chess_GameMode instance with Singleton pattern
-	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	// Add SelfDestroy method to the broadcast OnResetEvent delegate
 	GameMode->OnResetEvent.AddDynamic(this, &AChessboard::SelfDestroy); 
 
@@ -74,7 +74,7 @@ void AChessboard::BeginPlay()
 void AChessboard::GenerateChessBoard() const
 {
 	// Get the Chess_GameMode instance with Singleton pattern
-	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	
 	for (int x = 0; x < FieldSize; x++)
 	{
@@ -114,7 +114,7 @@ void AChessboard::GenerateChessBoard() const
 void AChessboard::SpawnPieces()
 {
 	// Get the Chess_GameMode instance with Singleton pattern
-	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode();
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	
 	for (ATile* CurrentTile: GameMode->TileArray)
 	{
@@ -158,7 +158,7 @@ void AChessboard::SpawnPieces()
 
 		if (CurrentTile->GetAlgebraicPosition().TileNumber == 7)
 		{
-			SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::PAWN);
+			SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::PAWN);
 		}
 
 		if (CurrentTile->GetAlgebraicPosition().TileNumber == 8)

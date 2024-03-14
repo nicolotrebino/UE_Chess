@@ -63,7 +63,7 @@ void AHumanPlayer::OnLose()
 
 void AHumanPlayer::OnClick()
 {
-	AChess_GameMode* GameMode = AChess_GameMode::GetChessGameMode(); // Get the Chess_GameMode instance with Singleton pattern
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the Chess_GameMode instance with Singleton pattern
 	
 	// Structure containing information about one hit of a trace, such as point of impact and surface normal at that point
 	FHitResult Hit = FHitResult(ForceInit);

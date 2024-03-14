@@ -23,15 +23,15 @@ public:
 	 * Setter and getter for the Piece information
 	 */
 	TCHAR GetNomenclature() const;
-	void SetTeam(const ETeam Team);
-	ETeam GetTeam() const;
-	void SetType(const EPieceType Type);
-	EPieceType GetType() const;
-	void SetPieceTile(ATile* Tile);
-	ATile* GetPieceTile() const;
-	void SetPieceLocation(const FVector& Location);
-	FVector GetPieceLocation() const;
-	int32 GetPieceValue() const;
+	virtual void SetTeam(const ETeam Team);
+	virtual ETeam GetTeam() const;
+	virtual void SetType(const EPieceType Type);
+	virtual EPieceType GetType() const;
+	virtual void SetPieceTile(ATile* Tile);
+	virtual ATile* GetPieceTile() const;
+	virtual void SetPieceLocation(const FVector& Location);
+	virtual FVector GetPieceLocation() const;
+	virtual int32 GetPieceValue() const;
 
 	/*
 	 * Functions that return legal moves

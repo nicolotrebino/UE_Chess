@@ -7,23 +7,7 @@
 #include "HumanPlayer.h"
 #include "RandomPlayer.h"
 #include "EngineUtils.h"
-
-/*
- * Singleton pattern implementation
- */ 
-AChess_GameMode* AChess_GameMode::GetChessGameMode()
-{
-	if (!ChessGameModeInstance)
-	{
-		// If the instance doesn't exist, make it
-		ChessGameModeInstance = NewObject<AChess_GameMode>();
-	}
-
-	return ChessGameModeInstance;
-}
-
-// Static variable initialization
-AChess_GameMode* AChess_GameMode::ChessGameModeInstance = nullptr;
+#include "Kismet/GameplayStatics.h"
 
 /*
  * Chess_GameMode methods implementation
@@ -83,6 +67,22 @@ void AChess_GameMode::BeginPlay()
 	this->ChoosePlayerAndStartGame();
 }
 
+TArray<ATile*> AChess_GameMode::GetAllLegalMovesForPlayer(const int32 CurrentPlayer)
+{
+	TArray<ATile*> MosseLegali;
+	if (CurrentPlayer) // The current player is the AI player (BLACK)
+	{
+		for (AChess_Piece* Piece: BlackTeam)
+		{
+			Piece->GetLegalMoves();
+		}
+	}
+	else // The current player is the Human player (WHITE)
+	{
+		
+	}
+}
+
 void AChess_GameMode::ChoosePlayerAndStartGame()
 {
 	CurrentPlayer = 0; // Set the first player to the Human Player
@@ -109,6 +109,38 @@ int32 AChess_GameMode::GetNextPlayer(int32 Player) const
 
 void AChess_GameMode::TurnNextPlayer()
 {
+	bIsBlackKingInCheck = IsKingInCheck(BLACK);
+	if (bIsBlackKingInCheck)
+	{
+		IsCheckMate(BLACK, BlackTeam);
+	}
+	bIsWhiteKingInCheck = IsKingInCheck(WHITE);
+	if (bIsWhiteKingInCheck)
+	{
+		IsCheckMate(WHITE, WhiteTeam);
+	}
+	
+	// AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	// Cpc->UserInterfaceWidget->SaveMove(Cpc->UserInterfaceWidget->ComputeNomenclature());
+
+	/*
+	if (bIsGameOver)
+	{
+		if (bIsWhiteKingInCheckMate)
+		{
+			CPC->UserInterfaceWidget->SaveEndGame("1 - 0");
+			Players[WHITE]->OnLose();
+			return;
+		}
+		if (bIsBlackKingInCheckMate)
+		{
+			CPC->UserInterfaceWidget->SaveEndGame("0 - 1");
+			Players[WHITE]->OnWin();
+			return;
+		}
+	}
+	*/
+	
 	MoveCounter += 1;
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 	Players[CurrentPlayer]->OnTurn();
@@ -342,8 +374,8 @@ void AChess_GameMode::ResetField()
 
 	bIsGameOver = false;
 	MoveCounter = 0;
-	
-	AChess_PlayerController* Cpc = AChess_PlayerController::GetChessPlayerController();
+
+	const AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	Cpc->UserInterfaceWidget->DestroyMoveHistory();
 
 	if (ChessboardClass != nullptr)

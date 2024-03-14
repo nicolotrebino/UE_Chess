@@ -17,15 +17,6 @@ class CHESS_API AChess_PlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	// Static method to obtain singleton instance
-	UFUNCTION(BlueprintCallable, Category = "Chess_GameMode")
-	static AChess_PlayerController* GetChessPlayerController();
-
-protected:
-	// Static variable for the singleton instance
-	static AChess_PlayerController* ChessPlayerControllerInstance;
-
-public:
 	AChess_PlayerController();
 
 	UPROPERTY(EditAnywhere, Category = Input)
