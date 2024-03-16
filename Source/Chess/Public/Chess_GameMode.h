@@ -21,35 +21,23 @@ class CHESS_API AChess_GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-/*
- * Chess_GameMode class
- */ 
 public:
+	
 	AChess_GameMode();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	/*
-	 * PROVA
-	 */
-	TArray<ATile*> MossePossibili;
-	TArray<ATile*> GetAllLegalMovesForPlayer(const int32 CurrentPlayer);
-
-	/*
-	 * Game variable
-	 */
+	/* Game variable */
 	bool bIsGameOver; // Tracks if the game is over
-	int32 MoveCounter; // Tracks the number of moves in order to signal a drawn game
+	int32 MoveCounter; // Tracks the number of moves
 	bool bIsWhiteKingInCheckMate;
 	bool bIsBlackKingInCheckMate;
 	bool bIsDraw;
 
-	/*
-	 * Game variable for a turn
-	 */
-	bool bIsKill; // If in that turn there was a kill
+	/* Game variable for a turn */
 	AChess_Piece* Checker; // Piece that is in check
+	bool bIsKill; // If in that turn there was a kill
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
 	bool bIsPromotion;
@@ -67,7 +55,7 @@ public:
 	 * Array to store important stuff for the game
 	 */
 	
-	// Array with the two kings on the Chessboard
+	// Array with references to the two kings on the Chessboard
 	// 0 (WHITE) --> White King
 	// 1 (BLACK) --> Black King
 	TArray<AChess_King*> Kings;
@@ -95,20 +83,19 @@ public:
 	 */
 	void ChoosePlayerAndStartGame(); // Called at the start of the game
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index
+	UFUNCTION(BlueprintCallable)
 	void TurnNextPlayer(); // Called at the end of the game turn
 	void ResetTargetedAndKillableTiles();
-	void ResetSelectedPiece();
+	void ResetSelectedPiece() const;
 	bool IsKingInCheck(const int32 KingTeam);
 	bool IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
 
-	/*
-	 * Score manager
-	 */
+	/* Score manager */
 	UFUNCTION(BlueprintCallable)
-	FString GetScoreWhiteTeam() const;
+	FString GetScoreWhiteTeam();
 	UFUNCTION(BlueprintCallable)
-	FString GetScoreBlackTeam() const;
+	FString GetScoreBlackTeam();
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Chess")
 	int32 ScoreWhiteTeam;
@@ -117,7 +104,7 @@ public:
 	
 	void UpdateScores();
 
-	// BlueprintAssignable Usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
+	// BlueprintAssignable usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
 	// declare a variable of type FOnReset (delegate)
 	UPROPERTY(BlueprintAssignable)
 	FOnReset OnResetEvent;

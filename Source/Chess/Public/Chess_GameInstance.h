@@ -15,46 +15,24 @@ class CHESS_API UChess_GameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	// Static method to obtain singleton instance
-	UFUNCTION(BlueprintCallable, Category = "Chess_GameInstance")
-	static UChess_GameInstance* GetChessGameInstance();
 
-protected:
-	// Static variable for the singleton instance
-	static UChess_GameInstance* ChessGameInstanceInstance;
-
-public:
-	// Score value for human player
+	/* Score of the players during all the game, it counts all the games won */
+	UPROPERTY(EditAnywhere) 
+	int32 ScoreHumanPlayer = 0; // Score value for human player
 	UPROPERTY(EditAnywhere)
-	int32 ScoreHumanPlayer = 0;
+	int32 ScoreAiPlayer = 0; // Score value for AI player
+	UFUNCTION(BlueprintCallable)
+	int32 GetScoreHumanPlayer(); // Get the score for human player
+	UFUNCTION(BlueprintCallable)
+	int32 GetScoreAiPlayer(); // Get the score for AI player
+	
+	void IncrementScoreHumanPlayer(); // Increment the score for human player
+	void IncrementScoreAiPlayer(); // Increment the score for AI player
 
-	// Score value for AI player
 	UPROPERTY(EditAnywhere)
-	int32 ScoreAiPlayer = 0;
-
-	// Message to show every turn
-	UPROPERTY(EditAnywhere)
-	FString CurrentTurnMessage = "Current Player";
-
-	// Increment the score for human player
-	void IncrementScoreHumanPlayer();
-
-	// Increment the score for AI player
-	void IncrementScoreAiPlayer();
-
-	// Get the score for human player
+	FString CurrentTurnMessage = "Current Player"; // Message to show every turn
 	UFUNCTION(BlueprintCallable)
-	int32 GetScoreHumanPlayer();
-
-	// Get the score for AI player
+	void SetTurnMessage(FString Message); // Set the turn message
 	UFUNCTION(BlueprintCallable)
-	int32 GetScoreAiPlayer();
-
-	// Get the current turn message
-	UFUNCTION(BlueprintCallable)
-	FString GetTurnMessage();
-
-	// Set the turn message
-	UFUNCTION(BlueprintCallable)
-	void SetTurnMessage(FString Message);
+	FString GetTurnMessage(); // Get the current turn message
 };

@@ -19,30 +19,24 @@ public:
 	// Sets default values for this actor's properties
 	AChess_Piece();
 
-	/*
-	 * Setter and getter for the Piece information
-	 */
-	TCHAR GetNomenclature() const;
+	/* Setter and getter for the Piece information */
+	TCHAR GetNomenclature();
 	virtual void SetTeam(const ETeam Team);
-	virtual ETeam GetTeam() const;
+	virtual ETeam GetTeam();
 	virtual void SetType(const EPieceType Type);
-	virtual EPieceType GetType() const;
+	virtual EPieceType GetType();
 	virtual void SetPieceTile(ATile* Tile);
-	virtual ATile* GetPieceTile() const;
+	virtual ATile* GetPieceTile();
 	virtual void SetPieceLocation(const FVector& Location);
-	virtual FVector GetPieceLocation() const;
+	virtual FVector GetPieceLocation();
 	virtual int32 GetPieceValue() const;
 
-	/*
-	 * Functions that return legal moves
-	 */
+	/* Functions that return legal moves */
 	virtual TArray<ATile*> GetPossibleMoves() { return TArray<ATile*>(); };
 	virtual void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves); 
-	TArray<ATile*> GetLegalMoves();
+	TArray<ATile*> GetLegitMoves();
 
-	/*
-	 * Functions to move the piece and "eat" opponents
-	 */
+	/* Functions to move the piece and "eat" opponents */
 	virtual void MovePiece(ATile* NextTile);
 	void Kill(const ETeam Team, AChess_Piece* Enemy) const;
 
@@ -59,9 +53,7 @@ protected:
 	// Reference to the Chess_GameMode
 	AChess_GameMode* GameMode;
 	
-	/*
-	 * Piece information
-	 */
+	/* Piece information */
 	TCHAR Nomenclature; // Capital letter to indicate the Piece for the Algebraic notation
 	ETeam PieceTeam;
 	EPieceType PieceType;

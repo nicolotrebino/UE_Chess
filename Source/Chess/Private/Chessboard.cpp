@@ -32,8 +32,6 @@ float AChessboard::GetTileSize() const
 
 AChess_Piece* AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
 {
-	// AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-
 	const FVector SpawnLocation = CurrentTile->GetTileLocation() + FVector (0,0,0.1);
 	const FRotator SpawnRotation = FRotator(0.0f, 90.0f, 0.0f);
 	
@@ -58,7 +56,7 @@ void AChessboard::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Get the Chess_GameMode instance with Singleton pattern
+	// Get the reference to the Chess_GameMode
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	// Add SelfDestroy method to the broadcast OnResetEvent delegate
 	GameMode->OnResetEvent.AddDynamic(this, &AChessboard::SelfDestroy); 
@@ -73,7 +71,7 @@ void AChessboard::BeginPlay()
  */
 void AChessboard::GenerateChessBoard() const
 {
-	// Get the Chess_GameMode instance with Singleton pattern
+	// Get the reference to the Chess_GameMode
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	
 	for (int x = 0; x < FieldSize; x++)
@@ -91,11 +89,11 @@ void AChessboard::GenerateChessBoard() const
 			
 			if ((x + y) % 2)
 			{
-				TileObject->SetMaterial(0);
+				TileObject->SetMaterial(0); // Silver
 			}
 			else
 			{
-				TileObject->SetMaterial(1);
+				TileObject->SetMaterial(1); // Black
 			}
 
 			TileObject->SetTileStatus(ETileStatus::EMPTY);
@@ -109,88 +107,125 @@ void AChessboard::GenerateChessBoard() const
 
 /*
  * Method used in the SpawnPieces to spawn a single ChessPiece
- *  in the right position and set the Tile to OCCUPIED
+ * in the right position and set the Tile to OCCUPIED
  */
 void AChessboard::SpawnPieces()
 {
-	// Get the Chess_GameMode instance with Singleton pattern
+	// Get the reference to the Chess_GameMode
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	
 	for (ATile* CurrentTile: GameMode->TileArray)
 	{
-		if (CurrentTile->GetAlgebraicPosition().TileNumber == 1)
+		const TCHAR TileLetter = CurrentTile->GetAlgebraicPosition().TileLetter;
+		const int32 TileNumber = CurrentTile->GetAlgebraicPosition().TileNumber;
+		
+		if (TileNumber == 1)
 		{
-			switch (CurrentTile->GetAlgebraicPosition().TileLetter)
+			switch (TileLetter)
 			{
 			case 'a':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::ROOK);
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, ROOK));
+					break;
+				}
 			case 'b':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::KNIGHT);
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, KNIGHT));
+					break;
+				}
 			case 'c':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::BISHOP);
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, BISHOP));
+					break;
+				}
 			case 'd':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::QUEEN);
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, QUEEN));
+					break;
+				}
 			case 'e':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::KING);
-				break;
+				{
+					AChess_Piece* WhiteKing = SpawnSinglePiece(CurrentTile, WHITE, KING);
+					GameMode->WhiteTeam.Add(WhiteKing);
+					GameMode->Kings[WHITE] = Cast<AChess_King>(WhiteKing);
+					break;
+				}
 			case 'f':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::BISHOP);
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, BISHOP));
+					break;
+				}
 			case 'g':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::KNIGHT);
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, KNIGHT));
+					break;
+				}
 			case 'h':
-				SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::ROOK);
-				break;
-			default:
-				break;
+				{
+					GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, ROOK));
+					break;
+				}
+			default: break;
 			}
 		}
 		
-		if (CurrentTile->GetAlgebraicPosition().TileNumber == 2)
+		if (TileNumber == 2)
 		{
-			SpawnSinglePiece(CurrentTile, ETeam::WHITE, EPieceType::PAWN);
+			GameMode->WhiteTeam.Add(SpawnSinglePiece(CurrentTile, WHITE, PAWN));
 		}
 
-		if (CurrentTile->GetAlgebraicPosition().TileNumber == 7)
+		if (TileNumber == 7)
 		{
-			SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::PAWN);
+			GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, PAWN));
 		}
 
-		if (CurrentTile->GetAlgebraicPosition().TileNumber == 8)
+		if (TileNumber == 8)
 		{
-			switch (CurrentTile->GetAlgebraicPosition().TileLetter)
+			switch (TileLetter)
 			{
 			case 'a':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::ROOK);
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, ROOK));
+					break;
+				}
 			case 'b':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::KNIGHT);
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, KNIGHT));
+					break;
+				}
 			case 'c':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::BISHOP);
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, BISHOP));
+					break;
+				}
 			case 'd':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::QUEEN);
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, QUEEN));
+					break;
+				}
 			case 'e':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::KING);
-				break;
+				{
+					AChess_Piece* BlackKing = SpawnSinglePiece(CurrentTile, BLACK, KING);
+					GameMode->BlackTeam.Add(BlackKing);
+					GameMode->Kings[BLACK] = Cast<AChess_King>(BlackKing);
+					break;
+				}
 			case 'f':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::BISHOP);
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, BISHOP));
+					break;
+				}
 			case 'g':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::KNIGHT);
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, KNIGHT));
+					break;
+				}
 			case 'h':
-				SpawnSinglePiece(CurrentTile, ETeam::BLACK, EPieceType::ROOK);
-				break;
-			default:
-				break;
+				{
+					GameMode->BlackTeam.Add(SpawnSinglePiece(CurrentTile, BLACK, ROOK));
+					break;
+				}
+			default: break;
 			}
 		}
 	}

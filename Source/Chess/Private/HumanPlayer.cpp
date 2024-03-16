@@ -5,6 +5,7 @@
 
 #include "Chess_GameInstance.h"
 #include "Chess_GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHumanPlayer::AHumanPlayer()
@@ -16,7 +17,7 @@ AHumanPlayer::AHumanPlayer()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera")); // Create a camera component
 	SetRootComponent(Camera); // Set the camera as RootComponent
 	
-	GameInstance = UChess_GameInstance::GetChessGameInstance(); // Get the game instance reference with the Singleton pattern
+	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); // Get the game instance reference
 
 	// Default init values
 	PlayerNumber = -1;
@@ -27,12 +28,6 @@ AHumanPlayer::AHumanPlayer()
 void AHumanPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-// Called every frame
-void AHumanPlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -63,7 +58,7 @@ void AHumanPlayer::OnLose()
 
 void AHumanPlayer::OnClick()
 {
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the Chess_GameMode instance with Singleton pattern
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
 	
 	// Structure containing information about one hit of a trace, such as point of impact and surface normal at that point
 	FHitResult Hit = FHitResult(ForceInit);
@@ -88,7 +83,7 @@ void AHumanPlayer::OnClick()
 
 				// For each tile in the array of possible moves for the selected piece,
 				// make it a target and add it to the array of target tiles at that time
-				for (ATile* Tile : CurrPiece->GetLegalMoves())
+				for (ATile* Tile : CurrPiece->GetLegitMoves())
 				{
 					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
 					{
@@ -166,5 +161,11 @@ void AHumanPlayer::OnClick()
 			}
 		}
 	}
+}
+
+// Called every frame
+void AHumanPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 

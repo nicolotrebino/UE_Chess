@@ -15,14 +15,14 @@ AChess_Piece::AChess_Piece()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Set defaults value
-	GameMode = nullptr;
+	// GameMode = nullptr;
 	// Nomenclature = '';
 	// PieceTeam = ETeam::NONE;
 	// PieceType = EPieceType::NONE;
-	CurrentTile = nullptr;
+	// CurrentTile = nullptr;
 }
 
-TCHAR AChess_Piece::GetNomenclature() const
+TCHAR AChess_Piece::GetNomenclature()
 {
 	return Nomenclature;
 }
@@ -32,7 +32,7 @@ void AChess_Piece::SetTeam(const ETeam Team)
 	PieceTeam = Team;
 }
 
-ETeam AChess_Piece::GetTeam() const
+ETeam AChess_Piece::GetTeam()
 {
 	return PieceTeam;
 }
@@ -42,7 +42,7 @@ void AChess_Piece::SetType(const EPieceType Type)
 	PieceType = Type;
 }
 
-EPieceType AChess_Piece::GetType() const
+EPieceType AChess_Piece::GetType()
 {
 	return PieceType;
 }
@@ -52,7 +52,7 @@ void AChess_Piece::SetPieceTile(ATile* Tile)
 	CurrentTile = Tile;
 }
 
-ATile* AChess_Piece::GetPieceTile() const
+ATile* AChess_Piece::GetPieceTile()
 {
 	return CurrentTile;
 }
@@ -62,7 +62,7 @@ void AChess_Piece::SetPieceLocation(const FVector& Location)
 	PieceLocation = Location;
 }
 
-FVector AChess_Piece::GetPieceLocation() const
+FVector AChess_Piece::GetPieceLocation()
 {
 	return PieceLocation;
 }
@@ -72,6 +72,10 @@ int32 AChess_Piece::GetPieceValue() const
 	return PieceValue;
 }
 
+/*
+ * Check if in the array of possible moves of a Piece
+ * there are illegal moves, if so it removes them
+ */
 void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 {
 	// Create a temporary new array same as the PossibleMoves array
@@ -96,7 +100,7 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 			// If the king is now/still in check with the move just made
 			if (GameMode->IsKingInCheck(PieceTeam))
 			{
-				// Avoid doing this move and remove it from the new array of possible moves created
+				// Avoid doing this move and remove it from the new array of possible (legal) moves created
 				NewArray.Remove(NextTile);
 			}
 		
@@ -112,22 +116,25 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 	PossibleMoves = MoveTempIfPossible(NewArray);
 }
 
-TArray<ATile*> AChess_Piece::GetLegalMoves()
+TArray<ATile*> AChess_Piece::GetLegitMoves()
 {
 	// Make an array of possible Tiles to move through
-	TArray<ATile*> LegalMoves = GetPossibleMoves();
-	
+	TArray<ATile*> LegitMoves = GetPossibleMoves();
+
 	if (this->IsA(AChess_King::StaticClass()))
 	{
-		return LegalMoves;
+		return LegitMoves;
 	}
 	
 	// Controls and modifies the array of possible Tiles to avoid a check
-	PossibleMovesCheckControl(LegalMoves);
+	PossibleMovesCheckControl(LegitMoves);
 
-	return LegalMoves;
+	return LegitMoves;
 }
 
+/*
+ * Move the selected piece to the new location
+ */
 void AChess_Piece::MovePiece(ATile* NextTile)
 {
 	// UnSelect the Tile under the selected piece
@@ -166,7 +173,9 @@ void AChess_Piece::Kill(const ETeam Team, AChess_Piece* Enemy) const
 		GameMode->BlackTeam.Remove(Enemy);
 		GameMode->KilledBlackTeam.Add(Enemy);
 	}
-	Enemy->SelfDestroy();
+	GameMode->UpdateScores();
+	Enemy->SetActorHiddenInGame(true);
+	Enemy->SetActorEnableCollision(false);
 	GameMode->bIsKill = true;
 }
 
@@ -184,10 +193,10 @@ void AChess_Piece::BeginPlay()
 }
 
 /*
-* Returns an array containing all the pointers to the Tiles on the vertical line of that particular piece
-* However, it returns only the cells into which the piece can go:
-* if it finds an occupied cell along the way, it will not be able to continue afterwards
-*/
+ * Returns an array containing all the pointers to the Tiles on the vertical line of that particular piece
+ * However, it returns only the cells into which the piece can go:
+ * if it finds an occupied cell along the way, it will not be able to continue afterwards
+ */
 TArray<ATile*> AChess_Piece::GetVerticalLine() const
 {
 	TArray<ATile*> VerticalTiles;
@@ -243,10 +252,10 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 }
 
 /*
-* Returns an array containing all the pointers to the Tiles on the horizontal line of that particular piece
-* However, it returns only the cells into which the piece can go:
-* if it finds an occupied cell along the way, it will not be able to continue afterwards
-*/
+ * Returns an array containing all the pointers to the Tiles on the horizontal line of that particular piece
+ * However, it returns only the cells into which the piece can go:
+ * if it finds an occupied cell along the way, it will not be able to continue afterwards
+ */
 TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 {
 	TArray<ATile*> HorizontalTiles;
@@ -302,10 +311,10 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 }
 
 /*
-* Returns an array containing all the pointers to the Tiles on the diagonal lines of that particular piece
-* However, it returns only the cells into which the piece can go:
-* if it finds an occupied cell along the way, it will not be able to continue afterwards
-*/
+ * Returns an array containing all the pointers to the Tiles on the diagonal lines of that particular piece
+ * However, it returns only the cells into which the piece can go:
+ * if it finds an occupied cell along the way, it will not be able to continue afterwards
+ */
 TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 {
 	TArray<ATile*> DiagonalTiles;

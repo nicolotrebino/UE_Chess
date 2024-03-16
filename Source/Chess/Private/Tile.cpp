@@ -3,6 +3,8 @@
 
 #include "Tile.h"
 
+#include "Chess_GameMode.h"
+
 // Sets default values
 ATile::ATile()
 {
@@ -35,8 +37,10 @@ FVector ATile::GetTileLocation() const
 	return TileLocation;
 }
 
-// Set the Tile position based on the chess Algebraic notation,
-// with a letter and a number
+/*
+ * Set the Tile position based on the chess Algebraic notation,
+ * with a letter and a number
+ */
 void ATile::SetAlgebraicPosition(const int X, const int Y)
 {
 	if ((X >= 0 && X < 8) && (Y >= 0 && Y < 8))
@@ -84,7 +88,7 @@ AChess_Piece* ATile::GetPieceOnTile() const
 }
 
 
-// Set the proper Tile material
+// Set the proper Tile Material
 void ATile::SetMaterial(const uint8 Index)
 {
 	if (DefaultMaterials[Index])
@@ -94,7 +98,7 @@ void ATile::SetMaterial(const uint8 Index)
 	}
 }
 
-// Set the Tile to TARGET and set the correct color
+// Set the Tile to TARGET and set the correct Material
 void ATile::SetTargetTile()
 {
 	Status = ETileStatus::TARGET;
@@ -104,14 +108,14 @@ void ATile::SetTargetTile()
 	}
 }
 
-// Set the Tile to EMPTY and set the correct color
+// Set the Tile to EMPTY and set the correct Material
 void ATile::UnsetTargetTile()
 {
 	Status = ETileStatus::EMPTY;
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
-// Set the Tile to SELECTED and set the correct color
+// Set the Material for selection
 void ATile::SetSelectedTile() const
 {
 	if (SelectMaterial && Status == ETileStatus::OCCUPIED)
@@ -120,11 +124,13 @@ void ATile::SetSelectedTile() const
 	}
 }
 
+// Reset the default Material of the Tile
 void ATile::UnsetSelectedTile()
 {
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
+// Set the Tile to KILLABLE and set the correct Material
 void ATile::SetKillableTile()
 {
 	Status = ETileStatus::KILLABLE;
@@ -134,6 +140,7 @@ void ATile::SetKillableTile()
 	} 
 }
 
+// Set the Tile to OCCUPIED and set the correct Material
 void ATile::UnsetKillableTile()
 {
 	Status = ETileStatus::OCCUPIED;
@@ -144,7 +151,9 @@ void ATile::UnsetKillableTile()
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->OnResetEvent.AddDynamic(this, &ATile::SelfDestroy);
 }
 
 void ATile::SelfDestroy()

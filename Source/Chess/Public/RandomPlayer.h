@@ -13,12 +13,18 @@ class CHESS_API ARandomPlayer : public APawn, public IPlayerInterface
 {
 	GENERATED_BODY()
 
-	// Game instance reference
-	UChess_GameInstance* GameInstance;
-
 public:
-	// Sets default values for this pawn's properties
-	ARandomPlayer();
+
+	ARandomPlayer(); // Sets default values for this pawn's properties
+	
+	UChess_GameInstance* GameInstance; // Chess_GameInstance reference
+	
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void OnTurn() override;
+	virtual void OnWin() override;
+	virtual void OnLose() override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,11 +33,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual void OnTurn() override;
-	virtual void OnWin() override;
-	virtual void OnLose() override;
 };

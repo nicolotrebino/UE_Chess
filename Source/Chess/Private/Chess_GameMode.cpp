@@ -9,9 +9,6 @@
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 
-/*
- * Chess_GameMode methods implementation
- */
 AChess_GameMode::AChess_GameMode()
 {
 	PlayerControllerClass = AChess_PlayerController::StaticClass(); // Associate the Cpc as the Player Controller for to this GameMode
@@ -64,23 +61,9 @@ void AChess_GameMode::BeginPlay()
 	
 	Players.Add(AI); // AI player = 1
 
-	this->ChoosePlayerAndStartGame();
-}
+	UpdateScores();
 
-TArray<ATile*> AChess_GameMode::GetAllLegalMovesForPlayer(const int32 CurrentPlayer)
-{
-	TArray<ATile*> MosseLegali;
-	if (CurrentPlayer) // The current player is the AI player (BLACK)
-	{
-		for (AChess_Piece* Piece: BlackTeam)
-		{
-			Piece->GetLegalMoves();
-		}
-	}
-	else // The current player is the Human player (WHITE)
-	{
-		
-	}
+	this->ChoosePlayerAndStartGame();
 }
 
 void AChess_GameMode::ChoosePlayerAndStartGame()
@@ -120,35 +103,34 @@ void AChess_GameMode::TurnNextPlayer()
 		IsCheckMate(WHITE, WhiteTeam);
 	}
 	
-	// AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	// Cpc->UserInterfaceWidget->SaveMove(Cpc->UserInterfaceWidget->ComputeNomenclature());
+	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	// Cpc->UserInterfaceWidget->SaveMove(CPC->UserInterfaceWidget->ComputeNomenclature());
 
-	/*
 	if (bIsGameOver)
 	{
 		if (bIsWhiteKingInCheckMate)
 		{
-			CPC->UserInterfaceWidget->SaveEndGame("1 - 0");
+			// Cpc->UserInterfaceWidget->SaveEndGame("1 - 0");
 			Players[WHITE]->OnLose();
 			return;
 		}
 		if (bIsBlackKingInCheckMate)
 		{
-			CPC->UserInterfaceWidget->SaveEndGame("0 - 1");
+			// Cpc->UserInterfaceWidget->SaveEndGame("0 - 1");
 			Players[WHITE]->OnWin();
 			return;
 		}
 	}
-	*/
 	
 	MoveCounter += 1;
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 	Players[CurrentPlayer]->OnTurn();
 	
-	// Reset all the game variables for this new turn
+	// Reset game variables
 	bIsKill = false;
 	bIsWhiteKingInCheck = false;
 	bIsBlackKingInCheck = false;
+	bIsPromotion = false;
 	Checker = nullptr;
 }
 
@@ -177,13 +159,12 @@ void AChess_GameMode::ResetTargetedAndKillableTiles()
  * Bring back to the default color the Tile
  * of the SelectedPiece
  */
-void AChess_GameMode::ResetSelectedPiece()
+void AChess_GameMode::ResetSelectedPiece() const
 {
 	if (SelectedPiece)
 	{
 		SelectedPiece->GetPieceTile()->UnsetSelectedTile();
 	}
-	SelectedPiece = nullptr;
 }
 
 bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
@@ -246,7 +227,7 @@ bool AChess_GameMode::IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piec
 		ATile* CurrentTile = Piece->GetPieceTile();
 		
 		// Get the legal moves of the piece
-		TArray<ATile*> PossibleMoves = Piece->GetLegalMoves();
+		TArray<ATile*> PossibleMoves = Piece->GetLegitMoves();
 
 		for (ATile* NextTile : PossibleMoves)
 		{
@@ -339,7 +320,7 @@ void AChess_GameMode::UpdateScores()
 	}
 }
 
-FString AChess_GameMode::GetScoreWhiteTeam() const
+FString AChess_GameMode::GetScoreWhiteTeam()
 {
 	const int32 NewScore = ScoreWhiteTeam - ScoreBlackTeam;
 	if (NewScore > 0)
@@ -349,7 +330,7 @@ FString AChess_GameMode::GetScoreWhiteTeam() const
 	return "0";
 }
 
-FString AChess_GameMode::GetScoreBlackTeam() const
+FString AChess_GameMode::GetScoreBlackTeam()
 {
 	const int32 NewScore = ScoreBlackTeam - ScoreWhiteTeam;
 	if (NewScore > 0)
@@ -367,8 +348,8 @@ void AChess_GameMode::ResetField()
 	TileArray.Empty();
 	WhiteTeam.Empty();
 	BlackTeam.Empty();
-	ResetSelectedPiece();
-	ResetSelectedPiece();
+	// ResetSelectedPiece();
+	// ResetTargetedAndKillableTiles();
 	Kings[WHITE] = nullptr;
 	Kings[BLACK] = nullptr;
 

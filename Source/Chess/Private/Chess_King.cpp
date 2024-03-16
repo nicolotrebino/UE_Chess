@@ -151,10 +151,10 @@ void AChess_King::CheckMobility(TArray<ATile*> &PossibleMoves) const
 		CurrentTile->SetTileStatus(ETileStatus::EMPTY);
 		CurrentTile->SetTileTeam(NONE);
 
-		// For each the enemy Black Piece (in game)
+		// For each enemy piece
 		for (AChess_Piece* EnemyPiece : EnemyTeam)
 		{
-			// If it is not the Black King
+			// If it is not the King
 			if (!(EnemyPiece && EnemyPiece->IsA(AChess_King::StaticClass())))
 			{
 				// Get all the possible moves of that Black Piece
@@ -164,9 +164,9 @@ void AChess_King::CheckMobility(TArray<ATile*> &PossibleMoves) const
 					NewArray.Remove(NextTile); // Remove this Tile from  the array of possible moves
 				}
 			}
-			else // If it is the Black King
+			else // If it is the King
 			{
-				// Set the CurrPiece to the BlackPiece (Black King)
+				// Set the CurrPiece to the enemy King
 				const AChess_King* CurrPiece = Cast<AChess_King>(EnemyPiece);
 				// If the NextTile is near the enemy King (Black King)
 				if (CurrPiece->GetNeighbors().Contains(NextTile))

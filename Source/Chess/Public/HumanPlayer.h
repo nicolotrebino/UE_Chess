@@ -16,22 +16,10 @@ class CHESS_API AHumanPlayer : public APawn, public IPlayerInterface
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
-	AHumanPlayer();
+	AHumanPlayer(); // Sets default values for this pawn's properties
 
 	UCameraComponent* Camera; // Camera component attached to player pawn
-	UChess_GameInstance* GameInstance; // Game instance reference
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	bool IsMyTurn = false; // Keeps track of my turn
-	AChess_Piece* SelectedPiece; // Current piece selected
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UChess_GameInstance* GameInstance; // Chess_GameInstance reference
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -43,4 +31,15 @@ public:
 	// Called on left mouse click (binding)
 	UFUNCTION()
 	void OnClick();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	bool IsMyTurn = false; // Keeps track of my turn
+	AChess_Piece* SelectedPiece; // Current piece selected
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 };

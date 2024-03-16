@@ -4,15 +4,15 @@
 
 #include "Chess_GameInstance.h"
 #include "Chess_GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ARandomPlayer::ARandomPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Get the game instance reference with the Singleton pattern
-	GameInstance = UChess_GameInstance::GetChessGameInstance();
+	
+	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); // Get the Chess_GameInstance reference
 
 	Team = BLACK;
 }
@@ -21,12 +21,6 @@ ARandomPlayer::ARandomPlayer()
 void ARandomPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-// Called every frame
-void ARandomPlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -47,17 +41,6 @@ void ARandomPlayer::OnTurn()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
 		{
 			AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-
-			/*
-			if (GameMode->IsKingInCheck(BLACK))
-			{
-				if (GameMode->IsCheckMate(BLACK, GameMode->BlackTeam))
-				{
-					OnLose();
-					return;
-				}
-			}
-			*/
 
 			if (GameMode->CurrentPlayer)
 			{
@@ -83,7 +66,7 @@ void ARandomPlayer::OnTurn()
 						CheckedIndices.Add(RandPieceIdx);
 									
 						// RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->GetLegalMoves();
+						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->GetLegitMoves();
 					}
 					// After finding the possible moves, choose one randomly
 					const int32 RandMoveIdx = FMath::Rand() % RandPlayerMoves.Num();
@@ -120,4 +103,10 @@ void ARandomPlayer::OnLose()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
+}
+
+// Called every frame
+void ARandomPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }

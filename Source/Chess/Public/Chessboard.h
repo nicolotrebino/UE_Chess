@@ -13,9 +13,9 @@ class CHESS_API AChessboard : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	AChessboard();
+public:
+	
+	AChessboard(); // Sets default values for this actor's properties
 
 	// Return a (x,y) position given a hit (click) on a field tile
 	FVector GetTilePosition(const FHitResult& Hit) const;
@@ -32,17 +32,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	/*
-	 * Tile and Pieces classes
-	 */
+	/* Tile and Pieces classes */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ATile> TileClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<TSubclassOf<AChess_Piece>> PieceClass;
 
-	/*
-	 * Chessboard size information
-	 */
+	/* Chessboard size information */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 FieldSize;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -56,9 +52,7 @@ protected:
 	UFUNCTION()
 	void SelfDestroy();
 
-/*
-* It shouldn't tick
-*/
+/* It shouldn't tick */
 // public:	
 	// Called every frame
 	// virtual void Tick(float DeltaTime) override;
