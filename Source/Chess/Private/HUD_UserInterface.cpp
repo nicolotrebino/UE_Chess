@@ -5,6 +5,7 @@
 
 #include "Chess_GameMode.h"
 #include "Chess_Pawn.h"
+#include "Manager_Turn.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/HorizontalBox.h"
 #include "Components/ScrollBox.h"
@@ -134,19 +135,20 @@ void UHUD_UserInterface::SaveEndGame(const FString& EndGame) const
 FString UHUD_UserInterface::ComputeNomenclature() const
 {
 	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	const AManager_Turn* TurnManager = GameMode->TurnManager;
 	if (!(NextTile || PieceToMove))
 	{
 		return ""; // Gestione errore
 	}
 
 	FString MoveNomenclature = "";
-	if (GameMode->bIsPromotion)
+	if (TurnManager->bIsPromotion)
 	{
 		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c/%c%d"), PieceToMove->GetNomenclature(), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 	}
 	else if (PieceToMove->IsA(AChess_Pawn::StaticClass()))
 	{
-		if (PreviousTile && GameMode->bIsKill)
+		if (PreviousTile && TurnManager->bIsKill)
 		{
 			MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
 		}
@@ -155,7 +157,7 @@ FString UHUD_UserInterface::ComputeNomenclature() const
 	else
 	{
 		MoveNomenclature = FString::Printf(TEXT("%c"), PieceToMove->GetNomenclature());
-		if (GameMode->bIsKill)
+		if (TurnManager->bIsKill)
 		{
 			MoveNomenclature = MoveNomenclature + "x";
 		}
@@ -166,23 +168,23 @@ FString UHUD_UserInterface::ComputeNomenclature() const
 	{
 		MoveNomenclature = MoveNomenclature + "#";
 	}
-	else if (GameMode->bIsWhiteKingInCheck || GameMode->bIsBlackKingInCheck)
+	else if (TurnManager->bIsWhiteKingInCheck || TurnManager->bIsBlackKingInCheck)
 	{
 		MoveNomenclature = MoveNomenclature + "+";
-	}
-	
+	} 
 	return MoveNomenclature;
 }
 
 
 void UHUD_UserInterface::MakeHistoryArray(UButton* Button)
 {
-	const FHistoryButton Move = {Button, PieceToMove, KilledPieceTeam, KilledPieceType, PreviousTile, NextTile};
-	MhButtons.Add(Move);
+	// const FHistoryButton Move = {Button, PieceToMove, KilledPieceTeam, KilledPieceType, PreviousTile, NextTile};
+	// MhButtons.Add(Move);
 }
 
 void UHUD_UserInterface::Backtrack()
 {
+	/*
 	const UButton* ClickedButton = Cast<UButton>(this);
 	int32 i = MhButtons.Num() - 1;
 	while (i >= 0 && MhButtons[i].Button == ClickedButton)
@@ -195,6 +197,7 @@ void UHUD_UserInterface::Backtrack()
 		}
 		i--;
 	}
+	*/
 }
 
 void UHUD_UserInterface::DestroyMoveHistory() const

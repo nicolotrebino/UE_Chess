@@ -7,6 +7,8 @@
 #include "HumanPlayer.h"
 #include "RandomPlayer.h"
 #include "EngineUtils.h"
+#include "Manager_Promotion.h"
+#include "Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
 
 AChess_GameMode::AChess_GameMode()
@@ -17,14 +19,9 @@ AChess_GameMode::AChess_GameMode()
 	// Set default values
 	bIsGameOver = false; // Tracks if the game is over
 	MoveCounter = 0; // Tracks the number of moves in order to signal a drawn game
-	Checker = nullptr; // Piece that is in check
-	bIsBlackKingInCheck = false;
-	bIsWhiteKingInCheck = false;
 	bIsWhiteKingInCheckMate = false;
 	bIsBlackKingInCheckMate = false;
 	bIsDraw = false;
-	bIsKill = false;
-	bIsPromotion = false;
 
 	ScoreWhiteTeam = 0;
 	ScoreBlackTeam = 0;
@@ -32,6 +29,10 @@ AChess_GameMode::AChess_GameMode()
 	CurrentPlayer = 0;
 
 	CBoard = nullptr;
+
+	TurnManager = nullptr;
+
+	PromotionManager = nullptr;
 
 	SelectedPiece = nullptr;
 
@@ -50,6 +51,14 @@ void AChess_GameMode::BeginPlay()
 	{
 		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
 	}
+	if (TurnManagerClass)
+	{
+		TurnManager = GetWorld()->SpawnActor<AManager_Turn>(TurnManagerClass);
+	}
+	if (PromotionManagerClass)
+	{
+		PromotionManager = GetWorld()->SpawnActor<AManager_Promotion>(PromotionManagerClass);
+	}
 
 	const float CameraPosX = (CBoard->GetTileSize() * CBoard->GetFieldSize() / 2);
 	const FVector CameraPos(CameraPosX, 0.0f, 1000.0f);
@@ -65,6 +74,13 @@ void AChess_GameMode::BeginPlay()
 
 	this->ChoosePlayerAndStartGame();
 }
+
+/*
+AManager_Promotion* AChess_GameMode::GetPromotionManager() const
+{
+	return PromotionManager;
+}
+*/
 
 void AChess_GameMode::ChoosePlayerAndStartGame()
 {
@@ -92,18 +108,19 @@ int32 AChess_GameMode::GetNextPlayer(int32 Player) const
 
 void AChess_GameMode::TurnNextPlayer()
 {
-	bIsBlackKingInCheck = IsKingInCheck(BLACK);
-	if (bIsBlackKingInCheck)
+	TurnManager->bIsBlackKingInCheck = IsKingInCheck(BLACK);
+	if (TurnManager->bIsBlackKingInCheck)
 	{
 		IsCheckMate(BLACK, BlackTeam);
 	}
-	bIsWhiteKingInCheck = IsKingInCheck(WHITE);
-	if (bIsWhiteKingInCheck)
+	TurnManager->bIsWhiteKingInCheck = IsKingInCheck(WHITE);
+	if (TurnManager->bIsWhiteKingInCheck)
 	{
 		IsCheckMate(WHITE, WhiteTeam);
 	}
-	
-	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	TurnManager->DisplayMove();
+	// AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	// Cpc->UserInterfaceWidget->SaveMove(CPC->UserInterfaceWidget->ComputeNomenclature());
 
 	if (bIsGameOver)
@@ -127,11 +144,13 @@ void AChess_GameMode::TurnNextPlayer()
 	Players[CurrentPlayer]->OnTurn();
 	
 	// Reset game variables
-	bIsKill = false;
-	bIsWhiteKingInCheck = false;
-	bIsBlackKingInCheck = false;
-	bIsPromotion = false;
-	Checker = nullptr;
+	TurnManager->ResetVariables();
+	
+	TurnManager->bIsKill = false;
+	TurnManager->bIsWhiteKingInCheck = false;
+	TurnManager->bIsBlackKingInCheck = false;
+	TurnManager->bIsPromotion = false;
+	TurnManager->Checker = nullptr;
 }
 
 /*
@@ -186,7 +205,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				// contains the Tile under the King
 				if (EnemyMoves.Contains(KingTile))
 				{
-					Checker = EnemyPiece; // Set that Piece as the Checker
+					TurnManager->Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
 					return true; // The AI King is in Check
 				}
@@ -207,7 +226,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				// contains the Tile under the King
 				if (EnemyMoves.Contains(KingTile))
 				{
-					Checker = EnemyPiece; // Set that Piece as the Checker
+					TurnManager->Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
 					return true; // The Human King is in Check
 				}
@@ -235,7 +254,7 @@ bool AChess_GameMode::IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piec
 			{
 				ATile* CurrentKingTile = Piece->GetPieceTile();
 				Piece->SetPieceTile(NextTile);
-				if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == Checker)
+				if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == TurnManager->Checker)
 				{
 					Piece->SetPieceTile(CurrentKingTile);
 					return false;
@@ -248,7 +267,7 @@ bool AChess_GameMode::IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piec
 			NextTile->SetTileTeam(Piece->GetTeam());
 			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
 			CurrentTile->SetTileTeam(NONE);
-			if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == Checker)
+			if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == TurnManager->Checker)
 			{
 				NextTile->SetTileStatus(NextStatus);
 				NextTile->SetTileTeam(NextTeam);
@@ -357,7 +376,7 @@ void AChess_GameMode::ResetField()
 	MoveCounter = 0;
 
 	const AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	Cpc->UserInterfaceWidget->DestroyMoveHistory();
+	// Cpc->UserInterfaceWidget->DestroyMoveHistory();
 
 	if (ChessboardClass != nullptr)
 	{

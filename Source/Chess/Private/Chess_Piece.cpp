@@ -6,6 +6,8 @@
 #include "BlueprintEditor.h"
 #include "Chess_GameMode.h"
 #include "Chess_King.h"
+// #include "Manager_Turn.h"
+#include "Manager_Turn.h"
 #include "Utility.h"
 
 // Sets default values
@@ -79,6 +81,7 @@ int32 AChess_Piece::GetPieceValue() const
 void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 {
 	// Create a temporary new array same as the PossibleMoves array
+	const AManager_Turn* TurnManager = GameMode->TurnManager;
 	TArray<ATile*> NewArray = PossibleMoves;
 	for (ATile* NextTile : PossibleMoves)
 	{
@@ -89,7 +92,7 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 		// ************ GameMode->IsMyKingInCheck(); // Control if the King is in check and set the Checker
 		
 		// If the next tile is the one under the Checker piece it means I can kill the Checker
-		if (!(GameMode->Checker && NextTile == GameMode->Checker->GetPieceTile()))
+		if (!(TurnManager->Checker && NextTile == TurnManager->Checker->GetPieceTile()))
 		{
 			// Pretend you're making the next move
 			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
@@ -176,7 +179,7 @@ void AChess_Piece::Kill(const ETeam Team, AChess_Piece* Enemy) const
 	GameMode->UpdateScores();
 	Enemy->SetActorHiddenInGame(true);
 	Enemy->SetActorEnableCollision(false);
-	GameMode->bIsKill = true;
+	GameMode->TurnManager->bIsKill = true;
 }
 
 void AChess_Piece::SelfDestroy()

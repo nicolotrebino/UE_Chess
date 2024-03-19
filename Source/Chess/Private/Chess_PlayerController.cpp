@@ -34,8 +34,8 @@ void AChess_PlayerController::BeginPlay()
 		Subsystem->AddMappingContext(ChessContext, 0);
 	}
 
-	// UserInterfaceWidget = CreateWidget<UHUD_UserInterface>(this, UserInterfaceWidgetClass);
-	// UserInterfaceWidget->AddToViewport();
+	UserInterfaceWidget = CreateWidget<UUserWidget>(this, UserInterfaceWidgetClass);
+	UserInterfaceWidget->AddToViewport();
 }
 
 void AChess_PlayerController::SetupInputComponent()

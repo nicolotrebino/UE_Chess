@@ -49,9 +49,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	// Reference to the Chess_GameMode
-	AChess_GameMode* GameMode;
+	
+	AChess_GameMode* GameMode; // Reference to the Chess_GameMode
 	
 	/* Piece information */
 	TCHAR Nomenclature; // Capital letter to indicate the Piece for the Algebraic notation

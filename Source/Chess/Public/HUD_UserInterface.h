@@ -8,6 +8,7 @@
 #include "Components/Button.h"
 #include "HUD_UserInterface.generated.h"
 
+/*
 USTRUCT()
 struct FHistoryButton
 {
@@ -20,6 +21,7 @@ struct FHistoryButton
 	ATile* PreviousTile;
 	ATile* NextTile;
 };
+*/
 
 // Macro declaration for a dynamic multicast delegate
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReplay);
@@ -62,7 +64,7 @@ protected:
 	ETeam KilledPieceTeam;
 	EPieceType KilledPieceType;
 
-	TArray<FHistoryButton> MhButtons;
+	// TArray<FHistoryButton> MhButtons;
 
 	// BlueprintAssignable Usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
 	// declare a variable of type FOnReset (delegate)

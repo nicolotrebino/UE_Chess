@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUD_UserInterface.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/PlayerController.h"
 #include "Chess_PlayerController.generated.h"
@@ -28,10 +27,10 @@ public:
 	void ClickOnGrid();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<UHUD_UserInterface> UserInterfaceWidgetClass;
+	TSubclassOf<UUserWidget> UserInterfaceWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly, Category = "UI")
-	UHUD_UserInterface* UserInterfaceWidget;
+	UUserWidget* UserInterfaceWidget;
 
 protected:
 	virtual void BeginPlay() override;

@@ -6,7 +6,7 @@
 #include "Chess_Piece.h"
 #include "Chess_Pawn.generated.h"
 
-class UHUD_PawnPromotion;
+class UManager_PromotionHUD;
 
 /**
  * 
@@ -22,33 +22,21 @@ public:
 	virtual TArray<ATile*> GetPossibleMoves() override;
 	virtual void SetMaterial(const int32 Index) override;
 	virtual void MovePiece(ATile* NextTile) override;
-	void StartPromotion();
-
-	// Called when a button in the widget is clicked
-	UFUNCTION(BlueprintCallable, Category = "Promotion")
-	void HandleButtonClicked(int32 SelectedPieceIndex);
 
 protected:
 	virtual void BeginPlay() override;
 
-	/* 
-	* Components
-	*/	
+	/* Components */	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* PawnComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* PawnMeshComponent;
 
-	/*
-	* Materials
-	*/	
+	/* Materials */	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UMaterialInstance*> PawnMaterials;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Promotion")
-	TSubclassOf<UHUD_PawnPromotion> PromotionWidgetClass;
-	UPROPERTY(BlueprintReadOnly, Category = "Promotion")
-	UHUD_PawnPromotion* PromotionWidget;
+	/* Promotion widget */
 
 	bool FirstMove;
 };

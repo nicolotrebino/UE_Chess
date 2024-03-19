@@ -5,10 +5,8 @@
 
 #include "Utility.h"
 #include "Chess_GameMode.h"
-#include "Chess_PlayerController.h"
-#include "HUD_PawnPromotion.h"
-#include "Blueprint/UserWidget.h"
-#include "Kismet/GameplayStatics.h"
+#include "Manager_Promotion.h"
+#include "Manager_Turn.h"
 
 AChess_Pawn::AChess_Pawn()
 {
@@ -148,29 +146,42 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 	Super::MovePiece(NextTile);
 
 	FirstMove = false;
+
+	AManager_Turn* TurnManager = GameMode->TurnManager;
+	AManager_Promotion* PromotionManager = GameMode->PromotionManager;
 		
 	if (NextTile->GetAlgebraicPosition().TileNumber == 8)
 	{
 		// Implement promotion for Human player
-		GameMode->bIsPromotion = true;
-		this->StartPromotion();
+		TurnManager->bIsPromotion = true;
+
+		GameMode->WhiteTeam.Remove(this);
+
+		PromotionManager->SetCurrentPawn(this);
+		PromotionManager->StartPromotion(this);
 	}
 	else if (NextTile->GetAlgebraicPosition().TileNumber == 1)
 	{
 		// Implement promotion for AI player
-		GameMode->bIsPromotion = true;
+		TurnManager->bIsPromotion = true;
+
+		GameMode->BlackTeam.Remove(this);
+
+		PromotionManager->SetCurrentPawn(this);
+		
 		const int32 RandomNumber = FMath::RandRange(0, 3);
-		this->HandleButtonClicked(RandomNumber);
+		PromotionManager->HandleButtonClicked(RandomNumber);
 	}
 }
 
+/*
 void AChess_Pawn::StartPromotion()
 {
 	if (GameMode)
 	{
 		AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		
-		PromotionWidget = CreateWidget<UHUD_PawnPromotion>(Cpc, PromotionWidgetClass);
+		PromotionWidget = CreateWidget<UManager_PromotionHUD>(Cpc, PromotionWidgetClass);
 		PromotionWidget->SetCurrentPawn(this);
 		PromotionWidget->AddToViewport();
 	}
@@ -227,6 +238,7 @@ void AChess_Pawn::HandleButtonClicked(const int32 SelectedPieceIndex)
 		// GameMode->SetGamePaused(false);
 	}
 }
+*/
 
 void AChess_Pawn::BeginPlay()
 {

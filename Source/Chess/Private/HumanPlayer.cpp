@@ -5,6 +5,7 @@
 
 #include "Chess_GameInstance.h"
 #include "Chess_GameMode.h"
+#include "Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -109,7 +110,7 @@ void AHumanPlayer::OnClick()
 				// Move the selected piece
 				SelectedPiece->MovePiece(NextTile);
 				
-				if (GameMode->bIsPromotion)
+				if (GameMode->TurnManager->bIsPromotion)
 				{
 					return;
 				}
@@ -138,8 +139,8 @@ void AHumanPlayer::OnClick()
 					
 					// Move the selected piece
 					SelectedPiece->MovePiece(NextTile);
-
-					if (GameMode->bIsPromotion)
+					
+					if (GameMode->TurnManager->bIsPromotion)
 					{
 						return;
 					}

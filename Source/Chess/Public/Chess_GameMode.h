@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Chessboard.h"
+#include "Manager_Turn.h"
 #include "PlayerInterface.h"
 #include "GameFramework/GameModeBase.h"
 #include "Chess_GameMode.generated.h"
 
+class AManager_Promotion;
 class AChess_King;
 
 // Macro declaration for a dynamic multicast delegate
@@ -30,26 +32,38 @@ public:
 
 	/* Game variable */
 	bool bIsGameOver; // Tracks if the game is over
-	int32 MoveCounter; // Tracks the number of moves
 	bool bIsWhiteKingInCheckMate;
 	bool bIsBlackKingInCheckMate;
 	bool bIsDraw;
-
-	/* Game variable for a turn */
-	AChess_Piece* Checker; // Piece that is in check
-	bool bIsKill; // If in that turn there was a kill
-	bool bIsBlackKingInCheck;
-	bool bIsWhiteKingInCheck;
-	bool bIsPromotion;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 MoveCounter; // Tracks the number of moves
 	
 	// Array of player interfaces
 	TArray<IPlayerInterface*> Players;
 	int32 CurrentPlayer;
-	
+
+	// Chessboard
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AChessboard> ChessboardClass;
 	UPROPERTY(VisibleAnywhere)
 	AChessboard* CBoard;
+
+	// Turn Manager
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AManager_Turn> TurnManagerClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AManager_Turn* TurnManager;
+
+	TArray<FHistoryButton> MhButtons;
+
+	// Promotion Manager
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AManager_Promotion> PromotionManagerClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AManager_Promotion* PromotionManager;
+
+	// UFUNCTION(BlueprintCallable)
+	// AManager_Promotion* GetPromotionManager() const;
 
 	/*
 	 * Array to store important stuff for the game
