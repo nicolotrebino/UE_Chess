@@ -70,17 +70,8 @@ void AChess_GameMode::BeginPlay()
 	
 	Players.Add(AI); // AI player = 1
 
-	UpdateScores();
-
 	this->ChoosePlayerAndStartGame();
 }
-
-/*
-AManager_Promotion* AChess_GameMode::GetPromotionManager() const
-{
-	return PromotionManager;
-}
-*/
 
 void AChess_GameMode::ChoosePlayerAndStartGame()
 {
@@ -93,6 +84,7 @@ void AChess_GameMode::ChoosePlayerAndStartGame()
 		Players[i]->Team = i == CurrentPlayer ? WHITE : BLACK;
 	}
 	MoveCounter += 1;
+	UpdateScores();
 	Players[CurrentPlayer]->OnTurn();
 }
 
@@ -120,11 +112,10 @@ void AChess_GameMode::TurnNextPlayer()
 	}
 
 	TurnManager->DisplayMove();
-	// AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	// Cpc->UserInterfaceWidget->SaveMove(CPC->UserInterfaceWidget->ComputeNomenclature());
 
 	if (bIsGameOver)
 	{
+		TurnManager->DisplayEndGame();
 		if (bIsWhiteKingInCheckMate)
 		{
 			// Cpc->UserInterfaceWidget->SaveEndGame("1 - 0");
@@ -339,7 +330,7 @@ void AChess_GameMode::UpdateScores()
 	}
 }
 
-FString AChess_GameMode::GetScoreWhiteTeam()
+FString AChess_GameMode::ComputeScoreWhiteTeam()
 {
 	const int32 NewScore = ScoreWhiteTeam - ScoreBlackTeam;
 	if (NewScore > 0)
@@ -349,7 +340,7 @@ FString AChess_GameMode::GetScoreWhiteTeam()
 	return "0";
 }
 
-FString AChess_GameMode::GetScoreBlackTeam()
+FString AChess_GameMode::ComputeScoreBlackTeam()
 {
 	const int32 NewScore = ScoreBlackTeam - ScoreWhiteTeam;
 	if (NewScore > 0)
@@ -375,8 +366,10 @@ void AChess_GameMode::ResetField()
 	bIsGameOver = false;
 	MoveCounter = 0;
 
-	const AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	// const AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	// Cpc->UserInterfaceWidget->DestroyMoveHistory();
+
+	TurnManager->DestroyMoveHistory();
 
 	if (ChessboardClass != nullptr)
 	{

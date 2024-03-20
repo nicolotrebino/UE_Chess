@@ -5,8 +5,10 @@
 #include "Chess_GameMode.h"
 #include "Chess_PlayerController.h"
 #include "Blueprint/WidgetTree.h"
-#include "Components/HorizontalBox.h"
+#include "Components/Button.h"
 #include "Components/ScrollBox.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -47,41 +49,54 @@ void AManager_Turn::ResetVariables()
 	NextTile = nullptr;
 }
 
-void AManager_Turn::DisplayMove()
+void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill)
+{
+	PreviousTile = PTile;
+	NextTile = NTile;
+	MovedPiece = PieceToMove;
+	KilledPiece = PieceToKill;
+}
+
+void AManager_Turn::DisplayMove() const
 {
 	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	// Creazione del widget del pulsante
-	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(ButtonClass);
+	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
 	FHistoryButton Move = {ButtonWidget, MovedPiece, KilledPiece, PreviousTile, NextTile};
 	// GameMode->MhButtons.Add(Move);
 	
 	// If it is the Human
 	if (!GameMode->CurrentPlayer)
 	{
-		UScrollBox* Container = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
+		UVerticalBox* Container = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_White"));
 		
 		if (Container)
 		{
-			// Creazione dell'Horizontal Box
-			UHorizontalBox* HorizontalBox = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
-
-			// Assegna un nome all'Horizontal Box per trovarla
-			HorizontalBox->Rename(*FString::Printf(TEXT("MH_%d"), FMath::CeilToInt(GameMode->MoveCounter / 2.0f)));
-			
-			HorizontalBox->AddChild(ButtonWidget);
-			Container->AddChild(HorizontalBox);
+			Container->AddChild(ButtonWidget);
 		}
 	}
 	else
 	{
-		UHorizontalBox* Container = Cast<UHorizontalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget(*FString::Printf(TEXT("MH_%d"), FMath::CeilToInt(GameMode->MoveCounter / 2.0f))));
+		UVerticalBox* Container = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Red"));
 
 		if (Container)
 		{
 			Container->AddChild(ButtonWidget);
 		}
+	}
+}
+
+void AManager_Turn::DisplayEndGame() const
+{
+	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	UScrollBox* Container = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
+
+	if (Container)
+	{
+		UUserWidget* LastButton = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(EndButtonClass);
+		Container->AddChild(LastButton);
 	}
 }
 
@@ -128,17 +143,25 @@ FString AManager_Turn::ComputeNotation() const
 	return MoveNomenclature;
 }
 
+void AManager_Turn::DestroyMoveHistory() const
+{
+	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	UVerticalBox* WhiteHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_White"));
+	UVerticalBox* RedHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Red"));
+
+	WhiteHistory->ClearChildren();
+	RedHistory->ClearChildren();
+}
+
 // Called when the game starts or when spawned
 void AManager_Turn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AManager_Turn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

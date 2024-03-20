@@ -32,8 +32,11 @@ public:
 
 	/* Game variable */
 	bool bIsGameOver; // Tracks if the game is over
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsWhiteKingInCheckMate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsBlackKingInCheckMate;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsDraw;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 MoveCounter; // Tracks the number of moves
@@ -61,9 +64,6 @@ public:
 	TSubclassOf<AManager_Promotion> PromotionManagerClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AManager_Promotion* PromotionManager;
-
-	// UFUNCTION(BlueprintCallable)
-	// AManager_Promotion* GetPromotionManager() const;
 
 	/*
 	 * Array to store important stuff for the game
@@ -107,13 +107,11 @@ public:
 
 	/* Score manager */
 	UFUNCTION(BlueprintCallable)
-	FString GetScoreWhiteTeam();
+	FString ComputeScoreWhiteTeam();
 	UFUNCTION(BlueprintCallable)
-	FString GetScoreBlackTeam();
+	FString ComputeScoreBlackTeam();
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Chess")
 	int32 ScoreWhiteTeam;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Chess")
 	int32 ScoreBlackTeam;
 	
 	void UpdateScores();

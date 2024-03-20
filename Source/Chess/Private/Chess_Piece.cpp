@@ -140,6 +140,8 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
  */
 void AChess_Piece::MovePiece(ATile* NextTile)
 {
+	GameMode->TurnManager->SetTilesAndPieces(this->GetPieceTile(), NextTile, this, NextTile->GetPieceOnTile());
+	
 	// UnSelect the Tile under the selected piece
 	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
 	this->GetPieceTile()->SetTileTeam(ETeam::NONE);

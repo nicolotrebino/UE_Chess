@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Chess_Piece.h"
 #include "GameFramework/Actor.h"
 #include "Manager_Turn.generated.h"
 
@@ -25,10 +26,7 @@ UCLASS()
 class CHESS_API AManager_Turn : public AActor
 {
 	GENERATED_BODY()
-
-	/**
-	* Class methods and attributes
-	*/
+	
 public:
 	// Sets default values for this actor's properties
 	AManager_Turn();
@@ -36,28 +34,36 @@ public:
 
 	/* Methods */
 	void ResetVariables();
+	void SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill);
 
-	/* Game variable for a turn */
+	/* Game references for a turn */
 	AChess_Piece* Checker; // Piece that is in check
 
 	AChess_Piece* MovedPiece;
 	AChess_Piece* KilledPiece;
-	
+
+	ATile* PreviousTile;
+	ATile* NextTile;
+
+	/* Game variables for a turn */
 	bool bIsKill; // If in that turn there was a kill
 	bool bIsPromotion; // If in that turn there was a promotion
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
 
-	ATile* PreviousTile;
-	ATile* NextTile;
-
 	/* Move History managing */
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> ButtonClass;
+	TSubclassOf<UUserWidget> MhButtonClass;
 
-	void DisplayMove();
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> EndButtonClass;
+
+	void DisplayMove() const;
+	void DisplayEndGame() const;
 	UFUNCTION(BlueprintCallable)
 	FString ComputeNotation() const;
+
+	void DestroyMoveHistory() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -66,5 +72,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };
