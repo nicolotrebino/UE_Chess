@@ -38,7 +38,7 @@ public:
 
 	/* Functions to move the piece and "eat" opponents */
 	virtual void MovePiece(ATile* NextTile);
-	void Kill(const ETeam Team, AChess_Piece* Enemy) const;
+	void Kill(AChess_Piece* Enemy) const;
 
 	// Set the right material for the Piece
 	virtual void SetMaterial(const int32 Index) {};

@@ -110,7 +110,7 @@ void AChess_GameMode::TurnNextPlayer()
 	{
 		IsCheckMate(WHITE, WhiteTeam);
 	}
-
+	
 	TurnManager->DisplayMove();
 
 	if (bIsGameOver)

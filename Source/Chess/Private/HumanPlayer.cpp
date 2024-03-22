@@ -102,7 +102,7 @@ void AHumanPlayer::OnClick()
 			{
 				ATile* NextTile = CurrPiece->GetPieceTile();
 
-				SelectedPiece->Kill(CurrPiece->GetTeam(), CurrPiece);
+				SelectedPiece->Kill(CurrPiece);
 
 				// Reset all the Tiles in the "global" arrays
 				GameMode->ResetTargetedAndKillableTiles();

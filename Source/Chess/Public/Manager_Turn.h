@@ -10,8 +10,8 @@
 class AChess_Piece;
 class ATile;
 
-USTRUCT()
-struct FHistoryButton
+USTRUCT(Blueprintable)
+struct FMoveInfo
 {
 	GENERATED_BODY()
 
@@ -58,12 +58,18 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> EndButtonClass;
 
-	void DisplayMove() const;
+	TArray<FMoveInfo> MoveHistory;
+	int32 CurrentButtonIndex;
+
+	void DisplayMove();
 	void DisplayEndGame() const;
 	UFUNCTION(BlueprintCallable)
 	FString ComputeNotation() const;
 
 	void DestroyMoveHistory() const;
+
+	UFUNCTION(BlueprintCallable)
+	void Replay(const int32 ClickedIndex);
 
 protected:
 	// Called when the game starts or when spawned

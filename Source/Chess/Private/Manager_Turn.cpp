@@ -57,15 +57,18 @@ void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* 
 	KilledPiece = PieceToKill;
 }
 
-void AManager_Turn::DisplayMove() const
+void AManager_Turn::DisplayMove()
 {
 	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	// Creazione del widget del pulsante
 	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
-	FHistoryButton Move = {ButtonWidget, MovedPiece, KilledPiece, PreviousTile, NextTile};
+	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PreviousTile, NextTile};
+	MoveHistory.Add(Move);
+	CurrentButtonIndex = GameMode->MoveCounter - 1;
 	// GameMode->MhButtons.Add(Move);
+	
 	
 	// If it is the Human
 	if (!GameMode->CurrentPlayer)
@@ -96,6 +99,7 @@ void AManager_Turn::DisplayEndGame() const
 	if (Container)
 	{
 		UUserWidget* LastButton = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(EndButtonClass);
+		LastButton->Rename(*FString::Printf(TEXT("EndGame")));
 		Container->AddChild(LastButton);
 	}
 }
@@ -148,9 +152,83 @@ void AManager_Turn::DestroyMoveHistory() const
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	UVerticalBox* WhiteHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_White"));
 	UVerticalBox* RedHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Red"));
+	UUserWidget* EndButton = Cast<UUserWidget>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("EndGame"));
 
-	WhiteHistory->ClearChildren();
-	RedHistory->ClearChildren();
+	if (WhiteHistory && RedHistory)
+	{
+		WhiteHistory->ClearChildren();
+		RedHistory->ClearChildren();
+	}
+	if (EndButton)
+	{
+		UScrollBox* ScrollBox = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
+		ScrollBox->RemoveChild(EndButton);
+	}
+}
+
+void AManager_Turn::Replay(const int32 ClickedIndex)
+{
+	// int32 i = MoveHistory.Num() - 1;
+	// UScrollBox* MhContainer = Cast<UScrollBox>(WidgetTree->FindWidget("MH_Scroll"));
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	if (ClickedIndex >= 0 && ClickedIndex < CurrentButtonIndex)
+	{
+		int32 i = CurrentButtonIndex;
+		while (i > 0 && i > ClickedIndex)
+		{
+			// Ripristina il pezzo mangiato
+			if (MoveHistory[i].KilledPiece)
+			{
+				MoveHistory[i].KilledPiece->SetActorEnableCollision(true);
+				MoveHistory[i].KilledPiece->SetActorHiddenInGame(false);
+				MoveHistory[i].NextTile->SetPieceOnTile(MoveHistory[i].KilledPiece);
+				MoveHistory[i].NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+				MoveHistory[i].NextTile->SetTileTeam(MoveHistory[i].KilledPiece->GetTeam());
+				if (KilledPiece->GetTeam() == WHITE)
+				{
+					GameMode->WhiteTeam.Add(KilledPiece);
+				}
+				else
+				{
+					GameMode->BlackTeam.Add(KilledPiece);
+				}
+			}
+			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].PreviousTile);
+			// MoveHistory[i].Button->RemoveFromParent();
+			GameMode->UpdateScores();
+			GameMode->MoveCounter - 1;
+			i--;
+		}
+	}
+	if (ClickedIndex <= MoveHistory.Num() - 1 && ClickedIndex > CurrentButtonIndex)
+	{
+		int32 i = CurrentButtonIndex;
+		while (i <= MoveHistory.Num() - 1 && i <= ClickedIndex)
+		{
+			// Mangia il pezzo
+			if (MoveHistory[i].KilledPiece)
+			{
+				if (MoveHistory[i].KilledPiece->GetTeam() == ETeam::WHITE)
+				{
+					GameMode->WhiteTeam.Remove(MoveHistory[i].KilledPiece);
+					GameMode->KilledWhiteTeam.Add(MoveHistory[i].KilledPiece);
+				}
+				else
+				{
+					GameMode->BlackTeam.Remove(MoveHistory[i].KilledPiece);
+					GameMode->KilledBlackTeam.Add(MoveHistory[i].KilledPiece);
+				}
+				MoveHistory[i].KilledPiece->SetActorHiddenInGame(true);
+				MoveHistory[i].KilledPiece->SetActorEnableCollision(false);
+			}
+			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
+			// MoveHistory[i].Button->RemoveFromParent();
+			GameMode->UpdateScores();
+			GameMode->MoveCounter + 1;
+			i++;
+		}
+	}
+	CurrentButtonIndex = ClickedIndex;
 }
 
 // Called when the game starts or when spawned

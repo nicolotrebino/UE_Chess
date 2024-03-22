@@ -163,12 +163,12 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	NextTile->SetPieceOnTile(this);
 }
 
-void AChess_Piece::Kill(const ETeam Team, AChess_Piece* Enemy) const
+void AChess_Piece::Kill(AChess_Piece* Enemy) const
 {
 	// Non dovrebbe esserci bisogno di cambiare il puntatore dalla Tile al Piece e metterlo a nullptr
 	// perché intanto lo sovrascrivo con la Move() e faccio puntare la Tile direttamente al nuovo pezzo
 	// sopra di essa
-	if (Team == ETeam::WHITE)
+	if (Enemy->GetTeam() == ETeam::WHITE)
 	{
 		GameMode->WhiteTeam.Remove(Enemy);
 		GameMode->KilledWhiteTeam.Add(Enemy);

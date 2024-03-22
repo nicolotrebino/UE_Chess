@@ -72,7 +72,7 @@ void ARandomPlayer::OnTurn()
 					const int32 RandMoveIdx = FMath::Rand() % RandPlayerMoves.Num();
 					if (RandPlayerMoves[RandMoveIdx]->GetTileStatus() == ETileStatus::OCCUPIED && RandPlayerMoves[RandMoveIdx]->GetTileTeam() != Team)
 					{
-						GameMode->BlackTeam[RandPieceIdx]->Kill(RandPlayerMoves[RandMoveIdx]->GetTileTeam(), RandPlayerMoves[RandMoveIdx]->GetPieceOnTile());
+						GameMode->BlackTeam[RandPieceIdx]->Kill(RandPlayerMoves[RandMoveIdx]->GetPieceOnTile());
 					}
 					
 					GameMode->BlackTeam[RandPieceIdx]->MovePiece(RandPlayerMoves[RandMoveIdx]);
