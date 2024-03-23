@@ -136,12 +136,14 @@ void AChess_GameMode::TurnNextPlayer()
 	
 	// Reset game variables
 	TurnManager->ResetVariables();
-	
+
+	/*
 	TurnManager->bIsKill = false;
 	TurnManager->bIsWhiteKingInCheck = false;
 	TurnManager->bIsBlackKingInCheck = false;
 	TurnManager->bIsPromotion = false;
 	TurnManager->Checker = nullptr;
+	*/
 }
 
 /*

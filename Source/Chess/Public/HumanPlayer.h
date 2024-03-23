@@ -36,7 +36,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool IsMyTurn = false; // Keeps track of my turn
+	
 	AChess_Piece* SelectedPiece; // Current piece selected
 
 public:	

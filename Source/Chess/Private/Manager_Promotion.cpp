@@ -62,9 +62,12 @@ void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 	}
 	
 	// Cpc->UserInterfaceWidget->SetPieceToMove(NewPiece);
-	TurnManager->MovedPiece = NewPiece;
+	// TurnManager->MovedPiece = NewPiece;
+	TurnManager->PromotedPiece = NewPiece;
 	GameMode->UpdateScores();
-	CurrentPawn->SelfDestroy();
+	// CurrentPawn->SelfDestroy();
+	CurrentPawn->SetActorHiddenInGame(true);
+	CurrentPawn->SetActorEnableCollision(false);
 
 	if (GameMode->Players[GameMode->CurrentPlayer]->Team == WHITE)
 	{

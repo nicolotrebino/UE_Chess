@@ -31,6 +31,9 @@ void ARandomPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ARandomPlayer::OnTurn()
 {
+	AChess_GameMode* ChessGameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	ChessGameMode->TurnManager->DisableReplay();
+	
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));
 	GameInstance->SetTurnMessage(TEXT("AI (Random) Turn"));
 
@@ -41,7 +44,7 @@ void ARandomPlayer::OnTurn()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
 		{
 			AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-
+		
 			if (GameMode->CurrentPlayer)
 			{
 				// If black still has ChessPieces available

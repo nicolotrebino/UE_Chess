@@ -18,6 +18,7 @@ struct FMoveInfo
 	UUserWidget* Button;
 	AChess_Piece* MovedPiece;
 	AChess_Piece* KilledPiece;
+	AChess_Piece* PromotedPiece;
 	ATile* PreviousTile;
 	ATile* NextTile;
 };
@@ -41,6 +42,7 @@ public:
 
 	AChess_Piece* MovedPiece;
 	AChess_Piece* KilledPiece;
+	AChess_Piece* PromotedPiece;
 
 	ATile* PreviousTile;
 	ATile* NextTile;
@@ -65,6 +67,9 @@ public:
 	void DisplayEndGame() const;
 	UFUNCTION(BlueprintCallable)
 	FString ComputeNotation() const;
+
+	void DisableReplay() const;
+	void EnableReplay();
 
 	void DestroyMoveHistory() const;
 

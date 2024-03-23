@@ -42,6 +42,8 @@ void AHumanPlayer::OnTurn()
 	IsMyTurn = true;
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	GameMode->TurnManager->EnableReplay();
 }
 
 void AHumanPlayer::OnWin()
@@ -70,10 +72,6 @@ void AHumanPlayer::OnClick()
 		// If the human player clicks on a ChessPiece
 		if (AChess_Piece* CurrPiece = Cast<AChess_Piece>(Hit.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Tile at position: %c, %i"), CurrPiece->GetPieceTile()->GetAlgebraicPosition().TileLetter, CurrPiece->GetPieceTile()->GetAlgebraicPosition().TileNumber);
-			UE_LOG(LogTemp, Warning, TEXT("Tile Status: %i"), CurrPiece->GetPieceTile()->GetTileStatus());
-			UE_LOG(LogTemp, Warning, TEXT("Tile Team: %i"), CurrPiece->GetPieceTile()->GetTileTeam());
-			
 			// If the Chess Piece has the color of the Human Player's team (WHITE)
 			if (CurrPiece->GetTeam() == Team)
 			{
@@ -124,9 +122,6 @@ void AHumanPlayer::OnClick()
 		// If the human player clicks on a Tile
 		if (ATile* NextTile = Cast<ATile>(Hit.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Tile at position: %c, %i"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
-			UE_LOG(LogTemp, Warning, TEXT("Tile Status: %i"), NextTile->GetTileStatus());
-			UE_LOG(LogTemp, Warning, TEXT("Tile Team: %i"), NextTile->GetTileTeam());
 			// If the Tile is a target
 			if (NextTile->GetTileStatus() == ETileStatus::TARGET)
 			{
@@ -154,9 +149,6 @@ void AHumanPlayer::OnClick()
 			// If the Tile is empty
 			else if (NextTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Tile at position: %c, %i"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
-				UE_LOG(LogTemp, Warning, TEXT("Tile Status: %i"), NextTile->GetTileStatus());
-				UE_LOG(LogTemp, Warning, TEXT("Tile Team: %i"), NextTile->GetTileTeam());
 				GameMode->ResetTargetedAndKillableTiles(); // Reset array of Targeted Tiles
 				GameMode->ResetSelectedPiece(); // Reset the Selected Piece
 			}

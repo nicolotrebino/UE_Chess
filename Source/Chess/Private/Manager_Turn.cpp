@@ -21,6 +21,7 @@ AManager_Turn::AManager_Turn()
 
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
+	PromotedPiece = nullptr;
 	
 	bIsKill = false;
 	bIsPromotion = false;
@@ -29,6 +30,8 @@ AManager_Turn::AManager_Turn()
 
 	PreviousTile = nullptr;
 	NextTile = nullptr;
+
+	CurrentButtonIndex = 0;
 }
 
 void AManager_Turn::SelfDestroy()
@@ -39,6 +42,10 @@ void AManager_Turn::SelfDestroy()
 void AManager_Turn::ResetVariables()
 {
 	Checker = nullptr;
+
+	MovedPiece = nullptr;
+	KilledPiece = nullptr;
+	PromotedPiece = nullptr;
 	
 	bIsKill = false;
 	bIsPromotion = false;
@@ -64,11 +71,10 @@ void AManager_Turn::DisplayMove()
 
 	// Creazione del widget del pulsante
 	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
-	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PreviousTile, NextTile};
+	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PromotedPiece, PreviousTile, NextTile};
 	MoveHistory.Add(Move);
 	CurrentButtonIndex = GameMode->MoveCounter - 1;
 	// GameMode->MhButtons.Add(Move);
-	
 	
 	// If it is the Human
 	if (!GameMode->CurrentPlayer)
@@ -116,7 +122,7 @@ FString AManager_Turn::ComputeNotation() const
 	FString MoveNomenclature = "";
 	if (TurnManager->bIsPromotion)
 	{
-		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c/%c%d"), MovedPiece->GetNomenclature(), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
+		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c/%c%d"), PromotedPiece->GetNomenclature(), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 	}
 	else if (MovedPiece->GetType() == EPieceType::PAWN)
 	{
@@ -147,6 +153,22 @@ FString AManager_Turn::ComputeNotation() const
 	return MoveNomenclature;
 }
 
+void AManager_Turn::DisableReplay() const
+{
+	for (FMoveInfo Info: MoveHistory)
+	{
+		Info.Button->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+}
+
+void AManager_Turn::EnableReplay()
+{
+	for (FMoveInfo Info: MoveHistory)
+	{
+		Info.Button->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 void AManager_Turn::DestroyMoveHistory() const
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -171,11 +193,15 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 	// int32 i = MoveHistory.Num() - 1;
 	// UScrollBox* MhContainer = Cast<UScrollBox>(WidgetTree->FindWidget("MH_Scroll"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->ResetTargetedAndKillableTiles();
+	GameMode->ResetSelectedPiece();
 	if (ClickedIndex >= 0 && ClickedIndex < CurrentButtonIndex)
 	{
 		int32 i = CurrentButtonIndex;
 		while (i > 0 && i > ClickedIndex)
 		{
+			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].PreviousTile);
+			
 			// Ripristina il pezzo mangiato
 			if (MoveHistory[i].KilledPiece)
 			{
@@ -184,18 +210,40 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				MoveHistory[i].NextTile->SetPieceOnTile(MoveHistory[i].KilledPiece);
 				MoveHistory[i].NextTile->SetTileStatus(ETileStatus::OCCUPIED);
 				MoveHistory[i].NextTile->SetTileTeam(MoveHistory[i].KilledPiece->GetTeam());
-				if (KilledPiece->GetTeam() == WHITE)
+				if (MoveHistory[i].KilledPiece->GetTeam() == WHITE)
 				{
-					GameMode->WhiteTeam.Add(KilledPiece);
+					GameMode->WhiteTeam.Add(MoveHistory[i].KilledPiece);
+					GameMode->KilledWhiteTeam.Remove(MoveHistory[i].KilledPiece);
 				}
 				else
 				{
-					GameMode->BlackTeam.Add(KilledPiece);
+					GameMode->BlackTeam.Add(MoveHistory[i].KilledPiece);
+					GameMode->KilledBlackTeam.Remove(MoveHistory[i].KilledPiece);
 				}
 			}
-			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].PreviousTile);
+
+			if (MoveHistory[i].PromotedPiece)
+			{
+				// MoveHistory[i].PromotedPiece->SelfDestroy();
+				MoveHistory[i].PromotedPiece->SetActorHiddenInGame(true);
+				MoveHistory[i].PromotedPiece->SetActorEnableCollision(false);
+
+				MoveHistory[i].MovedPiece->SetActorHiddenInGame(false);
+				MoveHistory[i].MovedPiece->SetActorEnableCollision(true);
+
+				if (MoveHistory[i].PromotedPiece->GetTeam() == ETeam::WHITE)
+				{
+					GameMode->WhiteTeam.Remove(MoveHistory[i].PromotedPiece);
+					GameMode->WhiteTeam.Add(MoveHistory[i].MovedPiece);
+				}
+				else
+				{
+					GameMode->BlackTeam.Remove(MoveHistory[i].PromotedPiece);
+					GameMode->BlackTeam.Add(MoveHistory[i].MovedPiece);
+				}
+			}
+			
 			// MoveHistory[i].Button->RemoveFromParent();
-			GameMode->UpdateScores();
 			GameMode->MoveCounter - 1;
 			i--;
 		}
@@ -205,6 +253,26 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		int32 i = CurrentButtonIndex;
 		while (i <= MoveHistory.Num() - 1 && i <= ClickedIndex)
 		{
+			if (MoveHistory[i].PromotedPiece)
+			{
+				// MoveHistory[i].MovedPiece->SelfDestroy();
+				MoveHistory[i].MovedPiece->SetActorHiddenInGame(true);
+				MoveHistory[i].MovedPiece->SetActorEnableCollision(false);
+				MoveHistory[i].PromotedPiece->SetActorHiddenInGame(false);
+				MoveHistory[i].PromotedPiece->SetActorEnableCollision(true);
+				
+				if (MoveHistory[i].PromotedPiece->GetTeam() == ETeam::WHITE)
+				{
+					GameMode->WhiteTeam.Remove(MoveHistory[i].MovedPiece);
+					GameMode->WhiteTeam.Add(MoveHistory[i].PromotedPiece);
+				}
+				else
+				{
+					GameMode->BlackTeam.Remove(MoveHistory[i].MovedPiece);
+					GameMode->BlackTeam.Add(MoveHistory[i].PromotedPiece);
+				}
+			}
+			
 			// Mangia il pezzo
 			if (MoveHistory[i].KilledPiece)
 			{
@@ -221,13 +289,15 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				MoveHistory[i].KilledPiece->SetActorHiddenInGame(true);
 				MoveHistory[i].KilledPiece->SetActorEnableCollision(false);
 			}
+			
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
+			
 			// MoveHistory[i].Button->RemoveFromParent();
-			GameMode->UpdateScores();
 			GameMode->MoveCounter + 1;
 			i++;
 		}
 	}
+	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
 }
 

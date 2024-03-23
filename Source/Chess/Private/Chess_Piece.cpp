@@ -145,6 +145,7 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	// UnSelect the Tile under the selected piece
 	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
 	this->GetPieceTile()->SetTileTeam(ETeam::NONE);
+	this->GetPieceTile()->SetPieceOnTile(nullptr);
 	this->GetPieceTile()->UnsetSelectedTile();
 	
 	// Set the next Location and Rotation of the ChessPiece

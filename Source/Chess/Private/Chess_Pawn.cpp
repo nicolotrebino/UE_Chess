@@ -147,30 +147,36 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 
 	FirstMove = false;
 
-	AManager_Turn* TurnManager = GameMode->TurnManager;
-	AManager_Promotion* PromotionManager = GameMode->PromotionManager;
-		
-	if (NextTile->GetAlgebraicPosition().TileNumber == 8)
+	if (!this->IsHidden())
 	{
-		// Implement promotion for Human player
-		TurnManager->bIsPromotion = true;
-
-		GameMode->WhiteTeam.Remove(this);
-
-		PromotionManager->SetCurrentPawn(this);
-		PromotionManager->StartPromotion(this);
-	}
-	else if (NextTile->GetAlgebraicPosition().TileNumber == 1)
-	{
-		// Implement promotion for AI player
-		TurnManager->bIsPromotion = true;
-
-		GameMode->BlackTeam.Remove(this);
-
-		PromotionManager->SetCurrentPawn(this);
+		if (NextTile->GetAlgebraicPosition().TileNumber == 8)
+		{
+			AManager_Turn* TurnManager = GameMode->TurnManager;
+			AManager_Promotion* PromotionManager = GameMode->PromotionManager;
 		
-		const int32 RandomNumber = FMath::RandRange(0, 3);
-		PromotionManager->HandleButtonClicked(RandomNumber);
+			// Implement promotion for Human player
+			TurnManager->bIsPromotion = true;
+
+			GameMode->WhiteTeam.Remove(this);
+
+			PromotionManager->SetCurrentPawn(this);
+			PromotionManager->StartPromotion(this);
+		}
+		else if (NextTile->GetAlgebraicPosition().TileNumber == 1)
+		{
+			AManager_Turn* TurnManager = GameMode->TurnManager;
+			AManager_Promotion* PromotionManager = GameMode->PromotionManager;
+		
+			// Implement promotion for AI player
+			TurnManager->bIsPromotion = true;
+
+			GameMode->BlackTeam.Remove(this);
+
+			PromotionManager->SetCurrentPawn(this);
+		
+			const int32 RandomNumber = FMath::RandRange(0, 3);
+			PromotionManager->HandleButtonClicked(RandomNumber);
+		}
 	}
 }
 
