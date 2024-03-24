@@ -66,8 +66,21 @@ void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* 
 
 void AManager_Turn::DisplayMove()
 {
-	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	if (GameMode->bInReplay)
+	{
+		int32 i = MoveHistory.Num() - 1;
+		while (i >= 0 && i != CurrentButtonIndex)
+		{
+			MoveHistory[i].Button->RemoveFromParent();
+			MoveHistory[i].Button = nullptr;
+			MoveHistory.RemoveAt(i);
+			GameMode->MoveCounter = GameMode->MoveCounter - 1;
+			i--;
+		}
+	}
 
 	// Creazione del widget del pulsante
 	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
@@ -169,7 +182,7 @@ void AManager_Turn::EnableReplay()
 	}
 }
 
-void AManager_Turn::DestroyMoveHistory() const
+void AManager_Turn::DestroyMoveHistory()
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	UVerticalBox* WhiteHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_White"));
@@ -186,6 +199,8 @@ void AManager_Turn::DestroyMoveHistory() const
 		UScrollBox* ScrollBox = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
 		ScrollBox->RemoveChild(EndButton);
 	}
+
+	MoveHistory.Empty();
 }
 
 void AManager_Turn::Replay(const int32 ClickedIndex)
@@ -244,7 +259,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			}
 			
 			// MoveHistory[i].Button->RemoveFromParent();
-			GameMode->MoveCounter - 1;
+			// GameMode->MoveCounter = GameMode->MoveCounter - 1;
 			i--;
 		}
 	}
@@ -293,7 +308,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
 			
 			// MoveHistory[i].Button->RemoveFromParent();
-			GameMode->MoveCounter + 1;
+			// GameMode->MoveCounter = GameMode->MoveCounter + 1;
 			i++;
 		}
 	}

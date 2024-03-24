@@ -23,6 +23,8 @@ AChess_GameMode::AChess_GameMode()
 	bIsBlackKingInCheckMate = false;
 	bIsDraw = false;
 
+	bInReplay = false;
+
 	ScoreWhiteTeam = 0;
 	ScoreBlackTeam = 0;
 
@@ -129,13 +131,14 @@ void AChess_GameMode::TurnNextPlayer()
 			return;
 		}
 	}
+
+	// Reset game variables
+	TurnManager->ResetVariables();
+	bInReplay = false;
 	
 	MoveCounter += 1;
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 	Players[CurrentPlayer]->OnTurn();
-	
-	// Reset game variables
-	TurnManager->ResetVariables();
 
 	/*
 	TurnManager->bIsKill = false;
@@ -360,16 +363,17 @@ void AChess_GameMode::ResetField()
 	TileArray.Empty();
 	WhiteTeam.Empty();
 	BlackTeam.Empty();
-	// ResetSelectedPiece();
-	// ResetTargetedAndKillableTiles();
+
 	Kings[WHITE] = nullptr;
 	Kings[BLACK] = nullptr;
 
 	bIsGameOver = false;
+	bIsWhiteKingInCheckMate = false;
+	bIsBlackKingInCheckMate = false;
+	bIsDraw = false;
 	MoveCounter = 0;
 
-	// const AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	// Cpc->UserInterfaceWidget->DestroyMoveHistory();
+	TurnManager->ResetVariables();
 
 	TurnManager->DestroyMoveHistory();
 

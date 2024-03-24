@@ -40,6 +40,9 @@ public:
 	bool bIsDraw;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 MoveCounter; // Tracks the number of moves
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bInReplay;
 	
 	// Array of player interfaces
 	TArray<IPlayerInterface*> Players;

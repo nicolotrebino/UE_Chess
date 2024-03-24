@@ -31,7 +31,7 @@ void ARandomPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ARandomPlayer::OnTurn()
 {
-	AChess_GameMode* ChessGameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	const AChess_GameMode* ChessGameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	ChessGameMode->TurnManager->DisableReplay();
 	
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));

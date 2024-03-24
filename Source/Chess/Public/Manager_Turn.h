@@ -71,7 +71,7 @@ public:
 	void DisableReplay() const;
 	void EnableReplay();
 
-	void DestroyMoveHistory() const;
+	void DestroyMoveHistory();
 
 	UFUNCTION(BlueprintCallable)
 	void Replay(const int32 ClickedIndex);

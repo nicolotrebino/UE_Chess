@@ -35,7 +35,7 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 	if (GetTeam() == WHITE)
 	{
 		// Advance
-		if (FirstMove)
+		if (CurrNumber == 2)
 		{
 			if (Utility::IsValidPosition(CurrLetter, CurrNumber + 1))
 			{
@@ -91,7 +91,7 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 	else
 	{
 		// Recede
-		if (FirstMove)
+		if (CurrNumber == 7)
 		{
 			ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
 			if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
