@@ -4,6 +4,7 @@
 
 #include "Chess_GameMode.h"
 #include "Chess_PlayerController.h"
+#include "Chess_Rook.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
 #include "Components/ScrollBox.h"
@@ -125,7 +126,7 @@ void AManager_Turn::DisplayEndGame() const
 
 FString AManager_Turn::ComputeNotation() const
 {
-	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	const AManager_Turn* TurnManager = GameMode->TurnManager;
 	if (!(NextTile || MovedPiece))
 	{
@@ -151,6 +152,56 @@ FString AManager_Turn::ComputeNotation() const
 		if (TurnManager->bIsKill)
 		{
 			MoveNomenclature = MoveNomenclature + "x";
+		}
+		if (MovedPiece->GetType() == EPieceType::ROOK)
+		{
+			TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+			
+			for (AChess_Piece* Piece: Team)
+			{
+				if (Piece->GetType() == EPieceType::ROOK && Piece != MovedPiece)
+				{
+					NextTile->SetTileStatus(ETileStatus::EMPTY);
+					TArray<ATile*> Moves = Piece->GetLegitMoves();
+					NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+					if (Moves.Contains(NextTile))
+					{
+						if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+						{
+							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+						}
+						else
+						{
+							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+						}
+					}
+				}
+			}
+		}
+		if (MovedPiece->GetType() == EPieceType::KNIGHT)
+		{
+			TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+			
+			for (AChess_Piece* Piece: Team)
+			{
+				if (Piece->GetType() == EPieceType::KNIGHT && Piece != MovedPiece)
+				{
+					NextTile->SetTileStatus(ETileStatus::EMPTY);
+					TArray<ATile*> Moves = Piece->GetLegitMoves();
+					NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+					if (Moves.Contains(NextTile))
+					{
+						if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+						{
+							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+						}
+						else
+						{
+							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+						}
+					}
+				}
+			}
 		}
 		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 	}

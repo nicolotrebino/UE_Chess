@@ -35,8 +35,4 @@ protected:
 	/* Materials */	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UMaterialInstance*> PawnMaterials;
-
-	/* Promotion widget */
-
-	bool FirstMove;
 };

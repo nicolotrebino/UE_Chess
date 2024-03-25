@@ -20,7 +20,6 @@ AChess_Pawn::AChess_Pawn()
 
 	Nomenclature = 'P';
 	PieceValue = 1;
-	FirstMove = true;
 }
 
 TArray<ATile*> AChess_Pawn::GetPossibleMoves()
@@ -139,13 +138,10 @@ void AChess_Pawn::SetMaterial(const int32 Index)
 	PawnMeshComponent->SetMaterial(0, PawnMaterials[Index]);
 }
 
-// Override to implement the promotion and to change
-// the FirstMove boolean managing Pawn moves
+// Override to implement the promotion
 void AChess_Pawn::MovePiece(ATile* NextTile)
 {
 	Super::MovePiece(NextTile);
-
-	FirstMove = false;
 
 	if (!this->IsHidden())
 	{
@@ -179,72 +175,6 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 		}
 	}
 }
-
-/*
-void AChess_Pawn::StartPromotion()
-{
-	if (GameMode)
-	{
-		AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		
-		PromotionWidget = CreateWidget<UManager_PromotionHUD>(Cpc, PromotionWidgetClass);
-		PromotionWidget->SetCurrentPawn(this);
-		PromotionWidget->AddToViewport();
-	}
-}
-
-void AChess_Pawn::HandleButtonClicked(const int32 SelectedPieceIndex)
-{
-	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	AChess_Piece* NewPiece;
-	
-	switch (SelectedPieceIndex)
-	{
-		case 0:
-			NewPiece = GameMode->CBoard->SpawnSinglePiece(CurrentTile, PieceTeam, ROOK);
-			break;
-		case 1:
-			NewPiece = GameMode->CBoard->SpawnSinglePiece(CurrentTile, PieceTeam, QUEEN);
-			break;
-		case 2:
-			NewPiece = GameMode->CBoard->SpawnSinglePiece(CurrentTile, PieceTeam, BISHOP);
-			break;
-		case 3:
-			NewPiece = GameMode->CBoard->SpawnSinglePiece(CurrentTile, PieceTeam, KNIGHT);
-			break;
-		default:
-			NewPiece = nullptr;
-			break;
-	}
-	
-	switch (PieceTeam)
-	{
-	case WHITE:
-		GameMode->WhiteTeam.Remove(this);
-		GameMode->WhiteTeam.Add(NewPiece);
-		break;
-	case BLACK:
-		GameMode->BlackTeam.Remove(this);
-		GameMode->BlackTeam.Add(NewPiece);
-		break;
-	default:
-		break;
-	}
-	
-	Cpc->UserInterfaceWidget->SetPieceToMove(NewPiece);
-	GameMode->UpdateScores();
-	this->Destroy();
-	
-	if (PromotionWidget)
-	{
-		PromotionWidget->RemoveFromParent();
-		// Probably I can't destroy the widget directly
-		// Hoping the garbage collector take care of it
-		PromotionWidget = nullptr;
-		// GameMode->SetGamePaused(false);
-	}
-}
-*/
 
 void AChess_Pawn::BeginPlay()
 {

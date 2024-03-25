@@ -60,8 +60,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AManager_Turn* TurnManager;
 
-	// TArray<FHistoryButton> MhButtons;
-
 	// Promotion Manager
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AManager_Promotion> PromotionManagerClass;
