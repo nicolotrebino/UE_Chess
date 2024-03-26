@@ -85,13 +85,6 @@ public:
 	TArray<AChess_Piece*> KilledWhiteTeam; // Keeps track of Black Pieces
 	UPROPERTY(Transient)
 	TArray<AChess_Piece*> KilledBlackTeam; // Keeps track of Black Pieces
-	
-	UPROPERTY(Transient)
-	TArray<ATile*> TargetedTiles; // Keeps track of Targeted Tiles
-	UPROPERTY(Transient)
-	TArray<ATile*> KillableTiles; // Keeps track of Killable Tiles
-	UPROPERTY(Transient)
-	AChess_Piece* SelectedPiece; // Keeps track of Selected Piece
 
 	/*
 	 * Class methods
@@ -103,8 +96,7 @@ public:
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index
 	UFUNCTION(BlueprintCallable)
 	void TurnNextPlayer(); // Called at the end of the game turn
-	void ResetTargetedAndKillableTiles();
-	void ResetSelectedPiece() const;
+
 	bool IsKingInCheck(const int32 KingTeam);
 	bool IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);

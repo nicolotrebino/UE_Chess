@@ -33,6 +33,8 @@ AManager_Turn::AManager_Turn()
 	PreviousTile = nullptr;
 	NextTile = nullptr;
 
+	SelectedPiece = nullptr;
+
 	CurrentButtonIndex = 0;
 }
 
@@ -64,6 +66,40 @@ void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* 
 	NextTile = NTile;
 	MovedPiece = PieceToMove;
 	KilledPiece = PieceToKill;
+}
+
+
+/*
+ * Bring back to the default color all the targeted Tiles
+ * and empty the TArray with all the pointers to the TargetedTiles
+ */
+void AManager_Turn::ResetTargetedAndKillableTiles()
+{
+	// Reset the targeted tiles and remove them from the "global" array
+	for (ATile* Tile : TargetedTiles)
+	{
+		Tile->UnsetTargetTile(); // Make it EMPTY and with the default material
+	}
+	TargetedTiles.Empty();
+
+	// Reset the killable tiles and remove them from the "global" array
+	for (ATile* Tile : KillableTiles)
+	{
+		Tile->UnsetKillableTile(); // Make it OCCUPIED and with the default material
+	}
+	KillableTiles.Empty();
+}
+
+/*
+ * Bring back to the default color the Tile
+ * of the SelectedPiece
+ */
+void AManager_Turn::ResetSelectedPiece() const
+{
+	if (SelectedPiece)
+	{
+		SelectedPiece->GetPieceTile()->UnsetSelectedTile();
+	}
 }
 
 void AManager_Turn::DisplayMove()
@@ -128,20 +164,20 @@ void AManager_Turn::DisplayEndGame() const
 FString AManager_Turn::ComputeNotation() const
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	const AManager_Turn* TurnManager = GameMode->TurnManager;
+	// const AManager_Turn* TurnManager = GameMode->TurnManager;
 	if (!(NextTile || MovedPiece))
 	{
 		return ""; // Gestione errore
 	}
 
 	FString MoveNomenclature = "";
-	if (TurnManager->bIsPromotion)
+	if (GameMode->TurnManager->bIsPromotion)
 	{
 		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c/%c%d"), PromotedPiece->GetNomenclature(), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 	}
 	else if (MovedPiece->GetType() == EPieceType::PAWN)
 	{
-		if (PreviousTile && TurnManager->bIsKill)
+		if (PreviousTile && GameMode->TurnManager->bIsKill)
 		{
 			MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
 		}
@@ -150,7 +186,7 @@ FString AManager_Turn::ComputeNotation() const
 	else
 	{
 		MoveNomenclature = FString::Printf(TEXT("%c"), MovedPiece->GetNomenclature());
-		if (TurnManager->bIsKill)
+		if (GameMode->TurnManager->bIsKill)
 		{
 			MoveNomenclature = MoveNomenclature + "x";
 		}
@@ -211,7 +247,7 @@ FString AManager_Turn::ComputeNotation() const
 	{
 		MoveNomenclature = MoveNomenclature + "#";
 	}
-	else if (TurnManager->bIsWhiteKingInCheck || TurnManager->bIsBlackKingInCheck)
+	else if (GameMode->TurnManager->bIsWhiteKingInCheck || GameMode->TurnManager->bIsBlackKingInCheck)
 	{
 		MoveNomenclature = MoveNomenclature + "+";
 	} 
@@ -263,8 +299,8 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 	// int32 i = MoveHistory.Num() - 1;
 	// UScrollBox* MhContainer = Cast<UScrollBox>(WidgetTree->FindWidget("MH_Scroll"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	GameMode->ResetTargetedAndKillableTiles();
-	GameMode->ResetSelectedPiece();
+	ResetTargetedAndKillableTiles();
+	ResetSelectedPiece();
 	if (ClickedIndex >= 0 && ClickedIndex < CurrentButtonIndex)
 	{
 		int32 i = CurrentButtonIndex;

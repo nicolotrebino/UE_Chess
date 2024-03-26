@@ -75,9 +75,9 @@ void AHumanPlayer::OnClick()
 			// If the Chess Piece has the color of the Human Player's team (WHITE)
 			if (CurrPiece->GetTeam() == Team)
 			{
-				GameMode->ResetTargetedAndKillableTiles(); // Reset array of both Targeted and Killable Tiles
-				GameMode->ResetSelectedPiece(); // Reset Selected Piece's Tile
-				GameMode->SelectedPiece = SelectedPiece = CurrPiece; // Set the Chess Piece selected by the Human Player
+				GameMode->TurnManager->ResetTargetedAndKillableTiles(); // Reset array of both Targeted and Killable Tiles
+				GameMode->TurnManager->ResetSelectedPiece(); // Reset Selected Piece's Tile
+				GameMode->TurnManager->SelectedPiece = SelectedPiece = CurrPiece; // Set the Chess Piece selected by the Human Player
 				CurrPiece->GetPieceTile()->SetSelectedTile(); // Select the Tile and set it to SELECTED
 
 				// For each tile in the array of possible moves for the selected piece,
@@ -122,12 +122,12 @@ void AHumanPlayer::OnClick()
 					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
 					{
 						Tile->SetKillableTile();
-						GameMode->KillableTiles.Add(Tile);
+						GameMode->TurnManager->KillableTiles.Add(Tile);
 					}
 					else
 					{
 						Tile->SetTargetTile();
-						GameMode->TargetedTiles.Add(Tile);
+						GameMode->TurnManager->TargetedTiles.Add(Tile);
 					}
 				}
 			}
@@ -138,7 +138,7 @@ void AHumanPlayer::OnClick()
 				SelectedPiece->Kill(CurrPiece);
 
 				// Reset all the Tiles in the "global" arrays
-				GameMode->ResetTargetedAndKillableTiles();
+				GameMode->TurnManager->ResetTargetedAndKillableTiles();
 
 				// Move the selected piece
 				SelectedPiece->MovePiece(NextTile);
@@ -165,7 +165,7 @@ void AHumanPlayer::OnClick()
 				if (SelectedPiece)
 				{
 					// Reset all the Tiles in the "global" arrays
-					GameMode->ResetTargetedAndKillableTiles();
+					GameMode->TurnManager->ResetTargetedAndKillableTiles();
 					
 					// Move the selected piece
 					SelectedPiece->MovePiece(NextTile);
@@ -186,8 +186,8 @@ void AHumanPlayer::OnClick()
 			// If the Tile is empty
 			else if (NextTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
-				GameMode->ResetTargetedAndKillableTiles(); // Reset array of Targeted Tiles
-				GameMode->ResetSelectedPiece(); // Reset the Selected Piece
+				GameMode->TurnManager->ResetTargetedAndKillableTiles(); // Reset array of Targeted Tiles
+				GameMode->TurnManager->ResetSelectedPiece(); // Reset the Selected Piece
 			}
 		}
 	}

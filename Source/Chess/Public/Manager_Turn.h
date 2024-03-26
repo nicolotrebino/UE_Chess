@@ -55,6 +55,16 @@ public:
 
 	TArray<ATile*> LegalMoves; // All legal moves for the particular turn
 
+	void ResetTargetedAndKillableTiles();
+	void ResetSelectedPiece() const;
+
+	UPROPERTY(Transient)
+	TArray<ATile*> TargetedTiles; // Keeps track of Targeted Tiles
+	UPROPERTY(Transient)
+	TArray<ATile*> KillableTiles; // Keeps track of Killable Tiles
+	UPROPERTY(Transient)
+	AChess_Piece* SelectedPiece; // Keeps track of Selected Piece
+
 	/* Move History managing */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MhButtonClass;

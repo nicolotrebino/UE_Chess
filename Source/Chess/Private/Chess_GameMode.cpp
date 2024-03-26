@@ -37,8 +37,6 @@ AChess_GameMode::AChess_GameMode()
 
 	PromotionManager = nullptr;
 
-	SelectedPiece = nullptr;
-
 	Kings.SetNum(2); // Create space for two elements in the array
 	Kings[WHITE] = nullptr;
 	Kings[BLACK] = nullptr;
@@ -208,39 +206,6 @@ void AChess_GameMode::TurnNextPlayer()
 	TurnManager->bIsPromotion = false;
 	TurnManager->Checker = nullptr;
 	*/
-}
-
-/*
- * Bring back to the default color all the targeted Tiles
- * and empty the TArray with all the pointers to the TargetedTiles
- */
-void AChess_GameMode::ResetTargetedAndKillableTiles()
-{
-	// Reset the targeted tiles and remove them from the "global" array
-	for (ATile* Tile : TargetedTiles)
-	{
-		Tile->UnsetTargetTile(); // Make it EMPTY and with the default material
-	}
-	TargetedTiles.Empty();
-
-	// Reset the killable tiles and remove them from the "global" array
-	for (ATile* Tile : KillableTiles)
-	{
-		Tile->UnsetKillableTile(); // Make it OCCUPIED and with the default material
-	}
-	KillableTiles.Empty();
-}
-
-/*
- * Bring back to the default color the Tile
- * of the SelectedPiece
- */
-void AChess_GameMode::ResetSelectedPiece() const
-{
-	if (SelectedPiece)
-	{
-		SelectedPiece->GetPieceTile()->UnsetSelectedTile();
-	}
 }
 
 bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
