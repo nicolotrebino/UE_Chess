@@ -53,8 +53,10 @@ void ARandomPlayer::OnTurn()
 					TArray<ATile*> RandPlayerMoves;
 					TSet<int32> CheckedIndices;
 					int32 RandPieceIdx = -1;
+					
 					// As long as the array of possible moves is empty,
 					// randomly choose a black piece and check if it has possible moves
+					/*
 					while (RandPlayerMoves.IsEmpty())
 					{
 						RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
@@ -71,6 +73,33 @@ void ARandomPlayer::OnTurn()
 						// RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
 						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->GetLegitMoves();
 					}
+					*/
+
+					while (RandPlayerMoves.IsEmpty())
+					{
+						RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+
+						// Continua a generare nuovi indici finché non ottieni uno diverso
+						while (CheckedIndices.Contains(RandPieceIdx))
+						{
+							RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+						}
+
+						// Aggiungi il nuovo indice al set
+						CheckedIndices.Add(RandPieceIdx);
+
+						/*
+						for (ATile* Tile: GameMode->BlackTeam[RandPieceIdx]->GetPossibleMoves())
+						{
+							if (GameMode->TurnManager->LegalMoves.Contains(Tile))
+							{
+								RandPlayerMoves.Add(Tile);
+							}
+						}
+						*/
+						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->MyLegalMoves;
+					}
+					
 					// After finding the possible moves, choose one randomly
 					const int32 RandMoveIdx = FMath::Rand() % RandPlayerMoves.Num();
 					if (RandPlayerMoves[RandMoveIdx]->GetTileStatus() == ETileStatus::OCCUPIED && RandPlayerMoves[RandMoveIdx]->GetTileTeam() != Team)

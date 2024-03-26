@@ -7,6 +7,7 @@
 #include "Chess_Rook.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
+#include "Components/HorizontalBox.h"
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
@@ -90,8 +91,8 @@ void AManager_Turn::DisplayMove()
 	CurrentButtonIndex = GameMode->MoveCounter - 1;
 	// GameMode->MhButtons.Add(Move);
 	
-	// If it is the Human
-	if (!GameMode->CurrentPlayer)
+	// If it is the AI, the move was done by the Human Player
+	if (GameMode->CurrentPlayer)
 	{
 		UVerticalBox* Container = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_White"));
 		
@@ -114,12 +115,12 @@ void AManager_Turn::DisplayMove()
 void AManager_Turn::DisplayEndGame() const
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	UScrollBox* Container = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
+	UVerticalBox* Container = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("EndGame"));
 
 	if (Container)
 	{
 		UUserWidget* LastButton = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(EndButtonClass);
-		LastButton->Rename(*FString::Printf(TEXT("EndGame")));
+		// LastButton->Rename(*FString::Printf(TEXT("EndGame")));
 		Container->AddChild(LastButton);
 	}
 }
@@ -238,18 +239,21 @@ void AManager_Turn::DestroyMoveHistory()
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	UVerticalBox* WhiteHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_White"));
 	UVerticalBox* RedHistory = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Red"));
-	UUserWidget* EndButton = Cast<UUserWidget>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("EndGame"));
+	UVerticalBox* EndButton = Cast<UVerticalBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("EndGame"));
 
-	if (WhiteHistory && RedHistory)
+	if (WhiteHistory && RedHistory && EndButton)
 	{
 		WhiteHistory->ClearChildren();
 		RedHistory->ClearChildren();
+		EndButton->ClearChildren();
 	}
+	/*
 	if (EndButton)
 	{
 		UScrollBox* ScrollBox = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
 		ScrollBox->RemoveChild(EndButton);
 	}
+	*/
 
 	MoveHistory.Empty();
 }
@@ -363,6 +367,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			i++;
 		}
 	}
+	GameMode->TurnManager->LegalMoves = GameMode->GetAllLegalMoves();
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
 }

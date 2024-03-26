@@ -39,7 +39,7 @@ void AHumanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AHumanPlayer::OnTurn()
 {
-	IsMyTurn = true;
+	bIsMyTurn = true;
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -67,7 +67,7 @@ void AHumanPlayer::OnClick()
 	FHitResult Hit = FHitResult(ForceInit);
 	// GetHitResultUnderCursor function sends a ray from the mouse position and gives the corresponding hit results
 	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECollisionChannel::ECC_Pawn, true, Hit);
-	if (Hit.bBlockingHit && IsMyTurn)
+	if (Hit.bBlockingHit && bIsMyTurn && !GameMode->bIsGameOver)
 	{
 		// If the human player clicks on a ChessPiece
 		if (AChess_Piece* CurrPiece = Cast<AChess_Piece>(Hit.GetActor()))
@@ -82,7 +82,42 @@ void AHumanPlayer::OnClick()
 
 				// For each tile in the array of possible moves for the selected piece,
 				// make it a target and add it to the array of target tiles at that time
+				/*
 				for (ATile* Tile : CurrPiece->GetLegitMoves())
+				{
+					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
+					{
+						Tile->SetKillableTile();
+						GameMode->KillableTiles.Add(Tile);
+					}
+					else
+					{
+						Tile->SetTargetTile();
+						GameMode->TargetedTiles.Add(Tile);
+					}
+				}
+				*/
+
+				/*
+				for (ATile* Tile: CurrPiece->GetPossibleMoves())
+				{
+					if (GameMode->TurnManager->LegalMoves.Contains(Tile))
+					{
+						if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
+						{
+							Tile->SetKillableTile();
+							GameMode->KillableTiles.Add(Tile);
+						}
+						else
+						{
+							Tile->SetTargetTile();
+							GameMode->TargetedTiles.Add(Tile);
+						}
+					}
+				}
+				*/
+
+				for (ATile* Tile: CurrPiece->MyLegalMoves)
 				{
 					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
 					{
@@ -114,7 +149,7 @@ void AHumanPlayer::OnClick()
 				}
 					
 				// Change the turn to Random Player
-				IsMyTurn = false;
+				bIsMyTurn = false;
 				GameMode->TurnNextPlayer();
 			}
 		}
@@ -134,6 +169,8 @@ void AHumanPlayer::OnClick()
 					
 					// Move the selected piece
 					SelectedPiece->MovePiece(NextTile);
+
+					UE_LOG(LogTemp, Error, TEXT("Moved Piece position: %c, %i"), SelectedPiece->GetPieceTile()->GetAlgebraicPosition().TileLetter, SelectedPiece->GetPieceTile()->GetAlgebraicPosition().TileNumber);
 					
 					if (GameMode->TurnManager->bIsPromotion)
 					{
@@ -141,7 +178,7 @@ void AHumanPlayer::OnClick()
 					}
 					
 					// Change the turn to Random Player
-					IsMyTurn = false;
+					bIsMyTurn = false;
 					GameMode->TurnNextPlayer();
 				}
 			}

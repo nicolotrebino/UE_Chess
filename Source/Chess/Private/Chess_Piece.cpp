@@ -89,8 +89,6 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 		const ETileStatus Status = NextTile->GetTileStatus();
 		const ETeam Team = NextTile->GetTileTeam();
 		
-		// ************ GameMode->IsMyKingInCheck(); // Control if the King is in check and set the Checker
-		
 		// If the next tile is the one under the Checker piece it means I can kill the Checker
 		if (!(TurnManager->Checker && NextTile == TurnManager->Checker->GetPieceTile()))
 		{

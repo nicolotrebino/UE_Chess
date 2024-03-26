@@ -53,6 +53,8 @@ public:
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
 
+	TArray<ATile*> LegalMoves; // All legal moves for the particular turn
+
 	/* Move History managing */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MhButtonClass;

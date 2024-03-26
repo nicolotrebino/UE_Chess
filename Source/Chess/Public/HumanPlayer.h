@@ -37,7 +37,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool IsMyTurn = false; // Keeps track of my turn
+	bool bIsMyTurn = false; // Keeps track of my turn
 	
 	AChess_Piece* SelectedPiece; // Current piece selected
 

@@ -96,6 +96,9 @@ public:
 	/*
 	 * Class methods
 	 */
+
+	TArray<ATile*> GetAllLegalMoves();
+	
 	void ChoosePlayerAndStartGame(); // Called at the start of the game
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index
 	UFUNCTION(BlueprintCallable)

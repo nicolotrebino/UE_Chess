@@ -33,7 +33,7 @@ public:
 
 	/* Functions that return legal moves */
 	virtual TArray<ATile*> GetPossibleMoves() { return TArray<ATile*>(); };
-	virtual void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves); 
+	void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves); 
 	TArray<ATile*> GetLegitMoves();
 
 	/* Functions to move the piece and "eat" opponents */
@@ -45,6 +45,8 @@ public:
 	
 	UFUNCTION()
 	void SelfDestroy(); // Destroy a ChessPiece actor
+
+	TArray<ATile*> MyLegalMoves;
 
 protected:
 	// Called when the game starts or when spawned

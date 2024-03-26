@@ -3,6 +3,7 @@
 #include "Chess_GameMode.h"
 
 #include "Chess_King.h"
+#include "Chess_Pawn.h"
 #include "Chess_PlayerController.h"
 #include "HumanPlayer.h"
 #include "RandomPlayer.h"
@@ -75,6 +76,37 @@ void AChess_GameMode::BeginPlay()
 	this->ChoosePlayerAndStartGame();
 }
 
+TArray<ATile*> AChess_GameMode::GetAllLegalMoves()
+{
+	TArray<ATile*> LegalMoves;
+	if (!CurrentPlayer) // White turn
+	{
+		for (AChess_Piece* Piece: WhiteTeam)
+		{
+			Piece->MyLegalMoves.Empty();
+			for (ATile* LegalMove: Piece->GetLegitMoves())
+			{
+				Piece->MyLegalMoves.Add(LegalMove);
+				LegalMoves.AddUnique(LegalMove);
+			}
+		}
+	}
+	else // Black turn
+	{
+		for (AChess_Piece* Piece: BlackTeam)
+		{
+			Piece->MyLegalMoves.Empty();
+			for (ATile* LegalMove: Piece->GetLegitMoves())
+			{
+				Piece->MyLegalMoves.Add(LegalMove);
+				LegalMoves.AddUnique(LegalMove);
+			}
+		}
+	}
+
+	return LegalMoves;
+}
+
 void AChess_GameMode::ChoosePlayerAndStartGame()
 {
 	CurrentPlayer = 0; // Set the first player to the Human Player
@@ -85,8 +117,12 @@ void AChess_GameMode::ChoosePlayerAndStartGame()
 		Players[i]->PlayerNumber = i;
 		Players[i]->Team = i == CurrentPlayer ? WHITE : BLACK;
 	}
+	
 	MoveCounter += 1;
 	UpdateScores();
+
+	TurnManager->LegalMoves = GetAllLegalMoves();
+	
 	Players[CurrentPlayer]->OnTurn();
 }
 
@@ -103,18 +139,40 @@ int32 AChess_GameMode::GetNextPlayer(int32 Player) const
 void AChess_GameMode::TurnNextPlayer()
 {
 	TurnManager->bIsBlackKingInCheck = IsKingInCheck(BLACK);
-	if (TurnManager->bIsBlackKingInCheck)
-	{
-		IsCheckMate(BLACK, BlackTeam);
-	}
 	TurnManager->bIsWhiteKingInCheck = IsKingInCheck(WHITE);
-	if (TurnManager->bIsWhiteKingInCheck)
-	{
-		IsCheckMate(WHITE, WhiteTeam);
-	}
 	
-	TurnManager->DisplayMove();
+	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 
+	TurnManager->LegalMoves = GetAllLegalMoves();
+
+	if (TurnManager->LegalMoves.IsEmpty())
+	{
+		if (TurnManager->bIsWhiteKingInCheck)
+		{
+			bIsGameOver = true;
+			bIsWhiteKingInCheckMate = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnLose();
+		}
+		else if (TurnManager->bIsBlackKingInCheck)
+		{
+			bIsGameOver = true;
+			bIsBlackKingInCheckMate = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnWin();
+		}
+		else
+		{
+			bIsGameOver = true;
+			bIsDraw = true;
+			TurnManager->DisplayEndGame();
+		}
+		return;
+	}
+
+	/*
 	if (bIsGameOver)
 	{
 		TurnManager->DisplayEndGame();
@@ -131,13 +189,16 @@ void AChess_GameMode::TurnNextPlayer()
 			return;
 		}
 	}
+	*/
+
+	TurnManager->DisplayMove();
+	
+	MoveCounter += 1;
 
 	// Reset game variables
 	TurnManager->ResetVariables();
 	bInReplay = false;
 	
-	MoveCounter += 1;
-	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 	Players[CurrentPlayer]->OnTurn();
 
 	/*
