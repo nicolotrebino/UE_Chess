@@ -10,6 +10,7 @@
 #include "EngineUtils.h"
 #include "Manager_Promotion.h"
 #include "Manager_Turn.h"
+#include "MinimaxPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
 AChess_GameMode::AChess_GameMode()
@@ -66,8 +67,8 @@ void AChess_GameMode::BeginPlay()
 	HumanPlayer->SetActorLocationAndRotation(CameraPos, FRotationMatrix::MakeFromX(FVector(0, 0, -1)).Rotator());
 
 	Players.Add(HumanPlayer); // Human player = 0
-	auto* AI = GetWorld()->SpawnActor<ARandomPlayer>(FVector(), FRotator()); // Random Player
-	// auto* AI = GetWorld()->SpawnActor<AChessMinimaxPlayer>(FVector(), FRotator()); // MiniMax Player
+	// auto* AI = GetWorld()->SpawnActor<ARandomPlayer>(FVector(), FRotator()); // Random Player
+	auto* AI = GetWorld()->SpawnActor<AMinimaxPlayer>(FVector(), FRotator()); // MiniMax Player
 	
 	Players.Add(AI); // AI player = 1
 

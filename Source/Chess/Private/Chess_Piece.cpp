@@ -170,17 +170,37 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 	if (Enemy->GetTeam() == ETeam::WHITE)
 	{
 		GameMode->WhiteTeam.Remove(Enemy);
-		GameMode->KilledWhiteTeam.Add(Enemy);
+		// GameMode->KilledWhiteTeam.Add(Enemy);
 	}
 	else
 	{
 		GameMode->BlackTeam.Remove(Enemy);
-		GameMode->KilledBlackTeam.Add(Enemy);
+		// GameMode->KilledBlackTeam.Add(Enemy);
 	}
 	GameMode->UpdateScores();
 	Enemy->SetActorHiddenInGame(true);
 	Enemy->SetActorEnableCollision(false);
 	GameMode->TurnManager->bIsKill = true;
+}
+
+void AChess_Piece::VirtualMove(ATile* NextTile)
+{
+	this->GetPieceTile()->SetTileTeam(NONE);
+	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
+	this->GetPieceTile()->SetPieceOnTile(nullptr);
+
+	this->SetPieceTile(NextTile); // Set the Tile under the ChessPiece
+	NextTile->SetTileStatus(ETileStatus::OCCUPIED); // Set the new Tile to OCCUPIED
+	NextTile->SetTileTeam(this->GetTeam());
+	NextTile->SetPieceOnTile(this); // Set the new reference of the Piece above the Tile
+}
+
+void AChess_Piece::VirtualKill(AChess_Piece* Enemy)
+{
+	// Enemy->SetActorHiddenInGame(true);
+	// Enemy->SetActorEnableCollision(false);
+	// GameMode->WhiteTeam.Remove(Enemy);
+	GameMode->KilledWhiteTeam.Add(Enemy);
 }
 
 void AChess_Piece::SelfDestroy()

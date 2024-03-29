@@ -40,6 +40,9 @@ public:
 	virtual void MovePiece(ATile* NextTile);
 	void Kill(AChess_Piece* Enemy) const;
 
+	void VirtualMove(ATile* NextTile);
+	void VirtualKill(AChess_Piece* Enemy);
+
 	// Set the right material for the Piece
 	virtual void SetMaterial(const int32 Index) {};
 	
