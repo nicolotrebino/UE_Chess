@@ -183,24 +183,79 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 	GameMode->TurnManager->bIsKill = true;
 }
 
-void AChess_Piece::VirtualMove(ATile* NextTile)
+void AChess_Piece::VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed)
 {
-	this->GetPieceTile()->SetTileTeam(NONE);
-	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
-	this->GetPieceTile()->SetPieceOnTile(nullptr);
+	// Unlink the previous Tile to the Piece to move
+	PreviousTile->SetTileTeam(NONE);
+	PreviousTile->SetTileStatus(ETileStatus::EMPTY);
+	PreviousTile->SetPieceOnTile(nullptr);
+
+	if (Killed && NextTile->GetTileStatus() == ETileStatus::OCCUPIED && NextTile->GetTileTeam() != PieceTeam)
+	{
+		if (Killed->GetTeam() == ETeam::WHITE)
+		{
+			// Killed->SetPieceTile(nullptr);
+			GameMode->WhiteTeam.Remove(Killed);
+			GameMode->KilledWhiteTeam.Add(Killed);
+		}
+		if (Killed->GetTeam() == ETeam::BLACK)
+		{
+			// Killed->SetPieceTile(nullptr);
+			GameMode->BlackTeam.Remove(Killed);
+			GameMode->KilledBlackTeam.Add(Killed);
+		}
+	}
 
 	this->SetPieceTile(NextTile); // Set the Tile under the ChessPiece
 	NextTile->SetTileStatus(ETileStatus::OCCUPIED); // Set the new Tile to OCCUPIED
-	NextTile->SetTileTeam(this->GetTeam());
+	NextTile->SetTileTeam(PieceTeam);
 	NextTile->SetPieceOnTile(this); // Set the new reference of the Piece above the Tile
 }
 
-void AChess_Piece::VirtualKill(AChess_Piece* Enemy)
+void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed)
 {
-	// Enemy->SetActorHiddenInGame(true);
-	// Enemy->SetActorEnableCollision(false);
-	// GameMode->WhiteTeam.Remove(Enemy);
-	GameMode->KilledWhiteTeam.Add(Enemy);
+	if (Killed)
+	{
+		if (Killed->GetTeam() == ETeam::WHITE)
+		{
+			GameMode->KilledWhiteTeam.Remove(Killed);
+			GameMode->WhiteTeam.Add(Killed);
+		}
+		if (Killed->GetTeam() == ETeam::BLACK)
+		{
+			GameMode->KilledBlackTeam.Remove(Killed);
+			GameMode->BlackTeam.Add(Killed);
+		}
+		NextTile->SetPieceOnTile(Killed);
+		NextTile->SetTileTeam(Killed->GetTeam());
+		NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+		Killed->SetPieceTile(NextTile);
+	}
+	else
+	{
+		NextTile->SetPieceOnTile(nullptr);
+		NextTile->SetTileTeam(NONE);
+		NextTile->SetTileStatus(ETileStatus::EMPTY);
+	}
+	PreviousTile->SetPieceOnTile(this);
+	PreviousTile->SetTileTeam(PieceTeam);
+	PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
+	this->SetPieceTile(PreviousTile);
+}
+
+bool AChess_Piece::IsUnderCheck() const
+{
+	TArray<AChess_Piece*> EnemyTeam = (PieceTeam == WHITE) ? GameMode->BlackTeam : GameMode->WhiteTeam;
+
+	for (AChess_Piece* Piece: EnemyTeam)
+	{
+		if (Piece->MyLegalMoves.Contains(CurrentTile))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void AChess_Piece::SelfDestroy()

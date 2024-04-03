@@ -78,28 +78,28 @@ void AChess_GameMode::BeginPlay()
 TArray<ATile*> AChess_GameMode::GetAllLegalMoves()
 {
 	TArray<ATile*> LegalMoves;
-	if (!CurrentPlayer) // White turn
+	TurnManager->WhiteMoves.Empty();
+	TurnManager->BlackMoves.Empty();
+	
+	for (AChess_Piece* Piece: WhiteTeam)
 	{
-		for (AChess_Piece* Piece: WhiteTeam)
+		Piece->MyLegalMoves.Empty();
+		for (ATile* LegalMove: Piece->GetLegitMoves())
 		{
-			Piece->MyLegalMoves.Empty();
-			for (ATile* LegalMove: Piece->GetLegitMoves())
-			{
-				Piece->MyLegalMoves.Add(LegalMove);
-				LegalMoves.AddUnique(LegalMove);
-			}
+			Piece->MyLegalMoves.Add(LegalMove);
+			TurnManager->WhiteMoves.AddUnique(LegalMove);
+			LegalMoves.AddUnique(LegalMove);
 		}
 	}
-	else // Black turn
+
+	for (AChess_Piece* Piece: BlackTeam)
 	{
-		for (AChess_Piece* Piece: BlackTeam)
+		Piece->MyLegalMoves.Empty();
+		for (ATile* LegalMove: Piece->GetLegitMoves())
 		{
-			Piece->MyLegalMoves.Empty();
-			for (ATile* LegalMove: Piece->GetLegitMoves())
-			{
-				Piece->MyLegalMoves.Add(LegalMove);
-				LegalMoves.AddUnique(LegalMove);
-			}
+			Piece->MyLegalMoves.Add(LegalMove);
+			TurnManager->BlackMoves.AddUnique(LegalMove);
+			LegalMoves.AddUnique(LegalMove);
 		}
 	}
 

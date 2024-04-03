@@ -54,6 +54,8 @@ public:
 	bool bIsWhiteKingInCheck;
 
 	TArray<ATile*> LegalMoves; // All legal moves for the particular turn
+	TArray<ATile*> WhiteMoves;
+	TArray<ATile*> BlackMoves;
 
 	void ResetTargetedAndKillableTiles();
 	void ResetSelectedPiece() const;

@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MinimaxPlayer.h"
 
+#include "Chess_Bishop.h"
 #include "Chess_GameMode.h"
 #include "Chess_Queen.h"
 #include "Chess_King.h"
+#include "Chess_Knight.h"
+#include "Chess_Pawn.h"
+#include "Chess_Rook.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -46,7 +49,7 @@ void AMinimaxPlayer::OnTurn()
 		{
 			AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-			const FNextMove NextMove = FindBestMove();
+			FNextMove NextMove = FindBestMove();
 
 			if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
 			{
@@ -82,7 +85,8 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	// GameMode->UpdateScores();
 	// if (GameMode->ScoreBlackTeam > GameMode->ScoreWhiteTeam) GridValue += 30;
 	// if (GameMode->ScoreBlackTeam < GameMode->ScoreWhiteTeam) GridValue += -30;
-	
+
+	/*
 	for (AChess_Piece* KilledPiece: GameMode->KilledWhiteTeam)
 	{
 		GridValue += KilledPiece->GetPieceValue() * 2;
@@ -91,112 +95,149 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	{
 		GridValue -= KilledPiece->GetPieceValue() * 2;
 	}
-
-	if (GameMode->GetTileAtPosition('c', 5)->GetTileTeam() == BLACK)
-	{
-		GridValue += 5;
-	}
-	if (GameMode->GetTileAtPosition('d', 5)->GetTileTeam() == BLACK)
-	{
-		GridValue += 5;
-	}
-	if (GameMode->GetTileAtPosition('e', 5)->GetTileTeam() == BLACK)
-	{
-		GridValue += 5;
-	}
-	if (GameMode->GetTileAtPosition('f', 5)->GetTileTeam() == BLACK)
-	{
-		GridValue += 5;
-	}
-
-	if (GameMode->IsKingInCheck(WHITE)) GridValue += 200;
-	if (GameMode->IsKingInCheck(BLACK)) GridValue += -200;
 	
-	for (AChess_Piece* EnemyPiece: GameMode->WhiteTeam)
+	GameMode->UpdateScores();
+	GridValue += GameMode->ScoreBlackTeam - GameMode->ScoreWhiteTeam;
+	*/
+
+	int32 BlackValue = 0;
+	for (AChess_Piece* Piece: GameMode->BlackTeam)
 	{
-		if (EnemyPiece)
+		if (Piece->IsA(AChess_Pawn::StaticClass()))
 		{
-			// Get the Possible Moves of that White Piece
-			TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
-			// If the array of the possible moves of the enemy piece
-			// contains the Tile under the King
-			if (EnemyMoves.Contains(GameMode->Kings[BLACK]->GetPieceTile()))
-			{
-				GridValue -= 200;
-			}
+			BlackValue += BPawns[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) BlackValue -= 100;
+			else BlackValue += 100;
+		}
+		if (Piece->IsA(AChess_Rook::StaticClass()))
+		{
+			BlackValue += BRooks[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) BlackValue -= 500;
+			else BlackValue += 500;
+		}
+		if (Piece->IsA(AChess_Knight::StaticClass()))
+		{
+			BlackValue += BKnights[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) BlackValue -= 320;
+			else BlackValue += 320;
+		}
+		if (Piece->IsA(AChess_Bishop::StaticClass()))
+		{
+			BlackValue += BBishops[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) BlackValue -= 330;
+			else BlackValue += 330;
+		}
+		if (Piece->IsA(AChess_Queen::StaticClass()))
+		{
+			BlackValue += BQueens[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) BlackValue -= 900;
+			else BlackValue += 900;
 		}
 	}
-	for (AChess_Piece* EnemyPiece: GameMode->BlackTeam)
+	
+	int32 WhiteValue = 0;
+	for (AChess_Piece* Piece: GameMode->WhiteTeam)
 	{
-		if (EnemyPiece)
+		if (Piece->IsA(AChess_Pawn::StaticClass()))
 		{
-			// Get the Possible Moves of that White Piece
-			TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
-			// If the array of the possible moves of the enemy piece
-			// contains the Tile under the King
-			if (EnemyMoves.Contains(GameMode->Kings[WHITE]->GetPieceTile()))
-			{
-				GridValue += 200;
-			}
+			WhiteValue += WPawns[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) WhiteValue -= 100;
+			else WhiteValue += 100;
+		}
+		if (Piece->IsA(AChess_Rook::StaticClass()))
+		{
+			WhiteValue += WRooks[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) WhiteValue -= 500;
+			else WhiteValue += 500;
+		}
+		if (Piece->IsA(AChess_Knight::StaticClass()))
+		{
+			WhiteValue += WKnights[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) WhiteValue -= 320;
+			else WhiteValue += 320;
+		}
+		if (Piece->IsA(AChess_Bishop::StaticClass()))
+		{
+			WhiteValue += WBishops[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) WhiteValue -= 330;
+			else WhiteValue += 330;
+		}
+		if (Piece->IsA(AChess_Queen::StaticClass()))
+		{
+			WhiteValue += WQueens[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
+			if (GameMode->TurnManager->WhiteMoves.Contains(Piece->GetPieceTile())) WhiteValue -= 900;
+			else WhiteValue += 900;
 		}
 	}
 
+	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
+	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
+	if (GameMode->TurnManager->bIsBlackKingInCheck) BlackValue += 450;
+	if (GameMode->TurnManager->bIsWhiteKingInCheck) WhiteValue += 450;
+
+	GridValue = BlackValue - WhiteValue;
 	return GridValue;
 }
 
 int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax)
 {
-	if (Depth == 0) return EvaluateGrid();
-
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->GetAllLegalMoves(); // Creo le legal moves per tutti i pezzi dopo la virtual move
+	
+	// GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
+	// GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
 
-	if (GameMode->bIsDraw) return 0;
-	if (GameMode->bIsWhiteKingInCheckMate) return 500;
-	if (GameMode->bIsBlackKingInCheckMate) return -500;
+	if (GameMode->TurnManager->BlackMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsBlackKingInCheck)
+		{
+			return -20000;
+		}
+		return 0;
+	}
+	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsWhiteKingInCheck)
+		{
+			return -20000;
+		}
+		return 0;
+	}
+
+	/*
+	if (GameMode->TurnManager->LegalMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsWhiteKingInCheck)
+		{
+			return 20000;
+		}
+		if (GameMode->TurnManager->bIsBlackKingInCheck)
+		{
+			return -20000;
+		}
+		return 0;
+	}
+	*/
+
+	if (Depth == 0) return EvaluateGrid();
 
 	if (IsMax)
 	{
-		int32 Best = -1000;
+		int32 Best = -50000;
 
-		for (AChess_Piece* Piece: GameMode->BlackTeam)
+		TArray<AChess_Piece*> AiTeam = GameMode->BlackTeam;
+		for (AChess_Piece* Piece: AiTeam)
 		{
 			ATile* PreviousTile = Piece->GetPieceTile();
 			for (ATile* Tile: Piece->GetLegitMoves())
 			{
-				AChess_Piece* Killed = nullptr;
-				if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
-				{
-					Killed = Tile->GetPieceOnTile();
-					// Piece->VirtualKill(Killed);
-					// Team.Remove(Killed);
-					GameMode->KilledWhiteTeam.Add(Killed);
-					GameMode->WhiteTeam.Remove(Killed);
-				}
-				Piece->VirtualMove(Tile);
-
+				AChess_Piece* Killed = Tile->GetPieceOnTile();
+				Piece->VirtualMove(Tile, PreviousTile, Killed);
+				
 				Best = FMath::Max(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, false));
 
-				if (Killed)
-				{
-					// GameMode->WhiteTeam.Add(Killed);
-					GameMode->KilledWhiteTeam.Remove(Killed);
-					// Team.Add(Killed);
-					GameMode->WhiteTeam.Add(Killed);
-					Tile->SetPieceOnTile(Killed);
-					Tile->SetTileTeam(Killed->GetTeam());
-					Tile->SetTileStatus(ETileStatus::OCCUPIED);
-					Killed->SetPieceTile(Tile);
-				}
-				else
-				{
-					Tile->SetPieceOnTile(nullptr);
-					Tile->SetTileTeam(NONE);
-					Tile->SetTileStatus(ETileStatus::EMPTY);
-				}
-				PreviousTile->SetPieceOnTile(Piece);
-				PreviousTile->SetTileTeam(Piece->GetTeam());
-				PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
-				Piece->SetPieceTile(PreviousTile);
+				Piece->VirtualUnMove(Tile, PreviousTile, Killed);
+				// UE_LOG(LogTemp, Error, TEXT("%i, %i, %i"), Tile, PreviousTile, Killed);
 
 				if (Best >= Beta) return Best;
 				Alpha = FMath::Max(Alpha, Best);
@@ -206,47 +247,22 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 	}
 	else
 	{
-		int32 Best = 1000;
+		int32 Best = 50000;
 
-		for (AChess_Piece* Piece: GameMode->BlackTeam)
+		// Human player
+		TArray<AChess_Piece*> HumanTeam = GameMode->WhiteTeam;
+		for (AChess_Piece* Piece: HumanTeam)
 		{
 			ATile* PreviousTile = Piece->GetPieceTile();
 			for (ATile* Tile: Piece->GetLegitMoves())
 			{
-				AChess_Piece* Killed = nullptr;
-				if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
-				{
-					Killed = Tile->GetPieceOnTile();
-					// Piece->VirtualKill(Killed);
-					// Team.Remove(Killed);
-					GameMode->KilledWhiteTeam.Add(Killed);
-					GameMode->WhiteTeam.Remove(Killed);
-				}
-				Piece->VirtualMove(Tile);
-
+				AChess_Piece* Killed = Tile->GetPieceOnTile();
+				Piece->VirtualMove(Tile, PreviousTile, Killed);
+				
 				Best = FMath::Min(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, true));
 
-				if (Killed)
-				{
-					// GameMode->WhiteTeam.Add(Killed);
-					GameMode->KilledWhiteTeam.Remove(Killed);
-					GameMode->WhiteTeam.Add(Killed);
-					// Team.Add(Killed);
-					Tile->SetPieceOnTile(Killed);
-					Tile->SetTileTeam(Killed->GetTeam());
-					Tile->SetTileStatus(ETileStatus::OCCUPIED);
-					Killed->SetPieceTile(Tile);
-				}
-				else
-				{
-					Tile->SetPieceOnTile(nullptr);
-					Tile->SetTileTeam(NONE);
-					Tile->SetTileStatus(ETileStatus::EMPTY);
-				}
-				PreviousTile->SetPieceOnTile(Piece);
-				PreviousTile->SetTileTeam(Piece->GetTeam());
-				PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
-				Piece->SetPieceTile(PreviousTile);
+				Piece->VirtualUnMove(Tile, PreviousTile, Killed);
+				// UE_LOG(LogTemp, Error, TEXT("%i, %i, %i"), Tile, PreviousTile, Killed);
 
 				if (Best <= Alpha) return Best;
 				Beta = FMath::Min(Beta, Best);
@@ -258,49 +274,23 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 
 FNextMove AMinimaxPlayer::FindBestMove()
 {
-	int32 BestVal = -1000;
+	int32 BestVal = -50000;
+	int32 Alpha = -50000;
+	int32 Beta = 50000;
 
 	FNextMove BestMove = {nullptr, nullptr};
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-	for (AChess_Piece* Piece: GameMode->BlackTeam)
+	TArray<AChess_Piece*> AiTeam = GameMode->BlackTeam;
+	for (AChess_Piece* Piece: AiTeam)
 	{
 		ATile* PreviousTile = Piece->GetPieceTile();
 		for (ATile* Tile: Piece->GetLegitMoves())
 		{
-			AChess_Piece* Killed = nullptr;
-			if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
-			{
-				Killed = Tile->GetPieceOnTile();
-				// Piece->VirtualKill(Killed);
-				// Team.Remove(Killed);
-				GameMode->WhiteTeam.Remove(Killed);
-				GameMode->KilledWhiteTeam.Add(Killed);
-			}
-			Piece->VirtualMove(Tile);
-
-			int32 MoveVal = AlphaBetaMiniMax(3, -1000, 1000, false);
-
-			if (Killed)
-			{
-				// GameMode->WhiteTeam.Add(Killed);
-				GameMode->KilledWhiteTeam.Remove(Killed);
-				GameMode->WhiteTeam.Add(Killed);
-				Tile->SetPieceOnTile(Killed);
-				Tile->SetTileTeam(Killed->GetTeam());
-				Tile->SetTileStatus(ETileStatus::OCCUPIED);
-				Killed->SetPieceTile(Tile);
-			}
-			else
-			{
-				Tile->SetPieceOnTile(nullptr);
-				Tile->SetTileTeam(NONE);
-				Tile->SetTileStatus(ETileStatus::EMPTY);
-			}
-			PreviousTile->SetPieceOnTile(Piece);
-			PreviousTile->SetTileTeam(Piece->GetTeam());
-			PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
-			Piece->SetPieceTile(PreviousTile);
+			AChess_Piece* Killed = Tile->GetPieceOnTile();
+			Piece->VirtualMove(Tile, PreviousTile, Killed);
+			
+			int32 MoveVal = AlphaBetaMiniMax(2, Alpha, Beta, false);
 
 			if (MoveVal > BestVal)
 			{
@@ -308,6 +298,8 @@ FNextMove AMinimaxPlayer::FindBestMove()
 				BestMove.NextTile = Tile;
 				BestVal = MoveVal;
 			}
+			
+			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 		}
 	}
 	

@@ -403,7 +403,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			i++;
 		}
 	}
-	GameMode->TurnManager->LegalMoves = GameMode->GetAllLegalMoves();
+	LegalMoves = GameMode->GetAllLegalMoves();
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
 }

@@ -169,8 +169,6 @@ void AHumanPlayer::OnClick()
 					
 					// Move the selected piece
 					SelectedPiece->MovePiece(NextTile);
-
-					UE_LOG(LogTemp, Error, TEXT("Moved Piece position: %c, %i"), SelectedPiece->GetPieceTile()->GetAlgebraicPosition().TileLetter, SelectedPiece->GetPieceTile()->GetAlgebraicPosition().TileNumber);
 					
 					if (GameMode->TurnManager->bIsPromotion)
 					{
