@@ -144,6 +144,44 @@ void AChess_GameMode::TurnNextPlayer()
 
 	TurnManager->LegalMoves = GetAllLegalMoves();
 
+	if (TurnManager->BlackMoves.IsEmpty())
+	{
+		if (TurnManager->bIsBlackKingInCheck)
+		{
+			bIsGameOver = true;
+			bIsBlackKingInCheckMate = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnWin();
+		}
+		else
+		{
+			bIsGameOver = true;
+			bIsDraw = true;
+			TurnManager->DisplayEndGame();
+		}
+		return;
+	}
+	if (TurnManager->WhiteMoves.IsEmpty())
+	{
+		if (TurnManager->bIsWhiteKingInCheck)
+		{
+			bIsGameOver = true;
+			bIsWhiteKingInCheckMate = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnLose();
+		}
+		else
+		{
+			bIsGameOver = true;
+			bIsDraw = true;
+			TurnManager->DisplayEndGame();
+		}
+		return;
+	}
+
+	/*
 	if (TurnManager->LegalMoves.IsEmpty())
 	{
 		if (TurnManager->bIsWhiteKingInCheck)
@@ -170,6 +208,7 @@ void AChess_GameMode::TurnNextPlayer()
 		}
 		return;
 	}
+	*/
 
 	/*
 	if (bIsGameOver)

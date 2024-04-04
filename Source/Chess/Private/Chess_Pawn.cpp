@@ -7,6 +7,8 @@
 #include "Chess_GameMode.h"
 #include "Manager_Promotion.h"
 #include "Manager_Turn.h"
+#include "MinimaxPlayer.h"
+#include "RandomPlayer.h"
 
 AChess_Pawn::AChess_Pawn()
 {
@@ -169,9 +171,16 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 			GameMode->BlackTeam.Remove(this);
 
 			PromotionManager->SetCurrentPawn(this);
-		
-			const int32 RandomNumber = FMath::RandRange(0, 3);
-			PromotionManager->HandleButtonClicked(RandomNumber);
+
+			if (AMinimaxPlayer* Player = Cast<AMinimaxPlayer>(GameMode->Players[GameMode->CurrentPlayer]))
+			{
+				PromotionManager->HandleButtonClicked(2); // Always for the Queen
+			}
+			if (ARandomPlayer* Player = Cast<ARandomPlayer>(GameMode->Players[GameMode->CurrentPlayer]))
+			{
+				const int32 RandomNumber = FMath::RandRange(0, 3);
+				PromotionManager->HandleButtonClicked(RandomNumber);
+			}
 		}
 	}
 }
