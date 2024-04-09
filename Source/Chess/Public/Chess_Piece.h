@@ -43,8 +43,6 @@ public:
 	void VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
 	void VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
 
-	bool IsUnderCheck() const;
-
 	// Set the right material for the Piece
 	virtual void SetMaterial(const int32 Index) {};
 	

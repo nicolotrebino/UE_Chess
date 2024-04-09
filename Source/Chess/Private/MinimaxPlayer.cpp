@@ -88,73 +88,35 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	int32 BlackValue = 0;
 	int32 WhiteValue = 0;
 
-	/*
-	for (AChess_Piece* Piece: GameMode->BlackTeam)
-	{
-		if (Piece->IsA(AChess_Pawn::StaticClass()))
-		{
-			// BlackValue += BPawns[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			BlackValue += 100;
-		}
-		if (Piece->IsA(AChess_Rook::StaticClass()))
-		{
-			// BlackValue += BRooks[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			BlackValue += 500;
-		}
-		if (Piece->IsA(AChess_Knight::StaticClass()))
-		{
-			// BlackValue += BKnights[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			BlackValue += 320;
-		}
-		if (Piece->IsA(AChess_Bishop::StaticClass()))
-		{
-			// BlackValue += BBishops[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			BlackValue += 330;
-		}
-		if (Piece->IsA(AChess_Queen::StaticClass()))
-		{
-			// BlackValue += BQueens[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			BlackValue += 900;
-		}
-		if (MovedPiece && Piece->GetType() != MovedPiece->GetType())
-		{
-			BlackValue += 450;
-		}
-	}
-	
-	for (AChess_Piece* Piece: GameMode->WhiteTeam)
-	{
-		if (Piece->IsA(AChess_Pawn::StaticClass()))
-		{
-			// WhiteValue += WPawns[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			WhiteValue += 100;
-		}
-		if (Piece->IsA(AChess_Rook::StaticClass()))
-		{
-			// WhiteValue += WRooks[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			WhiteValue += 500;
-		}
-		if (Piece->IsA(AChess_Knight::StaticClass()))
-		{
-			// WhiteValue += WKnights[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			WhiteValue += 320;
-		}
-		if (Piece->IsA(AChess_Bishop::StaticClass()))
-		{
-			// WhiteValue += WBishops[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			WhiteValue += 330;
-		}
-		if (Piece->IsA(AChess_Queen::StaticClass()))
-		{
-			// WhiteValue += WQueens[Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber - 1][Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter - 'a'];
-			WhiteValue += 900;
-		}
-	}
-	*/
-
 	// Mobility
-	BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num();
-	WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num();
+	BlackValue += 10 * GameMode->GetAllLegalMoves(0).Num(); // Human
+	WhiteValue += 10 * GameMode->GetAllLegalMoves(1).Num(); // AI
+	
+	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
+	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
+
+	if (GameMode->TurnManager->BlackMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsBlackKingInCheck)
+		{
+			GameMode->bIsGameOver = true;
+			return -30000;
+		}
+		return 0;
+	}
+	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsWhiteKingInCheck)
+		{
+			GameMode->bIsGameOver = true;
+			return 30000;
+		}
+		return 0;
+	}
+
+	
+	// BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num();
+	// WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num();
 
 	// Position and material
 	for (int32 i = 0; i < GameMode->TileArray.Num(); i++)
@@ -168,6 +130,10 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 				case PAWN:
 					WhiteValue += 100;
 					WhiteValue += Pawns[i];
+					if (Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber == 8)
+					{
+						WhiteValue += 900;
+					}
 					break;
 				case KNIGHT:
 					WhiteValue += 320;
@@ -197,6 +163,10 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 				case PAWN:
 					BlackValue += 100;
 					BlackValue += Pawns[Flip[i]];
+					if (Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber == 1)
+					{
+						BlackValue += 900;
+					}
 					break;
 				case KNIGHT:
 					BlackValue += 320;
@@ -222,26 +192,6 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 		}
 	}
 
-	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
-	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
-
-	if (GameMode->TurnManager->BlackMoves.IsEmpty())
-	{
-		if (GameMode->TurnManager->bIsBlackKingInCheck)
-		{
-			GameMode->bIsGameOver = true;
-			WhiteValue += 10000; // Mate
-		}
-	}
-	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
-	{
-		if (GameMode->TurnManager->bIsWhiteKingInCheck)
-		{
-			GameMode->bIsGameOver = true;
-			BlackValue += 10000;
-		}
-	}
-
 	GridValue = BlackValue - WhiteValue;
 	return GridValue;
 }
@@ -249,10 +199,10 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	GameMode->GetAllLegalMoves(); // Creo le legal moves per tutti i pezzi dopo la virtual move
+
+	if (Depth == 0 || GameMode->bIsGameOver) return EvaluateGrid();
 	
-	// GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
-	// GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
+	// GameMode->GetAllLegalMoves(IsMax); // Creo le legal moves per tutti i pezzi dopo la virtual move
 
 	/*
 	if (GameMode->TurnManager->LegalMoves.IsEmpty())
@@ -268,8 +218,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 		return 0;
 	}
 	*/
-
-	if (Depth == 0 || GameMode->bIsGameOver) return EvaluateGrid();
 
 	if (IsMax)
 	{
@@ -288,7 +236,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				Best = FMath::Max(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, false));
 
 				Piece->VirtualUnMove(Tile, PreviousTile, Killed);
-				// UE_LOG(LogTemp, Error, TEXT("%i, %i, %i"), Tile, PreviousTile, Killed);
 
 				if (Best >= Beta) return Best;
 				Alpha = FMath::Max(Alpha, Best);
@@ -345,14 +292,14 @@ FNextMove AMinimaxPlayer::FindBestMove()
 			
 			int32 MoveVal = AlphaBetaMiniMax(2, Alpha, Beta, false);
 
+			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
+
 			if (MoveVal > BestVal)
 			{
 				BestMove.PieceToMove = Piece;
 				BestMove.NextTile = Tile;
 				BestVal = MoveVal;
 			}
-			
-			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 		}
 	}
 	

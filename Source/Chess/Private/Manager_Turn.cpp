@@ -403,7 +403,13 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			i++;
 		}
 	}
-	LegalMoves = GameMode->GetAllLegalMoves();
+	////////// LegalMoves = GameMode->GetAllLegalMoves(); (Mi sa che devi mettere solo Human player però direi solo
+	/// se è il suo turno, controlla bene
+	///
+	if ((ClickedIndex % 2) != 0)
+	{
+		LegalMoves = GameMode->GetAllLegalMoves(0);
+	}
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
 }

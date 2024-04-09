@@ -75,31 +75,38 @@ void AChess_GameMode::BeginPlay()
 	this->ChoosePlayerAndStartGame();
 }
 
-TArray<ATile*> AChess_GameMode::GetAllLegalMoves()
+TArray<ATile*> AChess_GameMode::GetAllLegalMoves(int32 Player)
 {
 	TArray<ATile*> LegalMoves;
-	TurnManager->WhiteMoves.Empty();
-	TurnManager->BlackMoves.Empty();
 	
-	for (AChess_Piece* Piece: WhiteTeam)
+	// For the Human Player
+	if (!Player)
 	{
-		Piece->MyLegalMoves.Empty();
-		for (ATile* LegalMove: Piece->GetLegitMoves())
+		TurnManager->WhiteMoves.Empty();
+		for (AChess_Piece* Piece: WhiteTeam)
 		{
-			Piece->MyLegalMoves.Add(LegalMove);
-			TurnManager->WhiteMoves.AddUnique(LegalMove);
-			LegalMoves.AddUnique(LegalMove);
+			Piece->MyLegalMoves.Empty();
+			for (ATile* LegalMove: Piece->GetLegitMoves())
+			{
+				Piece->MyLegalMoves.Add(LegalMove);
+				TurnManager->WhiteMoves.AddUnique(LegalMove);
+				LegalMoves.AddUnique(LegalMove);
+			}
 		}
 	}
 
-	for (AChess_Piece* Piece: BlackTeam)
+	if (Player)
 	{
-		Piece->MyLegalMoves.Empty();
-		for (ATile* LegalMove: Piece->GetLegitMoves())
+		TurnManager->BlackMoves.Empty();
+		for (AChess_Piece* Piece: BlackTeam)
 		{
-			Piece->MyLegalMoves.Add(LegalMove);
-			TurnManager->BlackMoves.AddUnique(LegalMove);
-			LegalMoves.AddUnique(LegalMove);
+			Piece->MyLegalMoves.Empty();
+			for (ATile* LegalMove: Piece->GetLegitMoves())
+			{
+				Piece->MyLegalMoves.Add(LegalMove);
+				TurnManager->BlackMoves.AddUnique(LegalMove);
+				LegalMoves.AddUnique(LegalMove);
+			}
 		}
 	}
 
@@ -120,7 +127,7 @@ void AChess_GameMode::ChoosePlayerAndStartGame()
 	MoveCounter += 1;
 	UpdateScores();
 
-	TurnManager->LegalMoves = GetAllLegalMoves();
+	TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
 	
 	Players[CurrentPlayer]->OnTurn();
 }
@@ -142,8 +149,9 @@ void AChess_GameMode::TurnNextPlayer()
 	
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 
-	TurnManager->LegalMoves = GetAllLegalMoves();
+	TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
 
+	/*
 	if (TurnManager->BlackMoves.IsEmpty())
 	{
 		if (TurnManager->bIsBlackKingInCheck)
@@ -180,8 +188,8 @@ void AChess_GameMode::TurnNextPlayer()
 		}
 		return;
 	}
-
-	/*
+	*/
+	
 	if (TurnManager->LegalMoves.IsEmpty())
 	{
 		if (TurnManager->bIsWhiteKingInCheck)
@@ -208,7 +216,6 @@ void AChess_GameMode::TurnNextPlayer()
 		}
 		return;
 	}
-	*/
 
 	/*
 	if (bIsGameOver)

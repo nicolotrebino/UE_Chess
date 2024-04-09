@@ -90,7 +90,7 @@ public:
 	 * Class methods
 	 */
 
-	TArray<ATile*> GetAllLegalMoves();
+	TArray<ATile*> GetAllLegalMoves(int32 Player);
 	
 	void ChoosePlayerAndStartGame(); // Called at the start of the game
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index

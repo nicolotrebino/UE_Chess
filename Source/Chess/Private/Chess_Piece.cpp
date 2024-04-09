@@ -196,13 +196,13 @@ void AChess_Piece::VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piec
 		{
 			// Killed->SetPieceTile(nullptr);
 			GameMode->WhiteTeam.Remove(Killed);
-			GameMode->KilledWhiteTeam.Add(Killed);
+			// GameMode->KilledWhiteTeam.Add(Killed);
 		}
 		if (Killed->GetTeam() == ETeam::BLACK)
 		{
 			// Killed->SetPieceTile(nullptr);
 			GameMode->BlackTeam.Remove(Killed);
-			GameMode->KilledBlackTeam.Add(Killed);
+			// GameMode->KilledBlackTeam.Add(Killed);
 		}
 	}
 
@@ -218,12 +218,12 @@ void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Pi
 	{
 		if (Killed->GetTeam() == ETeam::WHITE)
 		{
-			GameMode->KilledWhiteTeam.Remove(Killed);
+			// GameMode->KilledWhiteTeam.Remove(Killed);
 			GameMode->WhiteTeam.Add(Killed);
 		}
 		if (Killed->GetTeam() == ETeam::BLACK)
 		{
-			GameMode->KilledBlackTeam.Remove(Killed);
+			// GameMode->KilledBlackTeam.Remove(Killed);
 			GameMode->BlackTeam.Add(Killed);
 		}
 		NextTile->SetPieceOnTile(Killed);
@@ -241,21 +241,6 @@ void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Pi
 	PreviousTile->SetTileTeam(PieceTeam);
 	PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
 	this->SetPieceTile(PreviousTile);
-}
-
-bool AChess_Piece::IsUnderCheck() const
-{
-	TArray<AChess_Piece*> EnemyTeam = (PieceTeam == WHITE) ? GameMode->BlackTeam : GameMode->WhiteTeam;
-
-	for (AChess_Piece* Piece: EnemyTeam)
-	{
-		if (Piece->MyLegalMoves.Contains(CurrentTile))
-		{
-			return true;
-		}
-	}
-
-	return false;
 }
 
 void AChess_Piece::SelfDestroy()
