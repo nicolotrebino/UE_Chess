@@ -25,6 +25,9 @@ public:
 	int32 GetScoreHumanPlayer(); // Get the score for human player
 	UFUNCTION(BlueprintCallable)
 	int32 GetScoreAiPlayer(); // Get the score for AI player
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 EnemyPlayer;
 	
 	void IncrementScoreHumanPlayer(); // Increment the score for human player
 	void IncrementScoreAiPlayer(); // Increment the score for AI player

@@ -47,8 +47,6 @@ void AChess_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AHumanPlayer* HumanPlayer = Cast<AHumanPlayer>(*TActorIterator<AHumanPlayer>(GetWorld()));
-	
 	if (ChessboardClass != nullptr)
 	{
 		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
@@ -62,15 +60,36 @@ void AChess_GameMode::BeginPlay()
 		PromotionManager = GetWorld()->SpawnActor<AManager_Promotion>(PromotionManagerClass);
 	}
 
+	AHumanPlayer* HumanPlayer = Cast<AHumanPlayer>(*TActorIterator<AHumanPlayer>(GetWorld()));
+
 	const float CameraPosX = (CBoard->GetTileSize() * CBoard->GetFieldSize() / 2);
 	const FVector CameraPos(CameraPosX, 0.0f, 1000.0f);
 	HumanPlayer->SetActorLocationAndRotation(CameraPos, FRotationMatrix::MakeFromX(FVector(0, 0, -1)).Rotator());
 
 	Players.Add(HumanPlayer); // Human player = 0
 	// auto* AI = GetWorld()->SpawnActor<ARandomPlayer>(FVector(), FRotator()); // Random Player
-	auto* AI = GetWorld()->SpawnActor<AMinimaxPlayer>(FVector(), FRotator()); // MiniMax Player
+	//auto* AI = GetWorld()->SpawnActor<AMinimaxPlayer>(FVector(), FRotator()); // MiniMax Player
 	
-	Players.Add(AI); // AI player = 1
+	// Players.Add(AI); // AI player = 1
+
+	const UChess_GameInstance* GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (GameInstance)
+	{
+		if (GameInstance->EnemyPlayer) // Random player
+		{
+			auto* AI = GetWorld()->SpawnActor<ARandomPlayer>(FVector(), FRotator()); // Random Player
+			Players.Add(AI);
+		}
+		else // MiniMax
+		{
+			auto* AI = GetWorld()->SpawnActor<AMinimaxPlayer>(FVector(), FRotator()); // MiniMax Player
+			Players.Add(AI);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Belin"));
+	}
 
 	this->ChoosePlayerAndStartGame();
 }
