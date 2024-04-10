@@ -283,13 +283,6 @@ void AManager_Turn::DestroyMoveHistory()
 		RedHistory->ClearChildren();
 		EndButton->ClearChildren();
 	}
-	/*
-	if (EndButton)
-	{
-		UScrollBox* ScrollBox = Cast<UScrollBox>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("MH_Scroll"));
-		ScrollBox->RemoveChild(EndButton);
-	}
-	*/
 
 	MoveHistory.Empty();
 }

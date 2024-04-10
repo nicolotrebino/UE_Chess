@@ -44,15 +44,15 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
 				{
 					PossibleMoves.Add(PossibleMove);
-				if (Utility::IsValidPosition(CurrLetter, CurrNumber + 2))
-				{
-					PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber + 2);
-					if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+					if (Utility::IsValidPosition(CurrLetter, CurrNumber + 2))
 					{
-						PossibleMoves.Add(PossibleMove);
+						PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber + 2);
+						if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+						{
+							PossibleMoves.Add(PossibleMove);
+						}
 					}
 				}
-			}
 			}
 		}
 		else
@@ -88,45 +88,63 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 			}
 		}
 	}
+	
 	// For black pawns
 	else
 	{
 		// Recede
 		if (CurrNumber == 7)
 		{
-			ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
-			if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+			if (Utility::IsValidPosition(CurrLetter, CurrNumber - 1))
 			{
-				PossibleMoves.Add(PossibleMove);
-				PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 2);
+				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
 				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
 				{
 					PossibleMoves.Add(PossibleMove);
+					if (Utility::IsValidPosition(CurrLetter, CurrNumber - 2))
+					{
+						PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 2);
+						if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+						{
+							PossibleMoves.Add(PossibleMove);
+						}
+					}
 				}
 			}
 		}
 		else
 		{
-			ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
-			if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+			if (Utility::IsValidPosition(CurrLetter, CurrNumber - 1))
 			{
-				// PossibleMove->TargetTile();
-				PossibleMoves.Add(PossibleMove);
+				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
+				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+				{
+					// PossibleMove->TargetTile();
+					PossibleMoves.Add(PossibleMove);
+				}
 			}
 		}
 
 		// Kill
-		ATile* DownRight = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber - 1);
-		ATile* DownLeft = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber - 1);
-		
-		if (DownRight && DownRight->GetTileStatus() == ETileStatus::OCCUPIED && (DownRight->GetTileTeam() != PieceTeam))
+
+		if (Utility::IsValidPosition(CurrLetter + 1, CurrNumber - 1))
 		{
-			PossibleMoves.Add(DownRight);
+			ATile* DownRight = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber - 1);
+
+			if (DownRight && DownRight->GetTileStatus() == ETileStatus::OCCUPIED && (DownRight->GetTileTeam() != PieceTeam))
+			{
+				PossibleMoves.Add(DownRight);
+			}
 		}
 
-		if (DownLeft && DownLeft->GetTileStatus() == ETileStatus::OCCUPIED && (DownLeft->GetTileTeam() != PieceTeam))
+		if (Utility::IsValidPosition(CurrLetter - 1, CurrNumber - 1))
 		{
-			PossibleMoves.Add(DownLeft);
+			ATile* DownLeft = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber - 1);
+
+			if (DownLeft && DownLeft->GetTileStatus() == ETileStatus::OCCUPIED && (DownLeft->GetTileTeam() != PieceTeam))
+			{
+				PossibleMoves.Add(DownLeft);
+			}
 		}
 	}
 

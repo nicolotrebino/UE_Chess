@@ -18,8 +18,6 @@ AMinimaxPlayer::AMinimaxPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-
-	MovedPiece = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -59,7 +57,6 @@ void AMinimaxPlayer::OnTurn()
 			}
 		
 			NextMove.PieceToMove->MovePiece(NextMove.NextTile);
-			MovedPiece = NextMove.PieceToMove;
 		
 			// Change player
 			GameMode->TurnNextPlayer();
@@ -89,8 +86,8 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	int32 WhiteValue = 0;
 
 	// Mobility
-	BlackValue += 10 * GameMode->GetAllLegalMoves(0).Num(); // Human
-	WhiteValue += 10 * GameMode->GetAllLegalMoves(1).Num(); // AI
+	WhiteValue += 10 * GameMode->GetAllLegalMoves(0).Num(); // Human
+	BlackValue += 10 * GameMode->GetAllLegalMoves(1).Num(); // AI
 	
 	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
 	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
@@ -113,7 +110,6 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 		}
 		return 0;
 	}
-
 	
 	// BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num();
 	// WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num();

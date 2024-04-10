@@ -231,6 +231,7 @@ void AChess_GameMode::TurnNextPlayer()
 		{
 			bIsGameOver = true;
 			bIsDraw = true;
+			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
 		}
 		return;
@@ -259,7 +260,7 @@ void AChess_GameMode::TurnNextPlayer()
 	
 	MoveCounter += 1;
 
-	// Reset game variables
+	// Reset turn variables
 	TurnManager->ResetVariables();
 	bInReplay = false;
 	

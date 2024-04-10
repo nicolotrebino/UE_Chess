@@ -48,8 +48,6 @@ public:
 	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);
 	FNextMove FindBestMove();
 
-	AChess_Piece* MovedPiece;
-
 private:
 	int32 Pawns[64] = {
 		0, 0, 0, 0, 0, 0, 0, 0,
