@@ -27,7 +27,13 @@ public:
 	int32 GetScoreAiPlayer(); // Get the score for AI player
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 EnemyPlayer;
+	int32 EnemyPlayer = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 MusicNumber = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UAudioComponent* Music = nullptr;
 	
 	void IncrementScoreHumanPlayer(); // Increment the score for human player
 	void IncrementScoreAiPlayer(); // Increment the score for AI player
