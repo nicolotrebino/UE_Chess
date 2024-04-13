@@ -83,20 +83,29 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 	// Create a temporary new array same as the PossibleMoves array
 	const AManager_Turn* TurnManager = GameMode->TurnManager;
 	TArray<ATile*> NewArray = PossibleMoves;
+	ATile* PreviousTile = CurrentTile;
 	for (ATile* NextTile : PossibleMoves)
 	{
+		AChess_Piece* Killed = NextTile->GetPieceOnTile();
+
+		/*
 		// Save the current Status and Team of the Next Tile
 		const ETileStatus Status = NextTile->GetTileStatus();
 		const ETeam Team = NextTile->GetTileTeam();
+		*/
 		
 		// If the next tile is the one under the Checker piece it means I can kill the Checker
 		if (!(TurnManager->Checker && NextTile == TurnManager->Checker->GetPieceTile()))
 		{
+			/*
 			// Pretend you're making the next move
 			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
 			NextTile->SetTileTeam(PieceTeam);
 			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
 			CurrentTile->SetTileTeam(ETeam::NONE);
+			*/
+
+			this->VirtualMove(NextTile, PreviousTile, Killed);
 		
 			// If the king is now/still in check with the move just made
 			if (GameMode->IsKingInCheck(PieceTeam))
@@ -104,13 +113,81 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 				// Avoid doing this move and remove it from the new array of possible (legal) moves created
 				NewArray.Remove(NextTile);
 			}
-		
+
+			this->VirtualUnMove(NextTile, PreviousTile, Killed);
+
+			/*
 			// Restores Tiles to how they originally were
 			NextTile->SetTileStatus(Status);
 			NextTile->SetTileTeam(Team);
 			CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
 			CurrentTile->SetTileTeam(PieceTeam);
+			*/
 		}
+	}
+
+	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
+	PossibleMoves = MoveTempIfPossible(NewArray);
+}
+
+void AChess_Piece::CheckKingMobility(TArray<ATile*> &PossibleMoves)
+{
+	// Create a temporary new array same as the PossibleMoves array
+	TArray<ATile*> NewArray = PossibleMoves;
+
+	TArray<AChess_Piece*> EnemyTeam = (PieceTeam == WHITE) ? GameMode->BlackTeam : GameMode->WhiteTeam;
+
+	ATile* PreviousTile = CurrentTile;
+	// For each Tile in the possible moves array
+	for (ATile* NextTile : PossibleMoves)
+	{
+		AChess_Piece* Killed = NextTile->GetPieceOnTile();
+		/*
+		// Save the current Status and Team of the Next Tile
+		const ETileStatus Status = NextTile->GetTileStatus();
+		const ETeam Team = NextTile->GetTileTeam();
+
+		// Pretend you're making the next move
+		NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+		NextTile->SetTileTeam(PieceTeam);
+		CurrentTile->SetTileStatus(ETileStatus::EMPTY);
+		CurrentTile->SetTileTeam(NONE);
+		*/
+
+		VirtualMove(NextTile, PreviousTile, Killed);
+
+		// For each enemy piece
+		for (AChess_Piece* EnemyPiece : EnemyTeam)
+		{
+			// Get all the possible moves of that Enemy Piece
+			TArray<ATile*> EnemyMoves = EnemyPiece->GetPossibleMoves();
+			if (EnemyMoves.Contains(NextTile)) // If that array contains the NextTile
+			{
+				NewArray.Remove(NextTile); // Remove this Tile from  the array of possible moves
+			}
+			/*
+			else // If it is the King
+			{
+				// Set the CurrPiece to the enemy King
+				const AChess_King* CurrPiece = Cast<AChess_King>(EnemyPiece);
+				// If the NextTile is near the enemy King (Black King)
+				if (CurrPiece->GetNeighbors().Contains(NextTile))
+				{
+					NewArray.Remove(NextTile); // Remove this Tile from the possible moves
+				}
+			}
+			*/
+		}
+
+		VirtualUnMove(NextTile, PreviousTile, Killed);
+
+		/*
+		// Restores Tiles to how they originally were
+		NextTile->SetTileStatus(Status);
+		NextTile->SetTileTeam(Team);
+		CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
+		CurrentTile->SetTileTeam(PieceTeam);
+		*/
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
@@ -121,14 +198,16 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
 {
 	// Make an array of possible Tiles to move through
 	TArray<ATile*> LegitMoves = GetPossibleMoves();
-
+	
 	if (this->IsA(AChess_King::StaticClass()))
 	{
-		return LegitMoves;
+		CheckKingMobility(LegitMoves);
 	}
-	
-	// Controls and modifies the array of possible Tiles to avoid a check
-	PossibleMovesCheckControl(LegitMoves);
+	else
+	{
+		// Controls and modifies the array of possible Tiles to avoid a check
+		PossibleMovesCheckControl(LegitMoves);
+	}
 
 	return LegitMoves;
 }

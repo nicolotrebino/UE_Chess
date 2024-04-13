@@ -86,6 +86,12 @@ public:
 	UPROPERTY(Transient)
 	TArray<AChess_Piece*> KilledBlackTeam; // Keeps track of Black Pieces
 
+	// Audio Components
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* MoveSound;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* KillSound;
+
 	/*
 	 * Class methods
 	 */

@@ -38,6 +38,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UMaterialInstance*> KingMaterials;
 	
-	void CheckMobility(TArray<ATile*> &PossibleMoves) const;
 	TArray<ATile*> GetNeighbors() const;
 };

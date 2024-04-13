@@ -33,7 +33,8 @@ public:
 
 	/* Functions that return legal moves */
 	virtual TArray<ATile*> GetPossibleMoves() { return TArray<ATile*>(); };
-	void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves); 
+	void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves);
+	void CheckKingMobility(TArray<ATile*> &PossibleMoves);
 	TArray<ATile*> GetLegitMoves();
 
 	/* Functions to move the piece and "eat" opponents */

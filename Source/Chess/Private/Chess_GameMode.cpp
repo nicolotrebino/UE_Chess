@@ -163,6 +163,15 @@ int32 AChess_GameMode::GetNextPlayer(int32 Player) const
 
 void AChess_GameMode::TurnNextPlayer()
 {
+	if(TurnManager->bIsKill && KillSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, KillSound, FVector(0, 0, 0));
+	}
+	else if (MoveSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, MoveSound, FVector(0, 0, 0));
+	}
+	
 	TurnManager->bIsBlackKingInCheck = IsKingInCheck(BLACK);
 	TurnManager->bIsWhiteKingInCheck = IsKingInCheck(WHITE);
 	
@@ -208,6 +217,15 @@ void AChess_GameMode::TurnNextPlayer()
 		return;
 	}
 	*/
+
+	if (BlackTeam.Num() == 1 && WhiteTeam.Num() == 1)
+	{
+		bIsGameOver = true;
+		bIsDraw = true;
+		TurnManager->DisplayMove();
+		TurnManager->DisplayEndGame();
+		return;
+	}
 	
 	if (TurnManager->LegalMoves.IsEmpty())
 	{
