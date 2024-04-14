@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Chess_Piece.h"
+
 #include "GameFramework/Actor.h"
 #include "Manager_Turn.generated.h"
 

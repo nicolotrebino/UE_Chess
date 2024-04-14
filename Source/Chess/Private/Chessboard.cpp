@@ -3,7 +3,7 @@
 #include "Chessboard.h"
 
 #include "Chess_GameMode.h"
-#include "Chess_King.h"
+#include "Pieces/Chess_King.h"
 
 // Sets default values
 AChessboard::AChessboard()

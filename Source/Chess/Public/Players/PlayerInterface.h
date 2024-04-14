@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Chess/Chess.h"
+#include "Utility.h"
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 

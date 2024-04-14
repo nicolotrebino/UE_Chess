@@ -1,14 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MinimaxPlayer.h"
+#include "Players/MinimaxPlayer.h"
 
-#include "Chess_Bishop.h"
 #include "Chess_GameMode.h"
-#include "Chess_Queen.h"
-#include "Chess_King.h"
-#include "Chess_Knight.h"
-#include "Chess_Pawn.h"
-#include "Chess_Rook.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values

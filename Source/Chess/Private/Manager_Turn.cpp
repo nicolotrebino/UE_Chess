@@ -4,12 +4,9 @@
 
 #include "Chess_GameMode.h"
 #include "Chess_PlayerController.h"
-#include "Chess_Rook.h"
+#include "Pieces/Chess_Rook.h"
 #include "Blueprint/WidgetTree.h"
-#include "Components/Button.h"
 #include "Components/HorizontalBox.h"
-#include "Components/ScrollBox.h"
-#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
 

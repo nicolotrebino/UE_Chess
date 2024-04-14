@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Chess_Knight.h"
+#include "Pieces/Chess_Knight.h"
 
 #include "Chess_GameMode.h"
 #include "Utility.h"

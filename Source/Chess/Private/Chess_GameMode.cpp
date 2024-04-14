@@ -2,16 +2,16 @@
 
 #include "Chess_GameMode.h"
 
-#include "Chess_King.h"
-#include "Chess_Pawn.h"
 #include "Chess_PlayerController.h"
-#include "HumanPlayer.h"
-#include "RandomPlayer.h"
 #include "EngineUtils.h"
 #include "Manager_Promotion.h"
 #include "Manager_Turn.h"
-#include "MinimaxPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Players/HumanPlayer.h"
+#include "Players/MinimaxPlayer.h"
+#include "Players/RandomPlayer.h"
+#include "Pieces/Chess_Piece.h"
+#include "Pieces/Chess_King.h"
 
 AChess_GameMode::AChess_GameMode()
 {

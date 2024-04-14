@@ -3,7 +3,7 @@
 #include "Manager_Promotion.h"
 
 #include "Chess_GameMode.h"
-#include "Chess_Pawn.h"
+#include "Pieces/Chess_Pawn.h"
 #include "Chess_PlayerController.h"
 #include "Manager_Turn.h"
 #include "Blueprint/UserWidget.h"

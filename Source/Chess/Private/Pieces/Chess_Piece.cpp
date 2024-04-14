@@ -1,12 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Pieces/Chess_Piece.h"
 
-#include "Chess_Piece.h"
-
-#include "BlueprintEditor.h"
 #include "Chess_GameMode.h"
-#include "Chess_King.h"
-// #include "Manager_Turn.h"
+#include "Pieces/Chess_King.h"
 #include "Manager_Turn.h"
 #include "Utility.h"
 

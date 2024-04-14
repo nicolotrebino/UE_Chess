@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Chess/Chess.h"
+#include "Utility.h"
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 

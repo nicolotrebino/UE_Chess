@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RandomPlayer.h"
+#include "Players/RandomPlayer.h"
 
 #include "Chess_GameInstance.h"
 #include "Chess_GameMode.h"
+#include "Pieces/Chess_Piece.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values

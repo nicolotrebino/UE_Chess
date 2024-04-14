@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Chessboard.h"
 #include "Manager_Turn.h"
-#include "PlayerInterface.h"
+#include "Players/PlayerInterface.h"
 #include "GameFramework/GameModeBase.h"
 #include "Chess_GameMode.generated.h"
 

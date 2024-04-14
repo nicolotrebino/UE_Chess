@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Chess_Queen.h"
+#include "Pieces/Chess_Queen.h"
 
 AChess_Queen::AChess_Queen()
 {

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Chess_Bishop.h"
+#include "Pieces/Chess_Bishop.h"
 
 AChess_Bishop::AChess_Bishop()
 {

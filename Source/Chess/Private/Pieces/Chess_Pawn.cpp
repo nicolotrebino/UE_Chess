@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Chess_Pawn.h"
+#include "Pieces/Chess_Pawn.h"
 
 #include "Utility.h"
 #include "Chess_GameMode.h"
 #include "Manager_Promotion.h"
 #include "Manager_Turn.h"
-#include "MinimaxPlayer.h"
-#include "RandomPlayer.h"
+#include "Players/MinimaxPlayer.h"
+#include "Players/RandomPlayer.h"
 
 AChess_Pawn::AChess_Pawn()
 {

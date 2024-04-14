@@ -2,7 +2,7 @@
 
 #include "Chess_PlayerController.h"
 
-#include "HumanPlayer.h"
+#include "Players/HumanPlayer.h"
 #include "Blueprint/UserWidget.h"
 #include "EnhancedInputComponent.h"
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Chess_GameInstance.h"
-#include "Chess_Piece.h"
+#include "Pieces/Chess_Piece.h"
 #include "PlayerInterface.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Pawn.h"
