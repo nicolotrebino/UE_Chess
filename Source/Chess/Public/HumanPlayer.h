@@ -27,6 +27,7 @@ public:
 	virtual void OnTurn() override;
 	virtual void OnWin() override;
 	virtual void OnLose() override;
+	virtual void OnDraw() override;
 
 	// Called on left mouse click (binding)
 	UFUNCTION()

@@ -43,6 +43,7 @@ public:
 	virtual void OnTurn() override;
 	virtual void OnWin() override;
 	virtual void OnLose() override;
+	virtual void OnDraw() override;
 
 	int32 EvaluateGrid() const;
 	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);

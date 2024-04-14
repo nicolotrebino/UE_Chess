@@ -91,6 +91,12 @@ public:
 	USoundBase* MoveSound;
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* KillSound;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* WinSound;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* LoseSound;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* DrawSound;
 
 	/*
 	 * Class methods

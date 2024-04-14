@@ -66,15 +66,22 @@ void AMinimaxPlayer::OnTurn()
 
 void AMinimaxPlayer::OnWin()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
 	GameInstance->SetTurnMessage(TEXT("AI Wins!"));
 	GameInstance->IncrementScoreAiPlayer();
 }
 
 void AMinimaxPlayer::OnLose()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
-	// GameInstance->SetTurnMessage(TEXT("AI Loses!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
+	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
+	GameInstance->IncrementScoreHumanPlayer();
+}
+
+void AMinimaxPlayer::OnDraw()
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
+	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
 int32 AMinimaxPlayer::EvaluateGrid() const

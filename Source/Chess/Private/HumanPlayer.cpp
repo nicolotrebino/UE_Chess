@@ -51,12 +51,34 @@ void AHumanPlayer::OnWin()
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
 	GameInstance->SetTurnMessage(TEXT("Human Wins!"));
 	GameInstance->IncrementScoreHumanPlayer();
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	if (GameMode->WinSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, GameMode->WinSound, FVector(0, 0, 0));
+	}
 }
 
 void AHumanPlayer::OnLose()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Human Loses!"));
+	GameInstance->IncrementScoreAiPlayer();
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	if (GameMode->LoseSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, GameMode->LoseSound, FVector(0, 0, 0));
+	}
+}
+
+void AHumanPlayer::OnDraw()
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
+	GameInstance->SetTurnMessage(TEXT("Draw game!"));
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	if (GameMode->DrawSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, GameMode->DrawSound, FVector(0, 0, 0));
+	}
 }
 
 void AHumanPlayer::OnClick()

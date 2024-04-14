@@ -163,15 +163,6 @@ int32 AChess_GameMode::GetNextPlayer(int32 Player) const
 
 void AChess_GameMode::TurnNextPlayer()
 {
-	if(TurnManager->bIsKill && KillSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, KillSound, FVector(0, 0, 0));
-	}
-	else if (MoveSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, MoveSound, FVector(0, 0, 0));
-	}
-	
 	TurnManager->bIsBlackKingInCheck = IsKingInCheck(BLACK);
 	TurnManager->bIsWhiteKingInCheck = IsKingInCheck(WHITE);
 	
@@ -224,6 +215,7 @@ void AChess_GameMode::TurnNextPlayer()
 		bIsDraw = true;
 		TurnManager->DisplayMove();
 		TurnManager->DisplayEndGame();
+		Players[WHITE]->OnDraw();
 		return;
 	}
 	
@@ -251,8 +243,18 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsDraw = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnDraw();
 		}
 		return;
+	}
+
+	if (TurnManager->bIsKill && KillSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, KillSound, FVector(0, 0, 0));
+	}
+	else if (MoveSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, MoveSound, FVector(0, 0, 0));
 	}
 
 	/*
