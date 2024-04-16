@@ -4,9 +4,7 @@
 
 #include "Chess_PlayerController.h"
 #include "EngineUtils.h"
-#include "Manager_Promotion.h"
-#include "Manager_Thread.h"
-#include "Manager_Turn.h"
+#include "Managers/Manager_Promotion.h"
 #include "Kismet/GameplayStatics.h"
 #include "Players/HumanPlayer.h"
 #include "Players/MinimaxPlayer.h"

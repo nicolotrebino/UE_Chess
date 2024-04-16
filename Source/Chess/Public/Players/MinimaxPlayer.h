@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Chess_GameInstance.h"
-#include "Pieces//Chess_Piece.h"
+#include "Pieces/Chess_Piece.h"
 #include "PlayerInterface.h"
 #include "GameFramework/Pawn.h"
 #include "MinimaxPlayer.generated.h"

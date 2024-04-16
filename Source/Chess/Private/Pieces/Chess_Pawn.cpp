@@ -5,8 +5,8 @@
 
 #include "Utility.h"
 #include "Chess_GameMode.h"
-#include "Manager_Promotion.h"
-#include "Manager_Turn.h"
+#include "Managers/Manager_Promotion.h"
+#include "Managers/Manager_Turn.h"
 #include "Players/MinimaxPlayer.h"
 #include "Players/RandomPlayer.h"
 

@@ -5,7 +5,7 @@
 
 #include "Chess_GameInstance.h"
 #include "Chess_GameMode.h"
-#include "Manager_Turn.h"
+#include "Managers/Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values

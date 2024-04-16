@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Chessboard.h"
-#include "Manager_Thread.h"
-#include "Manager_Turn.h"
+#include "Managers/Manager_Thread.h"
+#include "Managers/Manager_Turn.h"
 #include "Players/PlayerInterface.h"
 #include "GameFramework/GameModeBase.h"
 #include "Chess_GameMode.generated.h"

@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Manager_Promotion.h"
+#include "Managers/Manager_Promotion.h"
 
 #include "Chess_GameMode.h"
 #include "Pieces/Chess_Pawn.h"
 #include "Chess_PlayerController.h"
-#include "Manager_Turn.h"
+#include "Managers/Manager_Turn.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 

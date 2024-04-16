@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Manager_Thread.h"
+#include "Managers/Manager_Thread.h"
 
 #include "Chess_GameMode.h"
 
