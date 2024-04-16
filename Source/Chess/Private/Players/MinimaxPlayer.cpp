@@ -34,27 +34,19 @@ void AMinimaxPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AMinimaxPlayer::OnTurn()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
+	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->TurnManager->DisableReplay();
+	
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
 	GameInstance->SetTurnMessage(TEXT("AI (Minimax) Turn"));
 
 	FTimerHandle TimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [GameMode]()
 		{
-			AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-
-			FNextMove NextMove = FindBestMove();
-
-			if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
-			{
-				NextMove.PieceToMove->Kill(NextMove.NextTile->GetPieceOnTile());
-			}
-		
-			NextMove.PieceToMove->MovePiece(NextMove.NextTile);
-		
-			// Change player
-			GameMode->TurnNextPlayer();
-		
+			GameMode->EnemyThread->Init();
+			GameMode->EnemyThread->Run();
+			GameMode->EnemyThread->Stop();
 		}, 1, false);
 }
 
@@ -76,6 +68,28 @@ void AMinimaxPlayer::OnDraw()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
+}
+
+void AMinimaxPlayer::ComputeMove()
+{
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+
+	FNextMove NextMove = FindBestMove();
+
+	if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
+	{
+		NextMove.PieceToMove->Kill(NextMove.NextTile->GetPieceOnTile());
+	}
+		
+	NextMove.PieceToMove->MovePiece(NextMove.NextTile);
+		
+	// Change player
+	GameMode->TurnNextPlayer();
+}
+
+void AMinimaxPlayer::Destroy()
+{
+	delete this;
 }
 
 int32 AMinimaxPlayer::EvaluateGrid() const

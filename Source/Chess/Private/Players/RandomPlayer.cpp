@@ -32,8 +32,8 @@ void ARandomPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ARandomPlayer::OnTurn()
 {
-	const AChess_GameMode* ChessGameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	ChessGameMode->TurnManager->DisableReplay();
+	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->TurnManager->DisableReplay();
 	
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));
 	GameInstance->SetTurnMessage(TEXT("AI (Random) Turn"));
@@ -42,86 +42,11 @@ void ARandomPlayer::OnTurn()
 	FTimerHandle TimerHandle;
 	
 	// Wait for the timer before making your move
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [GameMode]()
 		{
-			AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-		
-			if (GameMode->CurrentPlayer)
-			{
-				// If black still has ChessPieces available
-				if (GameMode->BlackTeam.Num() > 0)
-				{
-					TArray<ATile*> RandPlayerMoves;
-					TSet<int32> CheckedIndices;
-					int32 RandPieceIdx = -1;
-					
-					// As long as the array of possible moves is empty,
-					// randomly choose a black piece and check if it has possible moves
-					/*
-					while (RandPlayerMoves.IsEmpty())
-					{
-						RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-
-						// Continua a generare nuovi indici finché non ottieni uno diverso
-						while (CheckedIndices.Contains(RandPieceIdx))
-						{
-							RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-						}
-
-						// Aggiungi il nuovo indice al set
-						CheckedIndices.Add(RandPieceIdx);
-									
-						// RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->GetLegitMoves();
-					}
-					*/
-
-					while (RandPlayerMoves.IsEmpty())
-					{
-						RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-
-						// Continua a generare nuovi indici finché non ottieni uno diverso
-						while (CheckedIndices.Contains(RandPieceIdx))
-						{
-							RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-						}
-
-						// Aggiungi il nuovo indice al set
-						CheckedIndices.Add(RandPieceIdx);
-
-						/*
-						for (ATile* Tile: GameMode->BlackTeam[RandPieceIdx]->GetPossibleMoves())
-						{
-							if (GameMode->TurnManager->LegalMoves.Contains(Tile))
-							{
-								RandPlayerMoves.Add(Tile);
-							}
-						}
-						*/
-						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->MyLegalMoves;
-					}
-					
-					// After finding the possible moves, choose one randomly
-					const int32 RandMoveIdx = FMath::Rand() % RandPlayerMoves.Num();
-					if (RandPlayerMoves[RandMoveIdx]->GetTileStatus() == ETileStatus::OCCUPIED && RandPlayerMoves[RandMoveIdx]->GetTileTeam() != Team)
-					{
-						GameMode->BlackTeam[RandPieceIdx]->Kill(RandPlayerMoves[RandMoveIdx]->GetPieceOnTile());
-					}
-					
-					GameMode->BlackTeam[RandPieceIdx]->MovePiece(RandPlayerMoves[RandMoveIdx]);
-
-					/*
-					GameMode->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
-					if (GameMode->bIsWhiteKingInCheck)
-					{
-						GameMode->IsCheckMate(WHITE, GameMode->WhiteTeam);
-					}
-					*/
-
-					// Change player
-					GameMode->TurnNextPlayer();
-				}
-			}
+			GameMode->EnemyThread->Init();
+			GameMode->EnemyThread->Run();
+			GameMode->EnemyThread->Stop();
 		}, 3, false);
 }
 
@@ -143,6 +68,93 @@ void ARandomPlayer::OnDraw()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
+}
+
+void ARandomPlayer::ComputeMove()
+{
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+		
+	if (GameMode->CurrentPlayer)
+	{
+		// If black still has ChessPieces available
+		if (GameMode->BlackTeam.Num() > 0)
+		{
+			TArray<ATile*> RandPlayerMoves;
+			TSet<int32> CheckedIndices;
+			int32 RandPieceIdx = -1;
+			
+			// As long as the array of possible moves is empty,
+			// randomly choose a black piece and check if it has possible moves
+			/*
+			while (RandPlayerMoves.IsEmpty())
+			{
+				RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+
+				// Continua a generare nuovi indici finché non ottieni uno diverso
+				while (CheckedIndices.Contains(RandPieceIdx))
+				{
+					RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+				}
+
+				// Aggiungi il nuovo indice al set
+				CheckedIndices.Add(RandPieceIdx);
+							
+				// RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+				RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->GetLegitMoves();
+			}
+			*/
+
+			while (RandPlayerMoves.IsEmpty())
+			{
+				RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+
+				// Continua a generare nuovi indici finché non ottieni uno diverso
+				while (CheckedIndices.Contains(RandPieceIdx))
+				{
+					RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
+				}
+
+				// Aggiungi il nuovo indice al set
+				CheckedIndices.Add(RandPieceIdx);
+
+				/*
+				for (ATile* Tile: GameMode->BlackTeam[RandPieceIdx]->GetPossibleMoves())
+				{
+					if (GameMode->TurnManager->LegalMoves.Contains(Tile))
+					{
+						RandPlayerMoves.Add(Tile);
+					}
+				}
+				*/
+				RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->MyLegalMoves;
+			}
+			
+			// After finding the possible moves, choose one randomly
+			const int32 RandMoveIdx = FMath::Rand() % RandPlayerMoves.Num();
+			if (RandPlayerMoves[RandMoveIdx]->GetTileStatus() == ETileStatus::OCCUPIED && RandPlayerMoves[RandMoveIdx]->GetTileTeam() != Team)
+			{
+				GameMode->BlackTeam[RandPieceIdx]->Kill(RandPlayerMoves[RandMoveIdx]->GetPieceOnTile());
+			}
+			
+			GameMode->BlackTeam[RandPieceIdx]->MovePiece(RandPlayerMoves[RandMoveIdx]);
+
+			/*
+			GameMode->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
+			if (GameMode->bIsWhiteKingInCheck)
+			{
+				GameMode->IsCheckMate(WHITE, GameMode->WhiteTeam);
+			}
+			*/
+
+			// Change player
+			GameMode->TurnNextPlayer();
+		}
+	}
+}
+
+void ARandomPlayer::Destroy()
+{
+	delete this;
 }
 
 // Called every frame

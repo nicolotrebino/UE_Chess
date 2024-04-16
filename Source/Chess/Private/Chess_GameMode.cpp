@@ -5,6 +5,7 @@
 #include "Chess_PlayerController.h"
 #include "EngineUtils.h"
 #include "Manager_Promotion.h"
+#include "Manager_Thread.h"
 #include "Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Players/HumanPlayer.h"
@@ -90,6 +91,8 @@ void AChess_GameMode::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Belin"));
 	}
+
+	EnemyThread = new Manager_Thread(GetWorld());
 
 	this->ChoosePlayerAndStartGame();
 }
@@ -283,6 +286,26 @@ void AChess_GameMode::TurnNextPlayer()
 	// Reset turn variables
 	TurnManager->ResetVariables();
 	bInReplay = false;
+
+	/*
+	if (CurrentPlayer)
+	{
+		// Set a random timer
+		FTimerHandle TimerHandle;
+	
+		// Wait for the timer before making your move
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+			{
+				EnemyThread->Init();
+				EnemyThread->Run();
+				EnemyThread->Stop();
+			}, 3, false);
+	}
+	else
+	{
+		Players[CurrentPlayer]->OnTurn();
+	}
+	*/
 	
 	Players[CurrentPlayer]->OnTurn();
 
@@ -500,4 +523,29 @@ void AChess_GameMode::ResetField()
 	}
 	
 	ChoosePlayerAndStartGame();
+}
+
+void AChess_GameMode::DestroyManagers()
+{
+	// Cancella il thread
+	if (EnemyThread)
+	{
+		EnemyThread->~Manager_Thread();
+		EnemyThread = nullptr;
+	}
+	
+	// Cancella i manager
+	if (TurnManager)
+	{
+		TurnManager->Destroy();
+		TurnManager = nullptr;
+	}
+
+	if (PromotionManager)
+	{
+		PromotionManager->Destroy();
+		PromotionManager = nullptr;
+	}
+	
+	this->Destroy();
 }

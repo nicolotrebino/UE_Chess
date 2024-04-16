@@ -44,6 +44,9 @@ public:
 	virtual void OnWin() override;
 	virtual void OnLose() override;
 	virtual void OnDraw() override;
+	virtual void ComputeMove() override;
+
+	virtual void Destroy() override;
 
 	int32 EvaluateGrid() const;
 	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);

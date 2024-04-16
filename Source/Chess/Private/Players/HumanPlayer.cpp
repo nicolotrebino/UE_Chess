@@ -81,6 +81,11 @@ void AHumanPlayer::OnDraw()
 	}
 }
 
+void AHumanPlayer::Destroy()
+{
+	delete this;
+}
+
 void AHumanPlayer::OnClick()
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode

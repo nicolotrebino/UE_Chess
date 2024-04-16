@@ -29,6 +29,8 @@ public:
 	virtual void OnLose() override;
 	virtual void OnDraw() override;
 
+	virtual void Destroy() override;
+
 	// Called on left mouse click (binding)
 	UFUNCTION()
 	void OnClick();

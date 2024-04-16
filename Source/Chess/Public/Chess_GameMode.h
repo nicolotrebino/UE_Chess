@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Chessboard.h"
+#include "Manager_Thread.h"
 #include "Manager_Turn.h"
 #include "Players/PlayerInterface.h"
 #include "GameFramework/GameModeBase.h"
@@ -29,6 +30,8 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	Manager_Thread* EnemyThread;
 
 	/* Game variable */
 	bool bIsGameOver; // Tracks if the game is over
@@ -132,4 +135,7 @@ public:
 	// Destroy the Chessboard and the pieces and create a new game field
 	UFUNCTION(BlueprintCallable)
 	void ResetField();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyManagers();
 };
