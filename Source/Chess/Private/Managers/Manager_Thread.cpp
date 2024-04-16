@@ -4,6 +4,8 @@
 #include "Managers/Manager_Thread.h"
 
 #include "Chess_GameMode.h"
+#include "Players/MinimaxPlayer.h"
+#include "Players/RandomPlayer.h"
 
 Manager_Thread::Manager_Thread(UWorld* InWorld)
 	: World(InWorld)
@@ -45,7 +47,11 @@ uint32 Manager_Thread::Run()
 		{
 			AChess_GameMode* GameMode = Cast<AChess_GameMode>(World->GetAuthGameMode());
 
-			GameMode->Players[BLACK]->ComputeMove();
+			if (GameMode->Players.IsValidIndex(BLACK))
+			{
+				// GameMode->Players[BLACK]->ComputeMove();
+				bStop = true;
+			}
 		}
 	}
 	return 0;

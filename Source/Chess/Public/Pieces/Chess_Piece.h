@@ -20,7 +20,7 @@ public:
 	AChess_Piece();
 
 	/* Setter and getter for the Piece information */
-	TCHAR GetNomenclature();
+	TCHAR GetNomenclature() const;
 	virtual void SetTeam(const ETeam Team);
 	virtual ETeam GetTeam();
 	virtual void SetType(const EPieceType Type);

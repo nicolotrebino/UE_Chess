@@ -14,8 +14,10 @@
 
 AChess_GameMode::AChess_GameMode()
 {
-	PlayerControllerClass = AChess_PlayerController::StaticClass(); // Associate the Cpc as the Player Controller for to this GameMode
-	DefaultPawnClass = AHumanPlayer::StaticClass(); // Associate the HumaPlayer as the default pawn class for this GameMode
+	PlayerControllerClass = AChess_PlayerController::StaticClass();
+	// Associate the Cpc as the Player Controller for to this GameMode
+	DefaultPawnClass = AHumanPlayer::StaticClass();
+	// Associate the HumaPlayer as the default pawn class for this GameMode
 
 	// Set default values
 	bIsGameOver = false; // Tracks if the game is over
@@ -34,19 +36,24 @@ AChess_GameMode::AChess_GameMode()
 	CBoard = nullptr;
 
 	TurnManager = nullptr;
-
 	PromotionManager = nullptr;
 
 	Kings.SetNum(2); // Create space for two elements in the array
 	Kings[WHITE] = nullptr;
 	Kings[BLACK] = nullptr;
+	
+	MoveSound = nullptr;
+	KillSound = nullptr;
+	WinSound = nullptr;
+	LoseSound = nullptr;
+	DrawSound = nullptr;
 }
 
 void AChess_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (ChessboardClass != nullptr)
+	if (ChessboardClass)
 	{
 		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
 	}
@@ -66,10 +73,6 @@ void AChess_GameMode::BeginPlay()
 	HumanPlayer->SetActorLocationAndRotation(CameraPos, FRotationMatrix::MakeFromX(FVector(0, 0, -1)).Rotator());
 
 	Players.Add(HumanPlayer); // Human player = 0
-	// auto* AI = GetWorld()->SpawnActor<ARandomPlayer>(FVector(), FRotator()); // Random Player
-	//auto* AI = GetWorld()->SpawnActor<AMinimaxPlayer>(FVector(), FRotator()); // MiniMax Player
-	
-	// Players.Add(AI); // AI player = 1
 
 	const UChess_GameInstance* GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GameInstance)
@@ -85,20 +88,17 @@ void AChess_GameMode::BeginPlay()
 			Players.Add(AI);
 		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Belin"));
-	}
-
-	EnemyThread = new Manager_Thread(GetWorld());
 
 	this->ChoosePlayerAndStartGame();
 }
 
-TArray<ATile*> AChess_GameMode::GetAllLegalMoves(int32 Player)
+/*
+ *	@brief	Get all the legal moves of that particular player in that turn, create the array of the legal
+ *			moves for each piece of the current player
+ *	@param	Player for whom it is necessary to calculate legal moves
+ */
+void AChess_GameMode::GetAllLegalMoves(const int32 Player)
 {
-	TArray<ATile*> LegalMoves;
-	
 	// For the Human Player
 	if (!Player)
 	{
@@ -110,11 +110,11 @@ TArray<ATile*> AChess_GameMode::GetAllLegalMoves(int32 Player)
 			{
 				Piece->MyLegalMoves.Add(LegalMove);
 				TurnManager->WhiteMoves.AddUnique(LegalMove);
-				LegalMoves.AddUnique(LegalMove);
 			}
 		}
 	}
 
+	// For the AI Player
 	if (Player)
 	{
 		TurnManager->BlackMoves.Empty();
@@ -125,12 +125,9 @@ TArray<ATile*> AChess_GameMode::GetAllLegalMoves(int32 Player)
 			{
 				Piece->MyLegalMoves.Add(LegalMove);
 				TurnManager->BlackMoves.AddUnique(LegalMove);
-				LegalMoves.AddUnique(LegalMove);
 			}
 		}
 	}
-
-	return LegalMoves;
 }
 
 void AChess_GameMode::ChoosePlayerAndStartGame()
@@ -147,7 +144,8 @@ void AChess_GameMode::ChoosePlayerAndStartGame()
 	MoveCounter += 1;
 	UpdateScores();
 
-	TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
+	// TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
+	GetAllLegalMoves(CurrentPlayer);
 	
 	Players[CurrentPlayer]->OnTurn();
 }
@@ -169,46 +167,8 @@ void AChess_GameMode::TurnNextPlayer()
 	
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 
-	TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
-
-	/*
-	if (TurnManager->BlackMoves.IsEmpty())
-	{
-		if (TurnManager->bIsBlackKingInCheck)
-		{
-			bIsGameOver = true;
-			bIsBlackKingInCheckMate = true;
-			TurnManager->DisplayMove();
-			TurnManager->DisplayEndGame();
-			Players[WHITE]->OnWin();
-		}
-		else
-		{
-			bIsGameOver = true;
-			bIsDraw = true;
-			TurnManager->DisplayEndGame();
-		}
-		return;
-	}
-	if (TurnManager->WhiteMoves.IsEmpty())
-	{
-		if (TurnManager->bIsWhiteKingInCheck)
-		{
-			bIsGameOver = true;
-			bIsWhiteKingInCheckMate = true;
-			TurnManager->DisplayMove();
-			TurnManager->DisplayEndGame();
-			Players[WHITE]->OnLose();
-		}
-		else
-		{
-			bIsGameOver = true;
-			bIsDraw = true;
-			TurnManager->DisplayEndGame();
-		}
-		return;
-	}
-	*/
+	// TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
+	GetAllLegalMoves(CurrentPlayer);
 
 	if (BlackTeam.Num() == 1 && WhiteTeam.Num() == 1)
 	{
@@ -219,7 +179,8 @@ void AChess_GameMode::TurnNextPlayer()
 		Players[WHITE]->OnDraw();
 		return;
 	}
-	
+
+	/*
 	if (TurnManager->LegalMoves.IsEmpty())
 	{
 		if (TurnManager->bIsWhiteKingInCheck)
@@ -248,6 +209,50 @@ void AChess_GameMode::TurnNextPlayer()
 		}
 		return;
 	}
+	*/
+
+	// For Human Player
+	if (TurnManager->WhiteMoves.IsEmpty())
+	{
+		if (TurnManager->bIsWhiteKingInCheck)
+		{
+			bIsGameOver = true;
+			bIsWhiteKingInCheckMate = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnLose();
+		}
+		else
+		{
+			bIsGameOver = true;
+			bIsDraw = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnDraw();
+		}
+		return;
+	}
+	// For AI Player
+	if (TurnManager->BlackMoves.IsEmpty())
+	{
+		if (TurnManager->bIsBlackKingInCheck)
+		{
+			bIsGameOver = true;
+			bIsBlackKingInCheckMate = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnWin();
+		}
+		else
+		{
+			bIsGameOver = true;
+			bIsDraw = true;
+			TurnManager->DisplayMove();
+			TurnManager->DisplayEndGame();
+			Players[WHITE]->OnDraw();
+		}
+		return;
+	}
 
 	if (TurnManager->bIsKill && KillSound)
 	{
@@ -258,25 +263,6 @@ void AChess_GameMode::TurnNextPlayer()
 		UGameplayStatics::PlaySoundAtLocation(this, MoveSound, FVector(0, 0, 0));
 	}
 
-	/*
-	if (bIsGameOver)
-	{
-		TurnManager->DisplayEndGame();
-		if (bIsWhiteKingInCheckMate)
-		{
-			// Cpc->UserInterfaceWidget->SaveEndGame("1 - 0");
-			Players[WHITE]->OnLose();
-			return;
-		}
-		if (bIsBlackKingInCheckMate)
-		{
-			// Cpc->UserInterfaceWidget->SaveEndGame("0 - 1");
-			Players[WHITE]->OnWin();
-			return;
-		}
-	}
-	*/
-
 	TurnManager->DisplayMove();
 	
 	MoveCounter += 1;
@@ -284,36 +270,8 @@ void AChess_GameMode::TurnNextPlayer()
 	// Reset turn variables
 	TurnManager->ResetVariables();
 	bInReplay = false;
-
-	/*
-	if (CurrentPlayer)
-	{
-		// Set a random timer
-		FTimerHandle TimerHandle;
-	
-		// Wait for the timer before making your move
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
-			{
-				EnemyThread->Init();
-				EnemyThread->Run();
-				EnemyThread->Stop();
-			}, 3, false);
-	}
-	else
-	{
-		Players[CurrentPlayer]->OnTurn();
-	}
-	*/
 	
 	Players[CurrentPlayer]->OnTurn();
-
-	/*
-	TurnManager->bIsKill = false;
-	TurnManager->bIsWhiteKingInCheck = false;
-	TurnManager->bIsBlackKingInCheck = false;
-	TurnManager->bIsPromotion = false;
-	TurnManager->Checker = nullptr;
-	*/
 }
 
 bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
@@ -335,7 +293,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				// contains the Tile under the King
 				if (EnemyMoves.Contains(KingTile))
 				{
-					TurnManager->Checker = EnemyPiece; // Set that Piece as the Checker
+					// TurnManager->Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
 					return true; // The AI King is in Check
 				}
@@ -356,7 +314,7 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 				// contains the Tile under the King
 				if (EnemyMoves.Contains(KingTile))
 				{
-					TurnManager->Checker = EnemyPiece; // Set that Piece as the Checker
+					// TurnManager->Checker = EnemyPiece; // Set that Piece as the Checker
 					// bIsCheck = true; // Set to true the CheckSituation
 					return true; // The Human King is in Check
 				}
@@ -366,55 +324,6 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
 	// Checker = nullptr;
 	// bIsCheck = false;
 	return false; // The King of the CurrentPlayer is not in Check
-}
-
-bool AChess_GameMode::IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team)
-{
-	// For each Chess Piece of the team
-	for (AChess_Piece* Piece : Team)
-	{
-		ATile* CurrentTile = Piece->GetPieceTile();
-		
-		// Get the legal moves of the piece
-		TArray<ATile*> PossibleMoves = Piece->GetLegitMoves();
-
-		for (ATile* NextTile : PossibleMoves)
-		{
-			if (Piece->IsA(AChess_King::StaticClass()))
-			{
-				ATile* CurrentKingTile = Piece->GetPieceTile();
-				Piece->SetPieceTile(NextTile);
-				if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == TurnManager->Checker)
-				{
-					Piece->SetPieceTile(CurrentKingTile);
-					return false;
-				}
-				Piece->SetPieceTile(CurrentKingTile);
-			}
-			const ETileStatus NextStatus = NextTile->GetTileStatus();
-			const ETeam NextTeam = NextTile->GetTileTeam();
-			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-			NextTile->SetTileTeam(Piece->GetTeam());
-			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
-			CurrentTile->SetTileTeam(NONE);
-			if (!IsKingInCheck(KingTeam) || NextTile->GetPieceOnTile() == TurnManager->Checker)
-			{
-				NextTile->SetTileStatus(NextStatus);
-				NextTile->SetTileTeam(NextTeam);
-				CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
-				CurrentTile->SetTileTeam(Piece->GetTeam());
-				return false;
-			}
-			NextTile->SetTileStatus(NextStatus);
-			NextTile->SetTileTeam(NextTeam);
-			CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
-			CurrentTile->SetTileTeam(Piece->GetTeam());
-		}
-	}
-	
-	KingTeam ? bIsBlackKingInCheckMate = true : bIsWhiteKingInCheckMate = true;
-	bIsGameOver = true;
-	return true;
 }
 
 /*
@@ -450,7 +359,7 @@ ATile* AChess_GameMode::GetTileAtPosition(const TCHAR Letter, const uint8 Number
 			EndIndex = MiddleIndex - 1;
 		}
 	}
-
+	
 	// Return nullptr if the Tile isn't in the array
 	return nullptr;
 }
@@ -525,13 +434,6 @@ void AChess_GameMode::ResetField()
 
 void AChess_GameMode::DestroyManagers()
 {
-	// Cancella il thread
-	if (EnemyThread)
-	{
-		EnemyThread->~Manager_Thread();
-		EnemyThread = nullptr;
-	}
-	
 	// Cancella i manager
 	if (TurnManager)
 	{
@@ -544,6 +446,5 @@ void AChess_GameMode::DestroyManagers()
 		PromotionManager->Destroy();
 		PromotionManager = nullptr;
 	}
-	
-	this->Destroy();
+	// this->Destroy();
 }

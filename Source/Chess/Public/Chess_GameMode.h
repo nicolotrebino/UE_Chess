@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Chessboard.h"
-#include "Managers/Manager_Thread.h"
 #include "Managers/Manager_Turn.h"
 #include "Players/PlayerInterface.h"
 #include "GameFramework/GameModeBase.h"
@@ -30,8 +29,6 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	Manager_Thread* EnemyThread;
 
 	/* Game variable */
 	bool bIsGameOver; // Tracks if the game is over
@@ -105,7 +102,7 @@ public:
 	 * Class methods
 	 */
 
-	TArray<ATile*> GetAllLegalMoves(int32 Player);
+	void GetAllLegalMoves(int32 Player);
 	
 	void ChoosePlayerAndStartGame(); // Called at the start of the game
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index
@@ -113,7 +110,6 @@ public:
 	void TurnNextPlayer(); // Called at the end of the game turn
 
 	bool IsKingInCheck(const int32 KingTeam);
-	bool IsCheckMate(const uint8 KingTeam, const TArray<AChess_Piece*>& Team);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
 
 	/* Score manager */

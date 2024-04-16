@@ -16,7 +16,7 @@ AManager_Turn::AManager_Turn()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	Checker = nullptr;
+	// Checker = nullptr;
 
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
@@ -42,7 +42,7 @@ void AManager_Turn::SelfDestroy()
 
 void AManager_Turn::ResetVariables()
 {
-	Checker = nullptr;
+	// Checker = nullptr;
 
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
@@ -398,7 +398,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 	///
 	if ((ClickedIndex % 2) != 0)
 	{
-		LegalMoves = GameMode->GetAllLegalMoves(0);
+		GameMode->GetAllLegalMoves(0);
 	}
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;

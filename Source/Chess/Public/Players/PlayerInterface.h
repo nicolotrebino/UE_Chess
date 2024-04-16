@@ -30,7 +30,6 @@ public:
 	virtual void OnWin() {};
 	virtual void OnLose() {};
 	virtual void OnDraw() {};
-	virtual void ComputeMove() {};
 
 	virtual void Destroy() = 0;
 };

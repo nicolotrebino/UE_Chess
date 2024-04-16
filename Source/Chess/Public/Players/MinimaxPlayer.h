@@ -44,7 +44,6 @@ public:
 	virtual void OnWin() override;
 	virtual void OnLose() override;
 	virtual void OnDraw() override;
-	virtual void ComputeMove() override;
 
 	virtual void Destroy() override;
 

@@ -38,7 +38,7 @@ public:
 	void SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill);
 
 	/* Game references for a turn */
-	AChess_Piece* Checker; // Piece that is in check
+	// AChess_Piece* Checker; // Piece that is in check
 
 	AChess_Piece* MovedPiece;
 	AChess_Piece* KilledPiece;
@@ -53,7 +53,7 @@ public:
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
 
-	TArray<ATile*> LegalMoves; // All legal moves for the particular turn
+	// TArray<ATile*> LegalMoves; // All legal moves for the particular turn
 	TArray<ATile*> WhiteMoves;
 	TArray<ATile*> BlackMoves;
 

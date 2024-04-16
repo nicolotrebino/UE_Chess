@@ -34,7 +34,7 @@ void AMinimaxPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AMinimaxPlayer::OnTurn()
 {
-	const AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	GameMode->TurnManager->DisableReplay();
 	
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
@@ -42,11 +42,19 @@ void AMinimaxPlayer::OnTurn()
 
 	FTimerHandle TimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [GameMode]()
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&, GameMode]()
 		{
-			GameMode->EnemyThread->Init();
-			GameMode->EnemyThread->Run();
-			GameMode->EnemyThread->Stop();
+			FNextMove NextMove = FindBestMove();
+
+			if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
+			{
+				NextMove.PieceToMove->Kill(NextMove.NextTile->GetPieceOnTile());
+			}
+			
+			NextMove.PieceToMove->MovePiece(NextMove.NextTile);
+			
+			// Change player
+			GameMode->TurnNextPlayer();
 		}, 1, false);
 }
 
@@ -70,23 +78,6 @@ void AMinimaxPlayer::OnDraw()
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
-void AMinimaxPlayer::ComputeMove()
-{
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-
-	FNextMove NextMove = FindBestMove();
-
-	if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
-	{
-		NextMove.PieceToMove->Kill(NextMove.NextTile->GetPieceOnTile());
-	}
-		
-	NextMove.PieceToMove->MovePiece(NextMove.NextTile);
-		
-	// Change player
-	GameMode->TurnNextPlayer();
-}
-
 void AMinimaxPlayer::Destroy()
 {
 	delete this;
@@ -100,9 +91,12 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	int32 BlackValue = 0;
 	int32 WhiteValue = 0;
 
+	GameMode->GetAllLegalMoves(0);
+	GameMode->GetAllLegalMoves(1);
+
 	// Mobility
-	WhiteValue += 10 * GameMode->GetAllLegalMoves(0).Num(); // Human
-	BlackValue += 10 * GameMode->GetAllLegalMoves(1).Num(); // AI
+	WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num(); // Human
+	BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num(); // AI
 	
 	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
 	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
@@ -125,9 +119,6 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 		}
 		return 0;
 	}
-	
-	// BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num();
-	// WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num();
 
 	// Position and material
 	for (int32 i = 0; i < GameMode->TileArray.Num(); i++)
@@ -287,9 +278,19 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	int32 BestVal = -50000;
 	int32 Alpha = -50000;
 	int32 Beta = 50000;
+	int32 Depth = 3;
 
 	FNextMove BestMove = {nullptr, nullptr};
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+
+	if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 15 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() <= 25)
+	{
+		Depth = 3;
+	}
+	else if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 0 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() < 15)
+	{
+		Depth = 4;
+	}
 
 	TArray<AChess_Piece*> AiTeam = GameMode->BlackTeam;
 	for (AChess_Piece* Piece: AiTeam)
@@ -299,9 +300,10 @@ FNextMove AMinimaxPlayer::FindBestMove()
 		for (ATile* Tile: Piece->GetLegitMoves())
 		{
 			AChess_Piece* Killed = Tile->GetPieceOnTile();
+			
 			Piece->VirtualMove(Tile, PreviousTile, Killed);
 			
-			int32 MoveVal = AlphaBetaMiniMax(2, Alpha, Beta, false);
+			int32 MoveVal = AlphaBetaMiniMax(Depth, Alpha, Beta, false);
 
 			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 
@@ -314,7 +316,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 		}
 	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
 	
 	return BestMove;
 }

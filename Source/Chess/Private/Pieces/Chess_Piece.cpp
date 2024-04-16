@@ -10,18 +10,19 @@
 // Sets default values
 AChess_Piece::AChess_Piece()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Set defaults value
-	// GameMode = nullptr;
-	// Nomenclature = '';
-	// PieceTeam = ETeam::NONE;
-	// PieceType = EPieceType::NONE;
-	// CurrentTile = nullptr;
+	GameMode = nullptr;
+	Nomenclature = 'z';
+	PieceTeam = ETeam::NONE;
+	PieceType = EPieceType::PAWN;
+	CurrentTile = nullptr;
+	PieceValue = 0;
 }
 
-TCHAR AChess_Piece::GetNomenclature()
+TCHAR AChess_Piece::GetNomenclature() const
 {
 	return Nomenclature;
 }
@@ -92,8 +93,8 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 		*/
 		
 		// If the next tile is the one under the Checker piece it means I can kill the Checker
-		if (!(TurnManager->Checker && NextTile == TurnManager->Checker->GetPieceTile()))
-		{
+		// if (!(TurnManager->Checker && NextTile == TurnManager->Checker->GetPieceTile()))
+		// {
 			/*
 			// Pretend you're making the next move
 			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
@@ -120,7 +121,7 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 			CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
 			CurrentTile->SetTileTeam(PieceTeam);
 			*/
-		}
+		// }
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
@@ -231,8 +232,8 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	this->SetActorRotation(SetRotation); // Set new rotation
 	this->SetPieceLocation(SetLocation); // Set new location for the Piece
 	this->SetPieceTile(NextTile); // Set the Tile under the ChessPiece
-	this->GetPieceTile()->SetTileStatus(ETileStatus::OCCUPIED); // Set the new Tile to OCCUPIED
-	this->GetPieceTile()->SetTileTeam(PieceTeam);
+	NextTile->SetTileStatus(ETileStatus::OCCUPIED); // Set the new Tile to OCCUPIED
+	NextTile->SetTileTeam(PieceTeam);
 
 	// Set the new reference of the Piece above the Tile
 	NextTile->SetPieceOnTile(this);
@@ -335,7 +336,7 @@ void AChess_Piece::BeginPlay()
 /*
  * Returns an array containing all the pointers to the Tiles on the vertical line of that particular piece
  * However, it returns only the cells into which the piece can go:
- * if it finds an occupied cell along the way, it will not be able to continue afterwards
+ * if it finds an occupied cell along the way, it will not be able to continue afterward
  */
 TArray<ATile*> AChess_Piece::GetVerticalLine() const
 {
@@ -394,7 +395,7 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 /*
  * Returns an array containing all the pointers to the Tiles on the horizontal line of that particular piece
  * However, it returns only the cells into which the piece can go:
- * if it finds an occupied cell along the way, it will not be able to continue afterwards
+ * if it finds an occupied cell along the way, it will not be able to continue afterward
  */
 TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 {
@@ -453,7 +454,7 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 /*
  * Returns an array containing all the pointers to the Tiles on the diagonal lines of that particular piece
  * However, it returns only the cells into which the piece can go:
- * if it finds an occupied cell along the way, it will not be able to continue afterwards
+ * if it finds an occupied cell along the way, it will not be able to continue afterward
  */
 TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 {

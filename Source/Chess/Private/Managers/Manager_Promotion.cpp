@@ -37,7 +37,6 @@ void AManager_Promotion::StartPromotion(AChess_Pawn* Pawn)
 void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the Chess_GameMode reference
-	const AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	AManager_Turn* TurnManager = GameMode->TurnManager;
 	
 	AChess_Piece* NewPiece;
@@ -64,8 +63,6 @@ void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 	// Cpc->UserInterfaceWidget->SetPieceToMove(NewPiece);
 	// TurnManager->MovedPiece = NewPiece;
 	TurnManager->PromotedPiece = NewPiece;
-	GameMode->UpdateScores();
-	// CurrentPawn->SelfDestroy();
 	CurrentPawn->SetActorHiddenInGame(true);
 	CurrentPawn->SetActorEnableCollision(false);
 
@@ -76,6 +73,7 @@ void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 	{
 		GameMode->BlackTeam.Add(NewPiece);
 	}
+	GameMode->UpdateScores();
 	
 	if (PromotionWidget)
 	{
