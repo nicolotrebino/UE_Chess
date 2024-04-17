@@ -2,10 +2,12 @@
 
 #include "Managers/Manager_Turn.h"
 
+#include "Chess_GameInstance.h"
 #include "Chess_GameMode.h"
 #include "Chess_PlayerController.h"
 #include "Pieces/Chess_Rook.h"
 #include "Blueprint/WidgetTree.h"
+#include "Components/Button.h"
 #include "Components/HorizontalBox.h"
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
@@ -253,17 +255,54 @@ FString AManager_Turn::ComputeNotation() const
 
 void AManager_Turn::DisableReplay() const
 {
-	for (FMoveInfo Info: MoveHistory)
+	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	UButton* BackButton = Cast<UButton>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("Back"));
+	UButton* ResetButton = Cast<UButton>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("Reset_Chessboard"));
+	if (BackButton)
 	{
-		Info.Button->SetVisibility(ESlateVisibility::HitTestInvisible);
+		BackButton->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	if (ResetButton)
+	{
+		ResetButton->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	
+	UChess_GameInstance* GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (!GameInstance->bNoReplay)
+	{
+		for (FMoveInfo Info: MoveHistory)
+		{
+			Info.Button->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
 	}
 }
 
 void AManager_Turn::EnableReplay()
 {
-	for (FMoveInfo Info: MoveHistory)
+	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	if (Cpc->UserInterfaceWidget)
 	{
-		Info.Button->SetVisibility(ESlateVisibility::Visible);
+		UButton* BackButton = Cast<UButton>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("Back"));
+		UButton* ResetButton = Cast<UButton>(Cpc->UserInterfaceWidget->WidgetTree->FindWidget("Reset_Chessboard"));
+		if (BackButton)
+		{
+			BackButton->SetVisibility(ESlateVisibility::Visible);
+		}
+		if (ResetButton)
+		{
+			ResetButton->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	UChess_GameInstance* GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (!GameInstance->bNoReplay)
+	{
+		for (FMoveInfo Info: MoveHistory)
+		{
+			Info.Button->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 }
 
@@ -309,12 +348,12 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				if (MoveHistory[i].KilledPiece->GetTeam() == WHITE)
 				{
 					GameMode->WhiteTeam.Add(MoveHistory[i].KilledPiece);
-					GameMode->KilledWhiteTeam.Remove(MoveHistory[i].KilledPiece);
+					// GameMode->KilledWhiteTeam.Remove(MoveHistory[i].KilledPiece);
 				}
 				else
 				{
 					GameMode->BlackTeam.Add(MoveHistory[i].KilledPiece);
-					GameMode->KilledBlackTeam.Remove(MoveHistory[i].KilledPiece);
+					// GameMode->KilledBlackTeam.Remove(MoveHistory[i].KilledPiece);
 				}
 			}
 
@@ -375,12 +414,12 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				if (MoveHistory[i].KilledPiece->GetTeam() == ETeam::WHITE)
 				{
 					GameMode->WhiteTeam.Remove(MoveHistory[i].KilledPiece);
-					GameMode->KilledWhiteTeam.Add(MoveHistory[i].KilledPiece);
+					// GameMode->KilledWhiteTeam.Add(MoveHistory[i].KilledPiece);
 				}
 				else
 				{
 					GameMode->BlackTeam.Remove(MoveHistory[i].KilledPiece);
-					GameMode->KilledBlackTeam.Add(MoveHistory[i].KilledPiece);
+					// GameMode->KilledBlackTeam.Add(MoveHistory[i].KilledPiece);
 				}
 				MoveHistory[i].KilledPiece->SetActorHiddenInGame(true);
 				MoveHistory[i].KilledPiece->SetActorEnableCollision(false);

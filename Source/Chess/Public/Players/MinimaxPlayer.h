@@ -40,6 +40,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool bIsVirtualPromotion = false;
+	AChess_Piece* PiecePromoted = nullptr;
+	AChess_Piece* NewQueen = nullptr;
+
 	virtual void OnTurn() override;
 	virtual void OnWin() override;
 	virtual void OnLose() override;

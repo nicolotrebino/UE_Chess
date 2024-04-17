@@ -247,12 +247,10 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 	if (Enemy->GetTeam() == ETeam::WHITE)
 	{
 		GameMode->WhiteTeam.Remove(Enemy);
-		// GameMode->KilledWhiteTeam.Add(Enemy);
 	}
 	else
 	{
 		GameMode->BlackTeam.Remove(Enemy);
-		// GameMode->KilledBlackTeam.Add(Enemy);
 	}
 	GameMode->UpdateScores();
 	Enemy->SetActorHiddenInGame(true);

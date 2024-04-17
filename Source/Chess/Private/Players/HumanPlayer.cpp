@@ -107,43 +107,6 @@ void AHumanPlayer::OnClick()
 				GameMode->TurnManager->SelectedPiece = SelectedPiece = CurrPiece; // Set the Chess Piece selected by the Human Player
 				CurrPiece->GetPieceTile()->SetSelectedTile(); // Select the Tile and set it to SELECTED
 
-				// For each tile in the array of possible moves for the selected piece,
-				// make it a target and add it to the array of target tiles at that time
-				/*
-				for (ATile* Tile : CurrPiece->GetLegitMoves())
-				{
-					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
-					{
-						Tile->SetKillableTile();
-						GameMode->KillableTiles.Add(Tile);
-					}
-					else
-					{
-						Tile->SetTargetTile();
-						GameMode->TargetedTiles.Add(Tile);
-					}
-				}
-				*/
-
-				/*
-				for (ATile* Tile: CurrPiece->GetPossibleMoves())
-				{
-					if (GameMode->TurnManager->LegalMoves.Contains(Tile))
-					{
-						if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
-						{
-							Tile->SetKillableTile();
-							GameMode->KillableTiles.Add(Tile);
-						}
-						else
-						{
-							Tile->SetTargetTile();
-							GameMode->TargetedTiles.Add(Tile);
-						}
-					}
-				}
-				*/
-
 				for (ATile* Tile: CurrPiece->MyLegalMoves)
 				{
 					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)

@@ -81,10 +81,6 @@ public:
 	TArray<AChess_Piece*> WhiteTeam; // Keeps track of White Pieces
 	UPROPERTY(Transient)
 	TArray<AChess_Piece*> BlackTeam; // Keeps track of Black Pieces
-	UPROPERTY(Transient)
-	TArray<AChess_Piece*> KilledWhiteTeam; // Keeps track of Black Pieces
-	UPROPERTY(Transient)
-	TArray<AChess_Piece*> KilledBlackTeam; // Keeps track of Black Pieces
 
 	// Audio Components
 	UPROPERTY(EditDefaultsOnly)

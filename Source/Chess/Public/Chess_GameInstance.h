@@ -34,6 +34,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UAudioComponent* Music = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bNoReplay = false; // Default buttons are not hittable
 	
 	void IncrementScoreHumanPlayer(); // Increment the score for human player
 	void IncrementScoreAiPlayer(); // Increment the score for AI player

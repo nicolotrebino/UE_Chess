@@ -7,6 +7,7 @@
 #include "Chess_GameMode.h"
 #include "Managers/Manager_Promotion.h"
 #include "Managers/Manager_Turn.h"
+#include "Pieces/Chess_Queen.h"
 #include "Players/MinimaxPlayer.h"
 #include "Players/RandomPlayer.h"
 

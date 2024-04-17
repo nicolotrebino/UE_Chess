@@ -4,6 +4,8 @@
 
 #include "Chess_GameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Pieces/Chess_Pawn.h"
+#include "Pieces/Chess_Queen.h"
 
 // Sets default values
 AMinimaxPlayer::AMinimaxPlayer()
@@ -203,23 +205,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
 	if (Depth == 0 || GameMode->bIsGameOver) return EvaluateGrid();
-	
-	// GameMode->GetAllLegalMoves(IsMax); // Creo le legal moves per tutti i pezzi dopo la virtual move
-
-	/*
-	if (GameMode->TurnManager->LegalMoves.IsEmpty())
-	{
-		if (GameMode->TurnManager->bIsWhiteKingInCheck)
-		{
-			return 20000;
-		}
-		if (GameMode->TurnManager->bIsBlackKingInCheck)
-		{
-			return -20000;
-		}
-		return 0;
-	}
-	*/
 
 	if (IsMax)
 	{
@@ -229,14 +214,35 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 		for (AChess_Piece* Piece: AiTeam)
 		{
 			ATile* PreviousTile = Piece->GetPieceTile();
-			// TArray<ATile*> LegalMoves = Piece->MyLegalMoves;
 			for (ATile* Tile: Piece->GetLegitMoves())
 			{
 				AChess_Piece* Killed = Tile->GetPieceOnTile();
-				Piece->VirtualMove(Tile, PreviousTile, Killed);
+
+				if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 1)
+				{
+					PiecePromoted = Piece;
+					NewQueen = NewObject<AChess_Queen>();
+					GameMode->BlackTeam.Add(NewQueen);
+					GameMode->BlackTeam.Remove(Piece);
+					NewQueen->VirtualMove(Tile, PreviousTile, Killed);
+					bIsVirtualPromotion = true;
+				}
+				else
+				{
+					Piece->VirtualMove(Tile, PreviousTile, Killed);
+				}
 				
 				Best = FMath::Max(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, false));
 
+				if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
+				{
+					GameMode->BlackTeam.Add(PiecePromoted);
+					GameMode->BlackTeam.Remove(NewQueen);
+					bIsVirtualPromotion = false;
+					PiecePromoted = nullptr;
+					NewQueen->Destroy();
+				}
+				
 				Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 
 				if (Best >= Beta) return Best;
@@ -254,16 +260,37 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 		for (AChess_Piece* Piece: HumanTeam)
 		{
 			ATile* PreviousTile = Piece->GetPieceTile();
-			// TArray<ATile*> LegalMoves = Piece->MyLegalMoves;
+
 			for (ATile* Tile: Piece->GetLegitMoves())
 			{
 				AChess_Piece* Killed = Tile->GetPieceOnTile();
-				Piece->VirtualMove(Tile, PreviousTile, Killed);
+
+				if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 8)
+				{
+					PiecePromoted = Piece;
+					NewQueen = NewObject<AChess_Queen>();
+					GameMode->WhiteTeam.Add(NewQueen);
+					GameMode->WhiteTeam.Remove(Piece);
+					NewQueen->VirtualMove(Tile, PreviousTile, Killed);
+					bIsVirtualPromotion = true;
+				}
+				else
+				{
+					Piece->VirtualMove(Tile, PreviousTile, Killed);
+				}
 				
 				Best = FMath::Min(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, true));
 
+				if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
+				{
+					GameMode->WhiteTeam.Add(PiecePromoted);
+					GameMode->WhiteTeam.Remove(NewQueen);
+					bIsVirtualPromotion = false;
+					PiecePromoted = nullptr;
+					NewQueen->Destroy();
+				}
+
 				Piece->VirtualUnMove(Tile, PreviousTile, Killed);
-				// UE_LOG(LogTemp, Error, TEXT("%i, %i, %i"), Tile, PreviousTile, Killed);
 
 				if (Best <= Alpha) return Best;
 				Beta = FMath::Min(Beta, Best);
@@ -278,16 +305,16 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	int32 BestVal = -50000;
 	int32 Alpha = -50000;
 	int32 Beta = 50000;
-	int32 Depth = 3;
+	int32 Depth = 2;
 
 	FNextMove BestMove = {nullptr, nullptr};
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-	if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 15 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() <= 25)
+	if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 5 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() <= 15)
 	{
 		Depth = 3;
 	}
-	else if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 0 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() < 15)
+	else if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 0 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() < 5)
 	{
 		Depth = 4;
 	}
@@ -296,18 +323,40 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	for (AChess_Piece* Piece: AiTeam)
 	{
 		ATile* PreviousTile = Piece->GetPieceTile();
-		// TArray<ATile*> LegalMoves = Piece->MyLegalMoves;
 		for (ATile* Tile: Piece->GetLegitMoves())
 		{
 			AChess_Piece* Killed = Tile->GetPieceOnTile();
+
+			if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 1)
+			{
+				PiecePromoted = Piece;
+				NewQueen = NewObject<AChess_Queen>();
+				GameMode->BlackTeam.Add(NewQueen);
+				GameMode->BlackTeam.Remove(Piece);
+				NewQueen->VirtualMove(Tile, PreviousTile, Killed);
+				bIsVirtualPromotion = true;
+			}
+			else
+			{
+				Piece->VirtualMove(Tile, PreviousTile, Killed);
+			}
 			
 			Piece->VirtualMove(Tile, PreviousTile, Killed);
 			
 			int32 MoveVal = AlphaBetaMiniMax(Depth, Alpha, Beta, false);
 
+			if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
+			{
+				GameMode->BlackTeam.Add(PiecePromoted);
+				GameMode->BlackTeam.Remove(NewQueen);
+				bIsVirtualPromotion = false;
+				PiecePromoted = nullptr;
+				NewQueen->Destroy();
+			}
+
 			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 
-			if (MoveVal > BestVal)
+			if (MoveVal > BestVal || (MoveVal == BestVal && FMath::Rand() % 2 == 1))
 			{
 				BestMove.PieceToMove = Piece;
 				BestMove.NextTile = Tile;

@@ -65,7 +65,7 @@ void AChess_GameMode::BeginPlay()
 	{
 		PromotionManager = GetWorld()->SpawnActor<AManager_Promotion>(PromotionManagerClass);
 	}
-
+	
 	AHumanPlayer* HumanPlayer = Cast<AHumanPlayer>(*TActorIterator<AHumanPlayer>(GetWorld()));
 
 	const float CameraPosX = (CBoard->GetTileSize() * CBoard->GetFieldSize() / 2);
@@ -73,7 +73,7 @@ void AChess_GameMode::BeginPlay()
 	HumanPlayer->SetActorLocationAndRotation(CameraPos, FRotationMatrix::MakeFromX(FVector(0, 0, -1)).Rotator());
 
 	Players.Add(HumanPlayer); // Human player = 0
-
+	
 	const UChess_GameInstance* GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GameInstance)
 	{
@@ -176,40 +176,10 @@ void AChess_GameMode::TurnNextPlayer()
 		bIsDraw = true;
 		TurnManager->DisplayMove();
 		TurnManager->DisplayEndGame();
+		TurnManager->EnableReplay();
 		Players[WHITE]->OnDraw();
 		return;
 	}
-
-	/*
-	if (TurnManager->LegalMoves.IsEmpty())
-	{
-		if (TurnManager->bIsWhiteKingInCheck)
-		{
-			bIsGameOver = true;
-			bIsWhiteKingInCheckMate = true;
-			TurnManager->DisplayMove();
-			TurnManager->DisplayEndGame();
-			Players[WHITE]->OnLose();
-		}
-		else if (TurnManager->bIsBlackKingInCheck)
-		{
-			bIsGameOver = true;
-			bIsBlackKingInCheckMate = true;
-			TurnManager->DisplayMove();
-			TurnManager->DisplayEndGame();
-			Players[WHITE]->OnWin();
-		}
-		else
-		{
-			bIsGameOver = true;
-			bIsDraw = true;
-			TurnManager->DisplayMove();
-			TurnManager->DisplayEndGame();
-			Players[WHITE]->OnDraw();
-		}
-		return;
-	}
-	*/
 
 	// For Human Player
 	if (TurnManager->WhiteMoves.IsEmpty())
@@ -220,6 +190,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsWhiteKingInCheckMate = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
+			TurnManager->EnableReplay();
 			Players[WHITE]->OnLose();
 		}
 		else
@@ -228,6 +199,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsDraw = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
+			TurnManager->EnableReplay();
 			Players[WHITE]->OnDraw();
 		}
 		return;
@@ -241,6 +213,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsBlackKingInCheckMate = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
+			TurnManager->EnableReplay();
 			Players[WHITE]->OnWin();
 		}
 		else
@@ -249,6 +222,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsDraw = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
+			TurnManager->EnableReplay();
 			Players[WHITE]->OnDraw();
 		}
 		return;
@@ -424,10 +398,6 @@ void AChess_GameMode::ResetField()
 	{
 		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Game Field is null"));
-	}
 	
 	ChoosePlayerAndStartGame();
 }
@@ -446,5 +416,4 @@ void AChess_GameMode::DestroyManagers()
 		PromotionManager->Destroy();
 		PromotionManager = nullptr;
 	}
-	// this->Destroy();
 }
