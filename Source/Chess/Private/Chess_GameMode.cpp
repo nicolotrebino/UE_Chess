@@ -228,7 +228,11 @@ void AChess_GameMode::TurnNextPlayer()
 		return;
 	}
 
-	if (TurnManager->bIsKill && KillSound)
+	if ((TurnManager->bIsBlackKingInCheck || TurnManager->bIsWhiteKingInCheck) && CheckSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, CheckSound, FVector(0, 0, 0));
+	}
+	else if (TurnManager->bIsKill && KillSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, KillSound, FVector(0, 0, 0));
 	}

@@ -221,7 +221,8 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 1)
 				{
 					PiecePromoted = Piece;
-					NewQueen = NewObject<AChess_Queen>();
+					// NewQueen = NewObject<AChess_Queen>();
+					NewQueen = GameMode->CBoard->SpawnSinglePiece(PreviousTile, BLACK, QUEEN);
 					GameMode->BlackTeam.Add(NewQueen);
 					GameMode->BlackTeam.Remove(Piece);
 					NewQueen->VirtualMove(Tile, PreviousTile, Killed);
@@ -268,7 +269,8 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 8)
 				{
 					PiecePromoted = Piece;
-					NewQueen = NewObject<AChess_Queen>();
+					// NewQueen = NewObject<AChess_Queen>();
+					NewQueen = GameMode->CBoard->SpawnSinglePiece(PreviousTile, WHITE, QUEEN);
 					GameMode->WhiteTeam.Add(NewQueen);
 					GameMode->WhiteTeam.Remove(Piece);
 					NewQueen->VirtualMove(Tile, PreviousTile, Killed);
@@ -330,7 +332,8 @@ FNextMove AMinimaxPlayer::FindBestMove()
 			if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 1)
 			{
 				PiecePromoted = Piece;
-				NewQueen = NewObject<AChess_Queen>();
+				// NewQueen = NewObject<AChess_Queen>();
+				NewQueen = GameMode->CBoard->SpawnSinglePiece(PreviousTile, BLACK, QUEEN);
 				GameMode->BlackTeam.Add(NewQueen);
 				GameMode->BlackTeam.Remove(Piece);
 				NewQueen->VirtualMove(Tile, PreviousTile, Killed);
@@ -341,7 +344,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 				Piece->VirtualMove(Tile, PreviousTile, Killed);
 			}
 			
-			Piece->VirtualMove(Tile, PreviousTile, Killed);
+			// Piece->VirtualMove(Tile, PreviousTile, Killed);
 			
 			int32 MoveVal = AlphaBetaMiniMax(Depth, Alpha, Beta, false);
 

@@ -267,14 +267,10 @@ void AManager_Turn::DisableReplay() const
 	{
 		ResetButton->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
-	
-	UChess_GameInstance* GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	if (!GameInstance->bNoReplay)
+
+	for (FMoveInfo Info: MoveHistory)
 	{
-		for (FMoveInfo Info: MoveHistory)
-		{
-			Info.Button->SetVisibility(ESlateVisibility::HitTestInvisible);
-		}
+		Info.Button->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
 }
 
@@ -302,6 +298,13 @@ void AManager_Turn::EnableReplay()
 		for (FMoveInfo Info: MoveHistory)
 		{
 			Info.Button->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		for (FMoveInfo Info: MoveHistory)
+		{
+			Info.Button->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 	}
 }

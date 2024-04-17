@@ -88,6 +88,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* KillSound;
 	UPROPERTY(EditDefaultsOnly)
+	USoundBase* CheckSound;
+	UPROPERTY(EditDefaultsOnly)
 	USoundBase* WinSound;
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* LoseSound;
