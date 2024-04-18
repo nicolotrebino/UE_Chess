@@ -96,6 +96,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* DrawSound;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bEnableSound = true;
+
 	TArray<TPair<FString, int32>> GameStates;
 
 	/*

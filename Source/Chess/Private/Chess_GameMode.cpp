@@ -228,15 +228,15 @@ void AChess_GameMode::TurnNextPlayer()
 		return;
 	}
 
-	if ((TurnManager->bIsBlackKingInCheck || TurnManager->bIsWhiteKingInCheck) && CheckSound)
+	if (bEnableSound && (TurnManager->bIsBlackKingInCheck || TurnManager->bIsWhiteKingInCheck) && CheckSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, CheckSound, FVector(0, 0, 0));
 	}
-	else if (TurnManager->bIsKill && KillSound)
+	else if (bEnableSound && TurnManager->bIsKill && KillSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, KillSound, FVector(0, 0, 0));
 	}
-	else if (MoveSound)
+	else if (bEnableSound && MoveSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, MoveSound, FVector(0, 0, 0));
 	}

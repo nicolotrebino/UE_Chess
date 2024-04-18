@@ -134,10 +134,6 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 				case PAWN:
 					WhiteValue += 100;
 					WhiteValue += Pawns[i];
-					if (Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber == 8)
-					{
-						WhiteValue += 900;
-					}
 					break;
 				case KNIGHT:
 					WhiteValue += 320;
@@ -167,10 +163,6 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 				case PAWN:
 					BlackValue += 100;
 					BlackValue += Pawns[Flip[i]];
-					if (Piece->GetPieceTile()->GetAlgebraicPosition().TileNumber == 1)
-					{
-						BlackValue += 900;
-					}
 					break;
 				case KNIGHT:
 					BlackValue += 320;
