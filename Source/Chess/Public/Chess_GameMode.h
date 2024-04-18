@@ -96,6 +96,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* DrawSound;
 
+	TArray<TPair<FString, int32>> GameStates;
+
 	/*
 	 * Class methods
 	 */

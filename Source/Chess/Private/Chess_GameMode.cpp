@@ -241,6 +241,27 @@ void AChess_GameMode::TurnNextPlayer()
 		UGameplayStatics::PlaySoundAtLocation(this, MoveSound, FVector(0, 0, 0));
 	}
 
+	TPair<FString, int32> CurrentState = TurnManager->SaveGameState(); // Value = 0
+	if (GameStates.Contains(CurrentState))
+	{
+		CurrentState.Value++; // Value = 1
+		if (GameStates.Contains(CurrentState))
+		{
+			CurrentState.Value++; // Value = 2
+			if ((CurrentState.Value + 1) == 3)
+			{
+				bIsGameOver = true;
+				bIsDraw = true;
+				TurnManager->DisplayMove();
+				TurnManager->DisplayEndGame();
+				TurnManager->EnableReplay();
+				Players[WHITE]->OnDraw();
+				return;
+			}
+		}
+	}
+	GameStates.Add(CurrentState);
+	
 	TurnManager->DisplayMove();
 	
 	MoveCounter += 1;
@@ -402,6 +423,8 @@ void AChess_GameMode::ResetField()
 	{
 		CBoard = GetWorld()->SpawnActor<AChessboard>(ChessboardClass);
 	}
+
+	GameStates.Empty();
 	
 	ChoosePlayerAndStartGame();
 }

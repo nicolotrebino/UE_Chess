@@ -52,8 +52,7 @@ public:
 	bool bIsPromotion; // If in that turn there was a promotion
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
-
-	// TArray<ATile*> LegalMoves; // All legal moves for the particular turn
+	
 	TArray<ATile*> WhiteMoves;
 	TArray<ATile*> BlackMoves;
 
@@ -66,6 +65,8 @@ public:
 	TArray<ATile*> KillableTiles; // Keeps track of Killable Tiles
 	UPROPERTY(Transient)
 	AChess_Piece* SelectedPiece; // Keeps track of Selected Piece
+
+	TPair<FString, int32> SaveGameState() const;
 
 	/* Move History managing */
 	UPROPERTY(EditDefaultsOnly)

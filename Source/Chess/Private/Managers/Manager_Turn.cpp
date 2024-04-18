@@ -101,6 +101,37 @@ void AManager_Turn::ResetSelectedPiece() const
 	}
 }
 
+TPair<FString, int32> AManager_Turn::SaveGameState() const
+{
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	TPair<FString, int32> Pair;
+	FString State;
+	for (ATile* Tile: GameMode->TileArray)
+	{
+		if (Tile->GetPieceOnTile())
+		{
+			State.AppendChar(Tile->GetPieceOnTile()->GetNomenclature());
+			if (Tile->GetTileTeam() == ETeam::WHITE)
+			{
+				State.AppendChar('W');
+			}
+			else
+			{
+				State.AppendChar('B');
+			}
+		}
+		else
+		{
+			State.AppendChar('E');
+		}
+	}
+
+	Pair.Key = State;
+	Pair.Value = 0;
+	
+	return Pair;
+}
+
 void AManager_Turn::DisplayMove()
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
@@ -115,6 +146,8 @@ void AManager_Turn::DisplayMove()
 			MoveHistory[i].Button = nullptr;
 			MoveHistory.RemoveAt(i);
 			GameMode->MoveCounter = GameMode->MoveCounter - 1;
+			GameMode->GameStates.RemoveAt(GameMode->GameStates.Num() - 1);
+			
 			i--;
 		}
 	}
