@@ -7,7 +7,7 @@
 #include "Chess_GameInstance.generated.h"
 
 /**
- * 
+ * It keeps track of all the variables from when the game starts to when it ends
  */
 UCLASS()
 class CHESS_API UChess_GameInstance : public UGameInstance
@@ -15,6 +15,15 @@ class CHESS_API UChess_GameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	/* Variables to change game's settings */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 EnemyPlayer = 0; // Used to choose the AI player (Random or Minimax)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 MusicNumber = 0; // Used to choose the background music
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UAudioComponent* Music = nullptr; // Reference to the background audio component
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bNoReplay = false; // Used to enable or disable replay (hard mode)
 
 	/* Score of the players during all the game, it counts all the games won */
 	UPROPERTY(EditAnywhere) 
@@ -25,22 +34,11 @@ public:
 	int32 GetScoreHumanPlayer(); // Get the score for human player
 	UFUNCTION(BlueprintCallable)
 	int32 GetScoreAiPlayer(); // Get the score for AI player
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 EnemyPlayer = 0;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 MusicNumber = 0;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	UAudioComponent* Music = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bNoReplay = false; // Default buttons are not hittable
 	
 	void IncrementScoreHumanPlayer(); // Increment the score for human player
 	void IncrementScoreAiPlayer(); // Increment the score for AI player
 
+	/* Game's turn messages */
 	UPROPERTY(EditAnywhere)
 	FString CurrentTurnMessage = "Current Player"; // Message to show every turn
 	UFUNCTION(BlueprintCallable)

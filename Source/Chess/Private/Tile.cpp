@@ -5,12 +5,8 @@
 
 #include "Chess_GameMode.h"
 
-// Sets default values
 ATile::ATile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	// Template function that creates a components
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
@@ -22,16 +18,28 @@ ATile::ATile()
 	// Set default values
 	Status = ETileStatus::EMPTY;
 	Team = ETeam::NONE;
-	ChessPosition = {'A', 0};
+	AlgebraicPosition = {'A', 0};
 	CurrentPieceOnTile = nullptr; // Nullptr as a default value and used also for the empty Tiles
 	TileLocation = FVector(0, 0, 0);
 }
 
+/*
+ *	@brief	Setter for the Tile location
+ *
+ *	@params	FVector as a location in the game scene
+ *
+ *	@return	Void
+ */
 void ATile::SetTileLocation(const FVector& Location)
 {
 	TileLocation = Location;
 }
 
+/*
+ *	@brief	Getter for the Tile location
+ *
+ *	@return	FVector as the Tile location in the game scene
+ */
 FVector ATile::GetTileLocation() const
 {
 	return TileLocation;
@@ -41,54 +49,111 @@ FVector ATile::GetTileLocation() const
  * Set the Tile position based on the chess Algebraic notation,
  * with a letter and a number
  */
+
+/*
+ *	@brief	Set the Tile position based on the chess Algebraic notation,
+ *			with a letter and a number
+ *
+ *	@params	X and Y to compute the algebraic position and as coordinates in the grid
+ *
+ *	@return	Void
+ */
 void ATile::SetAlgebraicPosition(const int X, const int Y)
 {
 	if ((X >= 0 && X < 8) && (Y >= 0 && Y < 8))
 	{
 		// Convert the number to the corresponding letter
 		const TCHAR Letter = TEXT('a' + X);
-		ChessPosition.TileLetter = Letter;
-		ChessPosition.TileNumber = Y+1;
+		AlgebraicPosition.TileLetter = Letter;
+		AlgebraicPosition.TileNumber = Y+1;
 	}
 }
 
+/*
+ *	@brief	Get the Tile position based on the chess Algebraic notation,
+ *			with a letter and a number
+ *
+ *	@return	The Algebraic position of the Tile (letter, number)
+ */
 FAlgebraicPosition ATile::GetAlgebraicPosition() const
 {
-	return ChessPosition;
+	return AlgebraicPosition;
 }
 
+/*
+ *	@brief	Set the Tile status
+ *
+ *	@params	Status from the structure TileStatus
+ *
+ *	@return	Void
+ */
 void ATile::SetTileStatus(const ETileStatus TileStatus)
 {
 	Status = TileStatus;
 }
 
+/*
+ *	@brief	Get the Tile status
+ *
+ *	@return	Tile status from the structure TileStatus
+ */
 ETileStatus ATile::GetTileStatus() const
 {
 	return Status;
 }
 
+/*
+ *	@brief	Setter for the Tile team
+ *
+ *	@params	A team from the structure of team
+ *
+ *	@return	Void
+ */
 void ATile::SetTileTeam(const ETeam TileTeam)
 {
 	Team = TileTeam;
 }
 
+/*
+ *	@brief	Getter for the Tile team
+ *
+ *	@return	The team of the Tile (that is, the team to which the piece above the tile itself belongs)
+ */
 ETeam ATile::GetTileTeam() const
 {
 	return Team;
 }
 
+/*
+ *	@brief	Set the Piece above the Tile
+ *
+ *	@params Reference to the Piece above this Tile
+ *
+ *	@return	Void
+ */
 void ATile::SetPieceOnTile(AChess_Piece* ChessPiece)
 {
 	CurrentPieceOnTile = ChessPiece;
 }
 
+/*
+ *	@brief	Get the Piece above the Tile
+ *
+ *	@return	Reference to that Piece
+ */
 AChess_Piece* ATile::GetPieceOnTile() const
 {
 	return CurrentPieceOnTile;
 }
 
 
-// Set the proper Tile Material
+/*
+ *	@brief	Set the proper Tile material
+ *
+ *	@params An integer for the index of the proper material in the array of materials
+ *
+ *	@return	Void
+ */
 void ATile::SetMaterial(const uint8 Index)
 {
 	if (DefaultMaterials[Index])
@@ -98,7 +163,11 @@ void ATile::SetMaterial(const uint8 Index)
 	}
 }
 
-// Set the Tile to TARGET and set the correct Material
+/*
+ *	@brief	Set the Tile to the status TARGET and set the correct material
+ *
+ *	@return	Void
+ */
 void ATile::SetTargetTile()
 {
 	Status = ETileStatus::TARGET;
@@ -108,14 +177,22 @@ void ATile::SetTargetTile()
 	}
 }
 
-// Set the Tile to EMPTY and set the correct Material
+/*
+ *	@brief	Set the Tile to the status EMPTY and set the proper material
+ *
+ *	@return	Void
+ */
 void ATile::UnsetTargetTile()
 {
 	Status = ETileStatus::EMPTY;
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
-// Set the Material for selection
+/*
+ *	@brief	Set the right material for the Tile selected by the user
+ *
+ *	@return	Void
+ */
 void ATile::SetSelectedTile() const
 {
 	if (SelectMaterial && Status == ETileStatus::OCCUPIED)
@@ -124,13 +201,21 @@ void ATile::SetSelectedTile() const
 	}
 }
 
-// Reset the default Material of the Tile
+/*
+ *	@brief	Returns the material to the default one (reset the material)
+ *
+ *	@return	Void
+ */
 void ATile::UnsetSelectedTile()
 {
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
-// Set the Tile to KILLABLE and set the correct Material
+/*
+ *	@brief	Set the Tile status to KILLABLE and set the proper material
+ *
+ *	@return	Void
+ */
 void ATile::SetKillableTile()
 {
 	Status = ETileStatus::KILLABLE;
@@ -140,7 +225,11 @@ void ATile::SetKillableTile()
 	} 
 }
 
-// Set the Tile to OCCUPIED and set the correct Material
+/*
+ *	@brief	Set the Tile status to OCCUPIED and set the proper material
+ *
+ *	@return	Void
+ */
 void ATile::UnsetKillableTile()
 {
 	Status = ETileStatus::OCCUPIED;
@@ -148,6 +237,12 @@ void ATile::UnsetKillableTile()
 }
 
 // Called when the game starts or when spawned
+/*
+ *	@brief	Called when the game starts or when spawned.
+ *			It Adds the "self destroy" to the broadcast event
+ *
+ *	@return	Void
+ */
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -156,14 +251,13 @@ void ATile::BeginPlay()
 	GameMode->OnResetEvent.AddDynamic(this, &ATile::SelfDestroy);
 }
 
+/*
+ *	@brief	Used by broadcast event to destruct the Tile during the "reset game field"
+ *
+ *	@return	Void
+ */
 void ATile::SelfDestroy()
 {
 	Destroy();
 }
-
-// Called every frame
-// void ATile::Tick(float DeltaTime)
-// {
-	// Super::Tick(DeltaTime);
-// }
 

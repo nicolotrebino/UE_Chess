@@ -6,15 +6,20 @@
 #include "Blueprint/UserWidget.h"
 #include "EnhancedInputComponent.h"
 
-/*
- * Chess_GameMode methods implementation
- */
 AChess_PlayerController::AChess_PlayerController()
 {
 	bShowMouseCursor = true; // Allows the mouse not to be captured but to be visible during gameplay
 	bEnableClickEvents = true;
+	ChessContext = nullptr;
+	ClickAction = nullptr;
+	UserInterfaceWidget = nullptr;
 }
 
+/*
+ *	@brief Method bonded to the user's left click, calls the Human Player method that manages the click
+ *
+ *	@return Void
+ */
 void AChess_PlayerController::ClickOnGrid()
 {
 	const auto HumanPlayer = Cast<AHumanPlayer>(GetPawn());
@@ -24,6 +29,12 @@ void AChess_PlayerController::ClickOnGrid()
 	}
 }
 
+/*
+ *	@brief	Called when the game starts or when spawned.
+ *			It maps the ChessContext and create the Widget (HUD)
+ *
+ *	@return Void
+ */
 void AChess_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -38,6 +49,11 @@ void AChess_PlayerController::BeginPlay()
 	UserInterfaceWidget->AddToViewport();
 }
 
+/*
+ *	@brief Bind the click action to the method to be performed
+ *
+ *	@return Void
+ */
 void AChess_PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();

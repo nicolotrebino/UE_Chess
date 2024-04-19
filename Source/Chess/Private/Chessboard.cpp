@@ -5,31 +5,53 @@
 #include "Chess_GameMode.h"
 #include "Pieces/Chess_King.h"
 
-// Sets default values
 AChessboard::AChessboard()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	FieldSize = 8;
 	TileSize = 120;
 }
 
+/*
+ *	@brief Return a (x,y) position given a hit (click) on a field tile
+ *
+ *	@params	Hit
+ *
+ *	@return	Vector (position of the clicked Tile)
+ */
 FVector AChessboard::GetTilePosition(const FHitResult& Hit) const
 {
 	return Cast<ATile>(Hit.GetActor())->GetTileLocation();
 }
 
+/*
+ *	@brief Getter for the field size
+ *
+ *	@return	Field size as an integer
+ */
 int32 AChessboard::GetFieldSize() const
 {
 	return FieldSize;
 }
 
+/*
+ *	@brief Getter for the Tile size
+ *
+ *	@return	Tile size as a float
+ */
 float AChessboard::GetTileSize() const
 {
 	return TileSize;
 }
 
+/*
+ *	@brief Spawns a single piece on the board with all its game characteristics
+ *
+ *	@params	CurrentTile: where the piece has to be spawned
+ *			Team: team of the piece
+ *			Type: the type of the piece to spawn
+ *
+ *	@return	Reference to the spawned piece
+ */
 AChess_Piece* AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type)
 {
 	const FVector SpawnLocation = CurrentTile->GetTileLocation() + FVector (0,0,0.1);
@@ -51,7 +73,12 @@ AChess_Piece* AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team
 	return Piece;
 }
 
-// Called when the game starts or when spawned
+/*
+ *	@brief	Called when the game starts or when spawned.
+ *			It Adds the "self destroy" to the broadcast event, it generates the board, and it spawns the pieces on it	
+ *
+ *	@return	Void
+ */
 void AChessboard::BeginPlay()
 {
 	Super::BeginPlay();
@@ -67,7 +94,9 @@ void AChessboard::BeginPlay()
 }
 
 /*
- * Generate the playing field
+ *	@brief	Generate the game field using Tiles	
+ *
+ *	@return	Void
  */
 void AChessboard::GenerateChessBoard() const
 {
@@ -106,8 +135,9 @@ void AChessboard::GenerateChessBoard() const
 }
 
 /*
- * Method used in the SpawnPieces to spawn a single ChessPiece
- * in the right position and set the Tile to OCCUPIED
+ *	@brief	Use the "SpawnSinglePiece" method to spawn the various pieces on the board	
+ *
+ *	@return	Void
  */
 void AChessboard::SpawnPieces()
 {
@@ -231,14 +261,13 @@ void AChessboard::SpawnPieces()
 	}
 }
 
+/*
+ *	@brief	Used by broadcast event to destruct the Chessboard during the "reset game field"
+ *
+ *	@return	Void
+ */
 void AChessboard::SelfDestroy()
 {
 	Destroy();
 }
-
-// Called every frame
-// void AChessboard::Tick(float DeltaTime)
-// {
-	// Super::Tick(DeltaTime);
-// }
 

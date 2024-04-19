@@ -18,6 +18,9 @@ struct FAlgebraicPosition
 	uint8 TileNumber;
 };
 
+/**
+ * Tile to compose the Chessboard
+ */
 UCLASS()
 class CHESS_API ATile : public AActor
 {
@@ -25,13 +28,13 @@ class CHESS_API ATile : public AActor
 	
 public:	
 
-	ATile(); // Sets default values for this actor's properties
+	ATile();
 
-	/* Setter and getter for the Tile location */
+	/*
+	 * Setter and getter for Tile information
+	 */
 	void SetTileLocation(const FVector& Location);
 	FVector GetTileLocation() const;
-
-	/* Setter and getter for Tile information */
 	void SetAlgebraicPosition(const int X, const int Y);
 	FAlgebraicPosition GetAlgebraicPosition() const;
 	void SetTileStatus(const ETileStatus TileStatus);
@@ -39,11 +42,15 @@ public:
 	void SetTileTeam(const ETeam TileTeam);
 	ETeam GetTileTeam() const;
 
-	/* Manage Piece on Tile */
+	/*
+	 * Manage Piece on Tile
+	 */
 	void SetPieceOnTile(AChess_Piece* ChessPiece);
 	AChess_Piece* GetPieceOnTile() const;
 
-	/* Manage Tile material and its Status in game */
+	/*
+	 * Manage Tile material and its Status in game
+	 */
 	void SetMaterial(const uint8 Index);
 	void SetTargetTile();
 	void UnsetTargetTile();
@@ -53,16 +60,19 @@ public:
 	void UnsetKillableTile();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	/* Components */
+	/*
+	 * Tile components
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Scene;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
 
-	/* Materials */
+	/*
+	 * Tile materials
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
 	TArray<UMaterialInstance*> DefaultMaterials;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
@@ -73,20 +83,16 @@ protected:
 	UMaterialInstance* SelectMaterial;
 	uint8 TileMaterial; // Tile default material
 
-	/* Tile information */
+	/*
+	 * Tile information
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVector TileLocation; // Tile location in the map
 	ETileStatus Status; // Tile Status
 	ETeam Team; // Team of the Piece on Tile
-	FAlgebraicPosition ChessPosition; // Position with Algebraic Notation
+	FAlgebraicPosition AlgebraicPosition; // Position with Algebraic Notation
 	AChess_Piece* CurrentPieceOnTile; // Piece on Tile
 	
 	UFUNCTION()
 	void SelfDestroy();
-
-/* It shouldn't tick */
-// public:
-	// Called every frame
-	// virtual void Tick(float DeltaTime) override;
-
 };

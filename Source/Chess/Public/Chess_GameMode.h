@@ -16,7 +16,7 @@ class AChess_King;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReset);
 
 /**
- * 
+ * It keeps track of all the variables needed for every chess game you play
  */
 UCLASS()
 class CHESS_API AChess_GameMode : public AGameModeBase
@@ -30,7 +30,9 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	/* Game variable */
+	/*
+	 * Game variables
+	 */
 	bool bIsGameOver; // Tracks if the game is over
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsWhiteKingInCheckMate;
@@ -39,41 +41,36 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsDraw;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 MoveCounter; // Tracks the number of moves
-
+	bool bInReplay; // If the human player is using the MoveHistory
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bInReplay;
+	int32 MoveCounter; // Tracks the number of moves
 	
 	// Array of player interfaces
 	TArray<IPlayerInterface*> Players;
 	int32 CurrentPlayer;
 
-	// Chessboard
+	/*
+	 * Managers & Chessboard
+	 */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AChessboard> ChessboardClass;
 	UPROPERTY(VisibleAnywhere)
-	AChessboard* CBoard;
+	AChessboard* CBoard; // Reference to the Chessboard
 
-	// Turn Manager
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AManager_Turn> TurnManagerClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	AManager_Turn* TurnManager;
+	AManager_Turn* TurnManager; // Reference to the TurnManager
 
-	// Promotion Manager
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AManager_Promotion> PromotionManagerClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	AManager_Promotion* PromotionManager;
+	AManager_Promotion* PromotionManager; // Reference to the PromotionManager
 
 	/*
-	 * Array to store important stuff for the game
+	 * Arrays to store important stuff for the game
 	 */
-	
-	// Array with references to the two kings on the Chessboard
-	// 0 (WHITE) --> White King
-	// 1 (BLACK) --> Black King
-	TArray<AChess_King*> Kings;
+	TArray<TPair<FString, int32>> GameStates; // It stores each state of the game as a pair (string, int)
 
 	UPROPERTY(Transient)
 	TArray<ATile*> TileArray; // Keeps track of Tiles
@@ -82,7 +79,14 @@ public:
 	UPROPERTY(Transient)
 	TArray<AChess_Piece*> BlackTeam; // Keeps track of Black Pieces
 
-	// Audio Components
+	// Array with references to the two kings on the Chessboard
+	// 0 (WHITE) --> White King
+	// 1 (BLACK) --> Black King
+	TArray<AChess_King*> Kings;
+
+	/*
+	 * Audio Components
+	 */
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* MoveSound;
 	UPROPERTY(EditDefaultsOnly)
@@ -97,44 +101,40 @@ public:
 	USoundBase* DrawSound;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bEnableSound = true;
-
-	TArray<TPair<FString, int32>> GameStates;
+	bool bEnableSound = true; // Used to enable or disable sounds during the match
 
 	/*
 	 * Class methods
 	 */
-
 	void GetAllLegalMoves(int32 Player);
-	
 	void ChoosePlayerAndStartGame(); // Called at the start of the game
 	int32 GetNextPlayer(int32 Player) const; // Get the next player index
 	UFUNCTION(BlueprintCallable)
 	void TurnNextPlayer(); // Called at the end of the game turn
-
 	bool IsKingInCheck(const int32 KingTeam);
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
 
-	/* Score manager */
+	/*
+	 * Score manager
+	 */
+	int32 ScoreWhiteTeam;
+	int32 ScoreBlackTeam;
+	
 	UFUNCTION(BlueprintCallable)
 	FString ComputeScoreWhiteTeam();
 	UFUNCTION(BlueprintCallable)
 	FString ComputeScoreBlackTeam();
-	
-	int32 ScoreWhiteTeam;
-	int32 ScoreBlackTeam;
-	
 	void UpdateScores();
 
+	/*
+	 * Reset field & turn to the menu
+	 */
 	// BlueprintAssignable usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
 	// declare a variable of type FOnReset (delegate)
 	UPROPERTY(BlueprintAssignable)
 	FOnReset OnResetEvent;
-
-	// Destroy the Chessboard and the pieces and create a new game field
 	UFUNCTION(BlueprintCallable)
-	void ResetField();
-
+	void ResetField(); // Destroy Chessboard and pieces and create a new game field
 	UFUNCTION(BlueprintCallable)
-	void DestroyManagers();
+	void DestroyManagers(); // Destroy PawnManager and TurnManager
 };

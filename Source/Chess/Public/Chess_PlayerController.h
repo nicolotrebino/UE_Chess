@@ -8,7 +8,7 @@
 #include "Chess_PlayerController.generated.h"
 
 /**
- * 
+ * Player controller
  */
 UCLASS()
 class CHESS_API AChess_PlayerController : public APlayerController
