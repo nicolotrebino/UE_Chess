@@ -8,7 +8,7 @@
 #include "Chessboard.generated.h"
 
 /**
- * Chessboard manager
+ *	Chessboard manager
  */
 UCLASS()
 class CHESS_API AChessboard : public AActor
@@ -30,10 +30,11 @@ public:
 	AChess_Piece* SpawnSinglePiece(ATile* CurrentTile, const ETeam Team, const EPieceType Type);
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/*
-	 * Tile and Pieces classes
+	 *	Tile and Pieces classes
 	 */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ATile> TileClass;
@@ -41,7 +42,7 @@ protected:
 	TArray<TSubclassOf<AChess_Piece>> PieceClass;
 
 	/*
-	 * Chessboard size information
+	 *	Chessboard size information
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 FieldSize;

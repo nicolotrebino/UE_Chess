@@ -40,23 +40,34 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/*
+	 *	Manage virtual promotion for the minimax algorithm
+	 */
 	bool bIsVirtualPromotion = false;
 	AChess_Piece* PiecePromoted = nullptr;
 	AChess_Piece* NewQueen = nullptr;
 
+	/*
+	 *	Methods inherited from PlayerInterface and
+	 *	overridden for the MinimaxPlayer
+	 */	
 	virtual void OnTurn() override;
 	virtual void OnWin() override;
 	virtual void OnLose() override;
 	virtual void OnDraw() override;
 
-	virtual void Destroy() override;
-
+	/*
+	 *	Minimax algorithm methods
+	 */
 	int32 EvaluateGrid() const;
 	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);
 	FNextMove FindBestMove();
 
 private:
-	TArray<int32> Pawns = {
+	/*
+	 *	Arrays to evaluate pieces position
+	 */
+	int32 Pawns[64] = {
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
@@ -67,7 +78,7 @@ private:
 		0, 0, 0, 0, 0, 0, 0, 0
 	  };
 
-	TArray<int32> Knight = {
+	int32 Knight[64] = {
 		-40, -25, -25, -25, -25, -25, -25, -40,
 		-30, 0, 0, 0, 0, 0, 0, -30,
 		-30, 0, 0, 0, 0, 0, 0, -30,
@@ -78,7 +89,7 @@ private:
 		-40, -30, -25, -25, -25, -25, -30, -40
 	  };
 
-	TArray<int32> Bishops = {
+	int32 Bishops[64] = {
 		-10, 0, 0, 0, 0, 0, 0, -10,
 		-10, 5, 0, 0, 0, 0, 5, -10,
 		-10, 0, 5, 0, 0, 5, 0, -10,
@@ -89,7 +100,7 @@ private:
 		-10, -20, -20, -20, -20, -20, -20, -10
 	  };
 
-	TArray<int32> Rooks = {
+	TArray<int32> Rooks[64] = {
 		0, 0, 0, 0, 0, 0, 0, 0,
 		10, 10, 10, 10, 10, 10, 10, 10,
 		0, 0, 0, 0, 0, 0, 0, 0,
@@ -100,7 +111,7 @@ private:
 		0, 0, 0, 5, 5, 0, 0, 0
 	  };
 
-	TArray<int32> Kings = {
+	TArray<int32> Kings[64] = {
 		-25, -25, -25, -25, -25, -25, -25, -25,
 		-25, -25, -25, -25, -25, -25, -25, -25,
 		-25, -25, -25, -25, -25, -25, -25, -25,
@@ -111,7 +122,7 @@ private:
 		10, 15, -15, -15, -15, -15, 15, 10
 	  };
 
-	TArray<int32> Flip = {
+	TArray<int32> Flip[64] = {
 		56, 57, 58, 59, 60, 61, 62, 63,
 		48, 49, 50, 51, 52, 53, 54, 55,
 		40, 41, 42, 43, 44, 45, 46, 47,

@@ -19,7 +19,7 @@ struct FAlgebraicPosition
 };
 
 /**
- * Tile to compose the Chessboard
+ *	Tile to compose the Chessboard
  */
 UCLASS()
 class CHESS_API ATile : public AActor
@@ -31,7 +31,7 @@ public:
 	ATile();
 
 	/*
-	 * Setter and getter for Tile information
+	 *	Setter and getter for Tile information
 	 */
 	void SetTileLocation(const FVector& Location);
 	FVector GetTileLocation() const;
@@ -43,13 +43,13 @@ public:
 	ETeam GetTileTeam() const;
 
 	/*
-	 * Manage Piece on Tile
+	 *	Manage Piece on Tile
 	 */
 	void SetPieceOnTile(AChess_Piece* ChessPiece);
 	AChess_Piece* GetPieceOnTile() const;
 
 	/*
-	 * Manage Tile material and its Status in game
+	 *	Manage Tile material and its Status in game
 	 */
 	void SetMaterial(const uint8 Index);
 	void SetTargetTile();
@@ -60,10 +60,11 @@ public:
 	void UnsetKillableTile();
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/*
-	 * Tile components
+	 *	Tile components
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Scene;
@@ -71,7 +72,7 @@ protected:
 	UStaticMeshComponent* StaticMeshComponent;
 
 	/*
-	 * Tile materials
+	 *	Tile materials
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Materials")
 	TArray<UMaterialInstance*> DefaultMaterials;
@@ -84,7 +85,7 @@ protected:
 	uint8 TileMaterial; // Tile default material
 
 	/*
-	 * Tile information
+	 *	Tile information
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVector TileLocation; // Tile location in the map

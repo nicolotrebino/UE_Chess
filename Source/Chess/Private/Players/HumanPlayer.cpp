@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Players/HumanPlayer.h"
 
 #include "Chess_GameInstance.h"
@@ -8,7 +7,6 @@
 #include "Managers/Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 AHumanPlayer::AHumanPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -25,67 +23,98 @@ AHumanPlayer::AHumanPlayer()
 	Team = WHITE;
 }
 
-// Called when the game starts or when spawned
+/*
+ *	@brief	Called when the game starts or when spawned
+ *
+ *	@return Void
+ */
 void AHumanPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// Called to bind functionality to input
+/*
+ *	@brief	Called to bind functionality to input
+ *
+ *	@return Void
+ */
 void AHumanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+/*
+ *	@brief	Implements the Human turn
+ *
+ *	@return Void
+ */
 void AHumanPlayer::OnTurn()
 {
-	bIsMyTurn = true;
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
+	bIsMyTurn = true;
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
 	GameMode->TurnManager->EnableReplay();
 }
 
+/*
+ *	@brief	Implements the Human victory
+ *
+ *	@return Void
+ */
 void AHumanPlayer::OnWin()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
 	GameInstance->SetTurnMessage(TEXT("Human Wins!"));
 	GameInstance->IncrementScoreHumanPlayer();
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	// Start the sound for the victory
 	if (GameMode->WinSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, GameMode->WinSound, FVector(0, 0, 0));
 	}
 }
 
+/*
+ *	@brief	Implements the Human defeat
+ *
+ *	@return Void
+ */
 void AHumanPlayer::OnLose()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Human Loses!"));
 	GameInstance->IncrementScoreAiPlayer();
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	// Start the sound for the defeat
 	if (GameMode->LoseSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, GameMode->LoseSound, FVector(0, 0, 0));
 	}
 }
 
+/*
+ *	@brief	Implements the Draw
+ *
+ *	@return Void
+ */
 void AHumanPlayer::OnDraw()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
+	// Start the sound for a draw game
 	if (GameMode->DrawSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, GameMode->DrawSound, FVector(0, 0, 0));
 	}
 }
 
-void AHumanPlayer::Destroy()
-{
-	delete this;
-}
-
+/*
+ *	@brief	Implements the functionality after a click of the user
+ *
+ *	@return Void
+ */
 void AHumanPlayer::OnClick()
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode

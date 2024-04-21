@@ -46,11 +46,6 @@ FVector ATile::GetTileLocation() const
 }
 
 /*
- * Set the Tile position based on the chess Algebraic notation,
- * with a letter and a number
- */
-
-/*
  *	@brief	Set the Tile position based on the chess Algebraic notation,
  *			with a letter and a number
  *
@@ -146,7 +141,6 @@ AChess_Piece* ATile::GetPieceOnTile() const
 	return CurrentPieceOnTile;
 }
 
-
 /*
  *	@brief	Set the proper Tile material
  *
@@ -236,7 +230,6 @@ void ATile::UnsetKillableTile()
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
-// Called when the game starts or when spawned
 /*
  *	@brief	Called when the game starts or when spawned.
  *			It Adds the "self destroy" to the broadcast event

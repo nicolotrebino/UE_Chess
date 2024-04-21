@@ -5,9 +5,7 @@
 #include "Chess_GameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/Chess_Pawn.h"
-#include "Pieces/Chess_Queen.h"
 
-// Sets default values
 AMinimaxPlayer::AMinimaxPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -16,34 +14,50 @@ AMinimaxPlayer::AMinimaxPlayer()
 	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
-// Called when the game starts or when spawned
+/*
+ *	@brief	Called when the game starts or when spawned
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// Called every frame
+/*
+ *	@brief	Called every frame
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
+/*
+ *	@brief	Called to bind functionality to input
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+/*
+ *	@brief	Implements the Minimax turn
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::OnTurn()
 {
-	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	GameMode->TurnManager->DisableReplay();
-	
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
+	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->TurnManager->DisableReplay(); // Disable the replay during the Minimax turn
+	
 	GameInstance->SetTurnMessage(TEXT("AI (Minimax) Turn"));
 
 	FTimerHandle TimerHandle;
-
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&, GameMode]()
 		{
 			FNextMove NextMove = FindBestMove();
@@ -60,6 +74,11 @@ void AMinimaxPlayer::OnTurn()
 		}, 1, false);
 }
 
+/*
+ *	@brief	Implements the Minimax victory
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::OnWin()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
@@ -67,6 +86,11 @@ void AMinimaxPlayer::OnWin()
 	GameInstance->IncrementScoreAiPlayer();
 }
 
+/*
+ *	@brief	Implements the Minimax defeat
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::OnLose()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
@@ -74,17 +98,23 @@ void AMinimaxPlayer::OnLose()
 	GameInstance->IncrementScoreHumanPlayer();
 }
 
+/*
+ *	@brief	Implements the draw game
+ *
+ *	@return Void
+ */
 void AMinimaxPlayer::OnDraw()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
-void AMinimaxPlayer::Destroy()
-{
-	delete this;
-}
-
+/*
+ *	@brief	Evaluates the state of the Chessboard
+ *			Material + Mobility + Position
+ *
+ *	@return Integer indicating the evaluation of the grid in that particular state
+ */
 int32 AMinimaxPlayer::EvaluateGrid() const
 {
 	int32 GridValue = 0;
@@ -192,6 +222,16 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	return GridValue;
 }
 
+/*
+ *	@brief	Minimax with alpha beta pruning algorithm
+ *
+ *	@params	Integer indicates the depth to reach in the tree of possible moves
+ *			Integer ...
+ *			Integer ...
+ *			Boolean indicates if it is the AI (true -> maximize) or the Human (false -> minimize)
+ *
+ *	@return Integer indicating the evaluation of the grid in that particular state
+ */
 int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
@@ -213,7 +253,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 1)
 				{
 					PiecePromoted = Piece;
-					// NewQueen = NewObject<AChess_Queen>();
 					NewQueen = GameMode->CBoard->SpawnSinglePiece(PreviousTile, BLACK, QUEEN);
 					GameMode->BlackTeam.Add(NewQueen);
 					GameMode->BlackTeam.Remove(Piece);
@@ -261,7 +300,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 8)
 				{
 					PiecePromoted = Piece;
-					// NewQueen = NewObject<AChess_Queen>();
 					NewQueen = GameMode->CBoard->SpawnSinglePiece(PreviousTile, WHITE, QUEEN);
 					GameMode->WhiteTeam.Add(NewQueen);
 					GameMode->WhiteTeam.Remove(Piece);
@@ -294,6 +332,13 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 	}
 }
 
+/*
+ *	@brief	Method that calls AlphaBetaMinimax to find the best move
+ *			that the AI player can do
+ *
+ *	@return Struct with the Piece to move and the Next Tile where the
+ *			Piece has to go
+ */
 FNextMove AMinimaxPlayer::FindBestMove()
 {
 	int32 BestVal = -50000;
@@ -304,6 +349,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	FNextMove BestMove = {nullptr, nullptr};
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
+	// Dynamic depth based on the number of pieces on the Chessboard
 	if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 5 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() <= 15)
 	{
 		Depth = 3;
@@ -324,7 +370,6 @@ FNextMove AMinimaxPlayer::FindBestMove()
 			if (Piece->IsA(AChess_Pawn::StaticClass()) && Tile->GetAlgebraicPosition().TileNumber == 1)
 			{
 				PiecePromoted = Piece;
-				// NewQueen = NewObject<AChess_Queen>();
 				NewQueen = GameMode->CBoard->SpawnSinglePiece(PreviousTile, BLACK, QUEEN);
 				GameMode->BlackTeam.Add(NewQueen);
 				GameMode->BlackTeam.Remove(Piece);
@@ -335,8 +380,6 @@ FNextMove AMinimaxPlayer::FindBestMove()
 			{
 				Piece->VirtualMove(Tile, PreviousTile, Killed);
 			}
-			
-			// Piece->VirtualMove(Tile, PreviousTile, Killed);
 			
 			int32 MoveVal = AlphaBetaMiniMax(Depth, Alpha, Beta, false);
 
@@ -361,7 +404,6 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	}
 	
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
-	
 	return BestMove;
 }
 

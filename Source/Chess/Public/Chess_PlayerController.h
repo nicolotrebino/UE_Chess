@@ -8,7 +8,7 @@
 #include "Chess_PlayerController.generated.h"
 
 /**
- * Player controller
+ *	Player controller
  */
 UCLASS()
 class CHESS_API AChess_PlayerController : public APlayerController
@@ -33,7 +33,8 @@ public:
 	UUserWidget* UserInterfaceWidget;
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void SetupInputComponent() override;
 	
+	virtual void SetupInputComponent() override;
 };

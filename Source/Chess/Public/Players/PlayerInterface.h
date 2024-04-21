@@ -30,6 +30,4 @@ public:
 	virtual void OnWin() {};
 	virtual void OnLose() {};
 	virtual void OnDraw() {};
-
-	virtual void Destroy() = 0;
 };

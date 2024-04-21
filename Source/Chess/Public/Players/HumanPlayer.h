@@ -16,7 +16,7 @@ class CHESS_API AHumanPlayer : public APawn, public IPlayerInterface
 	GENERATED_BODY()
 
 public:
-	AHumanPlayer(); // Sets default values for this pawn's properties
+	AHumanPlayer(); 
 
 	UCameraComponent* Camera; // Camera component attached to player pawn
 	UChess_GameInstance* GameInstance; // Chess_GameInstance reference
@@ -24,12 +24,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/*
+	 *	Methods inherited from PlayerInterface and
+	 *	overridden for the HumanPlayer
+	 */
 	virtual void OnTurn() override;
 	virtual void OnWin() override;
 	virtual void OnLose() override;
 	virtual void OnDraw() override;
-
-	virtual void Destroy() override;
 
 	// Called on left mouse click (binding)
 	UFUNCTION()

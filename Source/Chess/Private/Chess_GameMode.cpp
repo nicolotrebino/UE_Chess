@@ -154,8 +154,7 @@ void AChess_GameMode::ChoosePlayerAndStartGame()
 	
 	MoveCounter += 1;
 	UpdateScores();
-
-	// TurnManager->LegalMoves = GetAllLegalMoves(CurrentPlayer);
+	
 	GetAllLegalMoves(CurrentPlayer);
 	
 	Players[CurrentPlayer]->OnTurn();

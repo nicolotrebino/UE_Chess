@@ -16,7 +16,7 @@ class AChess_King;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReset);
 
 /**
- * It keeps track of all the variables needed for every chess game you play
+ *	It keeps track of all the variables needed for every chess game you play
  */
 UCLASS()
 class CHESS_API AChess_GameMode : public AGameModeBase
@@ -31,7 +31,7 @@ public:
 	virtual void BeginPlay() override;
 
 	/*
-	 * Game variables
+	 *	Game variables
 	 */
 	bool bIsGameOver; // Tracks if the game is over
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -50,7 +50,7 @@ public:
 	int32 CurrentPlayer;
 
 	/*
-	 * Managers & Chessboard
+	 *	Managers & Chessboard
 	 */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AChessboard> ChessboardClass;
@@ -68,7 +68,7 @@ public:
 	AManager_Promotion* PromotionManager; // Reference to the PromotionManager
 
 	/*
-	 * Arrays to store important stuff for the game
+	 *	Arrays to store important stuff for the game
 	 */
 	TArray<TPair<FString, int32>> GameStates; // It stores each state of the game as a pair (string, int)
 
@@ -85,7 +85,7 @@ public:
 	TArray<AChess_King*> Kings;
 
 	/*
-	 * Audio Components
+	 *	Audio Components
 	 */
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* MoveSound;
@@ -104,7 +104,7 @@ public:
 	bool bEnableSound = true; // Used to enable or disable sounds during the match
 
 	/*
-	 * Class methods
+	 *	Class methods
 	 */
 	void GetAllLegalMoves(int32 Player);
 	void ChoosePlayerAndStartGame(); // Called at the start of the game
@@ -115,7 +115,7 @@ public:
 	ATile* GetTileAtPosition(const TCHAR Letter, const uint8 Number);
 
 	/*
-	 * Score manager
+	 *	Score manager
 	 */
 	int32 ScoreWhiteTeam;
 	int32 ScoreBlackTeam;
@@ -127,7 +127,7 @@ public:
 	void UpdateScores();
 
 	/*
-	 * Reset field & turn to the menu
+	 *	Reset field & turn to the menu
 	 */
 	// BlueprintAssignable usable with Multicast Delegates only. Exposes the property for assigning in Blueprints.
 	// declare a variable of type FOnReset (delegate)
