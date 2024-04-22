@@ -51,7 +51,7 @@ void AMinimaxPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
  */
 void AMinimaxPlayer::OnTurn()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	GameMode->TurnManager->DisableReplay(); // Disable the replay during the Minimax turn
 	
@@ -81,7 +81,7 @@ void AMinimaxPlayer::OnTurn()
  */
 void AMinimaxPlayer::OnWin()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
 	GameInstance->SetTurnMessage(TEXT("AI Wins!"));
 	GameInstance->IncrementScoreAiPlayer();
 }
@@ -93,7 +93,7 @@ void AMinimaxPlayer::OnWin()
  */
 void AMinimaxPlayer::OnLose()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
 	GameInstance->IncrementScoreHumanPlayer();
 }
@@ -105,7 +105,7 @@ void AMinimaxPlayer::OnLose()
  */
 void AMinimaxPlayer::OnDraw()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
@@ -223,12 +223,14 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 }
 
 /*
- *	@brief	Minimax with alpha beta pruning algorithm
+ *	@brief	Minimax with alpha beta pruning algorithm,
+ *			it allows you to "prune" the branches that certainly do not lead
+ *			to an improvement in Alpha or Beta
  *
- *	@params	Integer indicates the depth to reach in the tree of possible moves
- *			Integer ...
- *			Integer ...
- *			Boolean indicates if it is the AI (true -> maximize) or the Human (false -> minimize)
+ *	@param	Depth indicates the depth to reach in the tree of possible moves
+ *	@param	Alpha is the value of the best choice for the MAX player
+ *	@param	Beta is the value of the best choice for the MIN player
+ *	@param	IsMax indicates if it is the AI (true -> maximize) or the Human (false -> minimize)
  *
  *	@return Integer indicating the evaluation of the grid in that particular state
  */
@@ -341,11 +343,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
  */
 FNextMove AMinimaxPlayer::FindBestMove()
 {
-	int32 BestVal = -50000;
-	int32 Alpha = -50000;
-	int32 Beta = 50000;
-	int32 Depth = 2;
-
 	FNextMove BestMove = {nullptr, nullptr};
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
@@ -403,7 +400,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 		}
 	}
 	
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
 	return BestMove;
 }
 

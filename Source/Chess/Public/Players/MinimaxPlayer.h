@@ -65,6 +65,14 @@ public:
 
 private:
 	/*
+	 *	Minimax + Alpha Beta Pruning values
+	 */
+	int32 BestVal = -50000;
+	int32 Alpha = -50000;
+	int32 Beta = 50000;
+	int32 Depth = 2;
+	
+	/*
 	 *	Arrays to evaluate pieces position
 	 */
 	int32 Pawns[64] = {

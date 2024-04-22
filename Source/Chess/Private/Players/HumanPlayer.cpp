@@ -50,7 +50,7 @@ void AHumanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
  */
 void AHumanPlayer::OnTurn()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
 	bIsMyTurn = true;
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -64,7 +64,7 @@ void AHumanPlayer::OnTurn()
  */
 void AHumanPlayer::OnWin()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
 	GameInstance->SetTurnMessage(TEXT("Human Wins!"));
 	GameInstance->IncrementScoreHumanPlayer();
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -82,7 +82,7 @@ void AHumanPlayer::OnWin()
  */
 void AHumanPlayer::OnLose()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Human Loses!"));
 	GameInstance->IncrementScoreAiPlayer();
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -100,7 +100,7 @@ void AHumanPlayer::OnLose()
  */
 void AHumanPlayer::OnDraw()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
 	// Start the sound for a draw game

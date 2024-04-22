@@ -35,7 +35,7 @@ void ARandomPlayer::OnTurn()
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	GameMode->TurnManager->DisableReplay();
 	
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));
 	GameInstance->SetTurnMessage(TEXT("AI (Random) Turn"));
 
 	// Set a random timer
@@ -87,21 +87,21 @@ void ARandomPlayer::OnTurn()
 
 void ARandomPlayer::OnWin()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Wins!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Wins!"));
 	GameInstance->SetTurnMessage(TEXT("AI Wins!"));
 	GameInstance->IncrementScoreAiPlayer();
 }
 
 void ARandomPlayer::OnLose()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
 	GameInstance->IncrementScoreHumanPlayer();
 }
 
 void ARandomPlayer::OnDraw()
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
