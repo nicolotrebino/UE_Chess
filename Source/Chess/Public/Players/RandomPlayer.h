@@ -27,8 +27,6 @@ public:
 	virtual void OnLose() override;
 	virtual void OnDraw() override;
 
-	virtual void Destroy() override;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

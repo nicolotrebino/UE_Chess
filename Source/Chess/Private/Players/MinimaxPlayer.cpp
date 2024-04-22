@@ -163,26 +163,26 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 				{
 				case PAWN:
 					WhiteValue += 100;
-					WhiteValue += Pawns[i];
+					WhiteValue += Pawns[Flip[i]];
 					break;
 				case KNIGHT:
 					WhiteValue += 320;
-					WhiteValue += Knight[i];
+					WhiteValue += Knight[Flip[i]];
 					break;
 				case BISHOP:
 					WhiteValue += 330;
-					WhiteValue += Bishops[i];
+					WhiteValue += Bishops[Flip[i]];
 					break;
 				case ROOK:
 					WhiteValue += 500;
-					WhiteValue += Rooks[i];
+					WhiteValue += Rooks[Flip[i]];
 					break;
 				case QUEEN:
 					WhiteValue += 900;
 					break;
 				case KING:
 					WhiteValue += 10000;
-					WhiteValue += Kings[i];
+					WhiteValue += Kings[Flip[i]];
 					break;
 				}
 			}
@@ -192,26 +192,26 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 				{
 				case PAWN:
 					BlackValue += 100;
-					BlackValue += Pawns[Flip[i]];
+					BlackValue += Pawns[i];
 					break;
 				case KNIGHT:
 					BlackValue += 320;
-					BlackValue += Knight[Flip[i]];
+					BlackValue += Knight[i];
 					break;
 				case BISHOP:
 					BlackValue += 330;
-					BlackValue += Bishops[Flip[i]];
+					BlackValue += Bishops[i];
 					break;
 				case ROOK:
 					BlackValue += 500;
-					BlackValue += Rooks[Flip[i]];
+					BlackValue += Rooks[i];
 					break;
 				case QUEEN:
 					BlackValue += 900;
 					break;
 				case KING:
 					BlackValue += 10000;
-					BlackValue += Kings[Flip[i]];
+					BlackValue += Kings[i];
 					break;
 				}
 			}

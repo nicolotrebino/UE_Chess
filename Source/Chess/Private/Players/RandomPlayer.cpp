@@ -105,11 +105,6 @@ void ARandomPlayer::OnDraw()
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
-void ARandomPlayer::Destroy()
-{
-	delete this;
-}
-
 // Called every frame
 void ARandomPlayer::Tick(float DeltaTime)
 {
