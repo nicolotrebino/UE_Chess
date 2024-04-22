@@ -196,24 +196,27 @@ void AManager_Turn::DisplayEndGame() const
 FString AManager_Turn::ComputeNotation() const
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	// const AManager_Turn* TurnManager = GameMode->TurnManager;
+
 	if (!(NextTile || MovedPiece))
 	{
 		return ""; // Gestione errore
 	}
 
 	FString MoveNomenclature = "";
-	if (GameMode->TurnManager->bIsPromotion)
-	{
-		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c/%c%d"), PromotedPiece->GetNomenclature(), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
-	}
-	else if (MovedPiece->GetType() == EPieceType::PAWN)
+	if (MovedPiece->GetType() == EPieceType::PAWN)
 	{
 		if (PreviousTile && GameMode->TurnManager->bIsKill)
 		{
 			MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
 		}
-		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
+		if (GameMode->TurnManager->bIsPromotion)
+		{
+			MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d=%c"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber, PromotedPiece->GetNomenclature());
+		}
+		else
+		{
+			MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
+		}
 	}
 	else
 	{
