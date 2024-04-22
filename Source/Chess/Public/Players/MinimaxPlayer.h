@@ -60,7 +60,7 @@ public:
 	 *	Minimax algorithm methods
 	 */
 	int32 EvaluateGrid() const;
-	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);
+	int32 AlphaBetaMiniMax(int32 D, int32 A, int32 B, bool IsMax);
 	FNextMove FindBestMove();
 
 private:

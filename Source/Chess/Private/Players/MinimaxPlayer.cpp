@@ -234,7 +234,7 @@ int32 AMinimaxPlayer::EvaluateGrid() const
  *
  *	@return Integer indicating the evaluation of the grid in that particular state
  */
-int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax)
+int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 D, int32 A, int32 B, bool IsMax)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
