@@ -24,7 +24,7 @@ public:
 	/*
 	 * Manage pawn promotion
 	 */
-	void StartPromotion(AChess_Pawn* Pawn);
+	void StartPromotion();
 	UFUNCTION(BlueprintCallable, Category = "Promotion")
 	void HandleButtonClicked(int32 SelectedPieceIndex); // Called when a button in the widget is clicked
 

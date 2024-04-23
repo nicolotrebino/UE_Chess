@@ -35,7 +35,7 @@ void AManager_Promotion::SelfDestroy()
  *
  *	@return Void
  */
-void AManager_Promotion::StartPromotion(AChess_Pawn* Pawn)
+void AManager_Promotion::StartPromotion()
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 

@@ -193,7 +193,7 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 			GameMode->WhiteTeam.Remove(this);
 
 			PromotionManager->SetCurrentPawn(this);
-			PromotionManager->StartPromotion(this);
+			PromotionManager->StartPromotion();
 		}
 		else if (NextTile->GetAlgebraicPosition().TileNumber == 1)
 		{
