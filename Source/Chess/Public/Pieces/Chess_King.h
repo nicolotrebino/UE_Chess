@@ -7,7 +7,7 @@
 #include "Chess_King.generated.h"
 
 /**
- * 
+ *	Chess_King class, derived from Chess_Piece class
  */
 UCLASS()
 class CHESS_API AChess_King : public AChess_Piece
@@ -15,13 +15,17 @@ class CHESS_API AChess_King : public AChess_Piece
 	GENERATED_BODY()
 
 public:
-	// Default constructor
 	AChess_King();
-
+	
+	/*
+	*	Methods inherited from Chess_Piece and
+	*	overridden for the King
+	*/
 	virtual TArray<ATile*> GetPossibleMoves() override;
 	virtual void SetMaterial(const int32 Index) override;
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/* 
@@ -37,6 +41,4 @@ protected:
 	*/
 	UPROPERTY(EditDefaultsOnly)
 	TArray<UMaterialInstance*> KingMaterials;
-	
-	TArray<ATile*> GetNeighbors() const;
 };

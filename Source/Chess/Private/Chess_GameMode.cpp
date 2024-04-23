@@ -12,12 +12,12 @@
 #include "Pieces/Chess_Piece.h"
 #include "Pieces/Chess_King.h"
 
+// Sets default values
 AChess_GameMode::AChess_GameMode()
 {
 	PlayerControllerClass = AChess_PlayerController::StaticClass(); // Associate the Cpc as the Player Controller for to this GameMode
 	DefaultPawnClass = AHumanPlayer::StaticClass(); // Associate the HumaPlayer as the default pawn class for this GameMode
 
-	// Set default values
 	bIsGameOver = false;
 	bIsWhiteKingInCheckMate = false;
 	bIsBlackKingInCheckMate = false;
@@ -163,7 +163,7 @@ void AChess_GameMode::ChoosePlayerAndStartGame()
 /*
  *	@brief	Get the next player to change it during the match
  *
- *	@params	The current player
+ *	@param	Player: the current player
  *
  *	@return	The next integer corresponding to index of the next player in the array of players
  */
@@ -303,7 +303,7 @@ void AChess_GameMode::TurnNextPlayer()
 /*
  *	@brief	Check whether the desired team's king is or is not in check
  *
- *	@params	The king's team for which you want to know if it is in check
+ *	@param	KingTeam: king's team for which you want to know if it is in check
  *
  *	@return	True if the current King is in check, false otherwise
  */
@@ -358,7 +358,8 @@ bool AChess_GameMode::IsKingInCheck(const int32 KingTeam)
  *			the Tile with a particular Letter and Number pair
  *			Notice: TileArray is ordered by numbers: A1-B1-...-A2-B2-...-A8-B8-...-H8
  *
- *	@params	Letter and number of the desired Tile
+ *	@param	Letter: letter of the desired Tile with AlgebraicPosition
+ *	@param	Number: number of the desired Tile with AlgebraicPosition
  *
  *	@return	The desired Tile
  */

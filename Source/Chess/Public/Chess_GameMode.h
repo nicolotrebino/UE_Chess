@@ -24,7 +24,6 @@ class CHESS_API AChess_GameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
-	
 	AChess_GameMode();
 
 	// Called when the game starts or when spawned

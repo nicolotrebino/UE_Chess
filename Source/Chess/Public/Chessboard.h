@@ -16,7 +16,7 @@ class CHESS_API AChessboard : public AActor
 	GENERATED_BODY()
 	
 public:
-	
+	// Sets default values for this actor's properties
 	AChessboard(); 
 	
 	FVector GetTilePosition(const FHitResult& Hit) const;

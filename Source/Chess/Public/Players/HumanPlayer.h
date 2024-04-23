@@ -10,12 +10,16 @@
 #include "GameFramework/Pawn.h"
 #include "HumanPlayer.generated.h"
 
+/**
+ * Human player class
+ */
 UCLASS()
 class CHESS_API AHumanPlayer : public APawn, public IPlayerInterface
 {
 	GENERATED_BODY()
 
 public:
+	// Sets default values for this pawn's properties
 	AHumanPlayer(); 
 
 	UCameraComponent* Camera; // Camera component attached to player pawn

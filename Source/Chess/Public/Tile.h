@@ -27,7 +27,7 @@ class CHESS_API ATile : public AActor
 	GENERATED_BODY()
 	
 public:	
-
+	// Sets default values for this actor's properties
 	ATile();
 
 	/*

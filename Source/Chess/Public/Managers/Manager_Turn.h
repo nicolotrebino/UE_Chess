@@ -10,6 +10,10 @@
 class AChess_Piece;
 class ATile;
 
+/**
+ * Structure assigned to each MoveHistory button with the variables
+ * relating to the move made in that turn
+ */
 USTRUCT(Blueprintable)
 struct FMoveInfo
 {
@@ -23,6 +27,9 @@ struct FMoveInfo
 	ATile* NextTile;
 };
 
+/**
+ *	Class used as manager of each turn
+ */
 UCLASS()
 class CHESS_API AManager_Turn : public AActor
 {
@@ -32,32 +39,31 @@ public:
 	// Sets default values for this actor's properties
 	AManager_Turn();
 	void SelfDestroy();
-
-	/* Methods */
+	
 	void ResetVariables();
+	void ResetTargetedAndKillableTiles();
+	void ResetSelectedPiece() const;
 	void SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill);
 
-	/* Game references for a turn */
-	// AChess_Piece* Checker; // Piece that is in check
-
+	/*
+	 * Game references for a turn
+	 */
 	AChess_Piece* MovedPiece;
 	AChess_Piece* KilledPiece;
 	AChess_Piece* PromotedPiece;
-
 	ATile* PreviousTile;
 	ATile* NextTile;
 
-	/* Game variables for a turn */
+	/*
+	 * Game variables for a turn
+	 */
 	bool bIsKill; // If in that turn there was a kill
 	bool bIsPromotion; // If in that turn there was a promotion
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
 	
-	TArray<ATile*> WhiteMoves;
-	TArray<ATile*> BlackMoves;
-
-	void ResetTargetedAndKillableTiles();
-	void ResetSelectedPiece() const;
+	TArray<ATile*> WhiteMoves; // Array with White's legal moves in the current turn
+	TArray<ATile*> BlackMoves; // Array with Black's legal moves in the current turn
 
 	UPROPERTY(Transient)
 	TArray<ATile*> TargetedTiles; // Keeps track of Targeted Tiles
@@ -68,7 +74,9 @@ public:
 
 	TPair<FString, int32> SaveGameState() const;
 
-	/* Move History managing */
+	/*
+	 * Manage MoveHistory
+	 */
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MhButtonClass;
 

@@ -5,7 +5,8 @@
 /*
  *	@brief	Function to check if a chess position is valid
  *
- *	@params Integer for a letter in ASCII code, integer for a number
+ *	@param	Letter: integer for a letter in ASCII code
+ *	@param	Number: integer for a number
  *
  *	@return True if the position is valid, false otherwise
  */

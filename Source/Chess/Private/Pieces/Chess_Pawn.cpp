@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Pieces/Chess_Pawn.h"
 
 #include "Utility.h"
@@ -25,6 +24,11 @@ AChess_Pawn::AChess_Pawn()
 	PieceValue = 1;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to compute the PossibleMoves of the Pawn
+ *
+ *	@return	Array of Tiles where the Pawn can go
+ */
 TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 {
 	Super::GetPossibleMoves();
@@ -78,7 +82,6 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 				PossibleMoves.Add(UpRight);
 			}
 		}
-
 		if (Utility::IsValidPosition(CurrLetter - 1, CurrNumber + 1))
 		{
 			ATile* UpLeft = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber + 1);
@@ -127,7 +130,6 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 		}
 
 		// Kill
-
 		if (Utility::IsValidPosition(CurrLetter + 1, CurrNumber - 1))
 		{
 			ATile* DownRight = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber - 1);
@@ -137,7 +139,6 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 				PossibleMoves.Add(DownRight);
 			}
 		}
-
 		if (Utility::IsValidPosition(CurrLetter - 1, CurrNumber - 1))
 		{
 			ATile* DownLeft = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber - 1);
@@ -152,6 +153,14 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 	return PossibleMoves;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to set
+ *			the material for this piece based on its team
+ *
+ *	@param	Index: integer indicates the team of this Pawn
+ *
+ *	@return Void
+ */
 void AChess_Pawn::SetMaterial(const int32 Index)
 {
 	Super::SetMaterial(Index);
@@ -159,7 +168,14 @@ void AChess_Pawn::SetMaterial(const int32 Index)
 	PawnMeshComponent->SetMaterial(0, PawnMaterials[Index]);
 }
 
-// Override to implement the promotion
+/*
+ *	@brief	Method inherited from the parent class to Move
+ *			the pawn and, in particular conditions, promote it
+ *
+ *	@param	NextTile: reference to the Tile where the piece as to go
+ *
+ *	@return Void
+ */
 void AChess_Pawn::MovePiece(ATile* NextTile)
 {
 	Super::MovePiece(NextTile);
@@ -204,6 +220,7 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 	}
 }
 
+// Called when the game starts or when spawned
 void AChess_Pawn::BeginPlay()
 {
 	Super::BeginPlay();

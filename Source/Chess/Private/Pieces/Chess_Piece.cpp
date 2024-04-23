@@ -12,8 +12,7 @@ AChess_Piece::AChess_Piece()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Set defaults value
+	
 	GameMode = nullptr;
 	Nomenclature = 'z';
 	PieceTeam = ETeam::NONE;
@@ -22,112 +21,154 @@ AChess_Piece::AChess_Piece()
 	PieceValue = 0;
 }
 
+/*
+ *	@brief	Getter for the piece notation
+ *
+ *	@return	Letter indicates the piece in the Algebraic Notation
+ */
 TCHAR AChess_Piece::GetNomenclature() const
 {
 	return Nomenclature;
 }
 
+/*
+ *	@brief	Setter for the piece team
+ *
+ *	@param	Team: team of piece from the ETeam enumeration
+ *
+ *	@return	Void
+ */
 void AChess_Piece::SetTeam(const ETeam Team)
 {
 	PieceTeam = Team;
 }
 
+/*
+ *	@brief	Getter for the piece team
+ *	
+ *	@return	Team of the piece as ETeam enumeration
+ */
 ETeam AChess_Piece::GetTeam()
 {
 	return PieceTeam;
 }
 
+/*
+ *	@brief	Setter for the piece type
+ *
+ *	@param	Type: type of the piece from the EPieceType enumeration
+ *
+ *	@return	Void
+ */
 void AChess_Piece::SetType(const EPieceType Type)
 {
 	PieceType = Type;
 }
 
+/*
+ *	@brief	Getter for the piece type
+ *
+ *	@return	The type of the piece as EPieceType enumeration
+ */
 EPieceType AChess_Piece::GetType()
 {
 	return PieceType;
 }
 
+/*
+ *	@brief	Setter for the Tile under the piece
+ *
+ *	@param	Tile: reference to the tile under the current piece
+ *
+ *	@return	Void
+ */
 void AChess_Piece::SetPieceTile(ATile* Tile)
 {
 	CurrentTile = Tile;
 }
 
+/*
+ *	@brief	Getter for the Tile under the piece
+ *
+ *	@return	Reference to the Tile under the piece
+ */
 ATile* AChess_Piece::GetPieceTile()
 {
 	return CurrentTile;
 }
 
+/*
+ *	@brief	Setter for the piece location in the grid and in the scene
+ *
+ *	@param	Location: FVector to set the Actor location in the scene
+ *
+ *	@return	Void
+ */
 void AChess_Piece::SetPieceLocation(const FVector& Location)
 {
 	PieceLocation = Location;
 }
 
+/*
+ *	@brief	Getter for the piece location
+ *
+ *	@return	FVector as a location of the piece
+ */
 FVector AChess_Piece::GetPieceLocation()
 {
 	return PieceLocation;
 }
 
+/*
+ *	@brief	Getter for the piece value to compute the scores
+ *
+ *	@return	The value of the piece as integer
+ */
 int32 AChess_Piece::GetPieceValue() const
 {
 	return PieceValue;
 }
 
 /*
- * Check if in the array of possible moves of a Piece
- * there are illegal moves, if so it removes them
+ *	@brief	Check if in the array of possible moves of a Piece
+ *			there are illegal moves, if so it removes them
+ *
+ *	@param	PossibleMoves: array of tiles in which the piece can move
+ *
+ *	@return	Void
  */
 void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 {
 	// Create a temporary new array same as the PossibleMoves array
-	const AManager_Turn* TurnManager = GameMode->TurnManager;
 	TArray<ATile*> NewArray = PossibleMoves;
 	ATile* PreviousTile = CurrentTile;
 	for (ATile* NextTile : PossibleMoves)
 	{
 		AChess_Piece* Killed = NextTile->GetPieceOnTile();
 
-		/*
-		// Save the current Status and Team of the Next Tile
-		const ETileStatus Status = NextTile->GetTileStatus();
-		const ETeam Team = NextTile->GetTileTeam();
-		*/
-		
-		// If the next tile is the one under the Checker piece it means I can kill the Checker
-		// if (!(TurnManager->Checker && NextTile == TurnManager->Checker->GetPieceTile()))
-		// {
-			/*
-			// Pretend you're making the next move
-			NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-			NextTile->SetTileTeam(PieceTeam);
-			CurrentTile->SetTileStatus(ETileStatus::EMPTY);
-			CurrentTile->SetTileTeam(ETeam::NONE);
-			*/
+		this->VirtualMove(NextTile, PreviousTile, Killed);
+	
+		// If the king is now/still in check with the move just made
+		if (GameMode->IsKingInCheck(PieceTeam))
+		{
+			// Avoid doing this move and remove it from the new array of possible (legal) moves created
+			NewArray.Remove(NextTile);
+		}
 
-			this->VirtualMove(NextTile, PreviousTile, Killed);
-		
-			// If the king is now/still in check with the move just made
-			if (GameMode->IsKingInCheck(PieceTeam))
-			{
-				// Avoid doing this move and remove it from the new array of possible (legal) moves created
-				NewArray.Remove(NextTile);
-			}
-
-			this->VirtualUnMove(NextTile, PreviousTile, Killed);
-
-			/*
-			// Restores Tiles to how they originally were
-			NextTile->SetTileStatus(Status);
-			NextTile->SetTileTeam(Team);
-			CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
-			CurrentTile->SetTileTeam(PieceTeam);
-			*/
-		// }
+		this->VirtualUnMove(NextTile, PreviousTile, Killed);
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
 	PossibleMoves = MoveTempIfPossible(NewArray);
 }
 
+/*
+ *	@brief	Check that the piece (King) can move to its possible tiles without being "eaten"
+ *
+ *	@param	PossibleMoves: array of tiles in which the piece can move (normally the King)
+ *
+ *	@return	Void
+ */
 void AChess_Piece::CheckKingMobility(TArray<ATile*> &PossibleMoves)
 {
 	// Create a temporary new array same as the PossibleMoves array
@@ -140,17 +181,6 @@ void AChess_Piece::CheckKingMobility(TArray<ATile*> &PossibleMoves)
 	for (ATile* NextTile : PossibleMoves)
 	{
 		AChess_Piece* Killed = NextTile->GetPieceOnTile();
-		/*
-		// Save the current Status and Team of the Next Tile
-		const ETileStatus Status = NextTile->GetTileStatus();
-		const ETeam Team = NextTile->GetTileTeam();
-
-		// Pretend you're making the next move
-		NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-		NextTile->SetTileTeam(PieceTeam);
-		CurrentTile->SetTileStatus(ETileStatus::EMPTY);
-		CurrentTile->SetTileTeam(NONE);
-		*/
 
 		VirtualMove(NextTile, PreviousTile, Killed);
 
@@ -163,35 +193,21 @@ void AChess_Piece::CheckKingMobility(TArray<ATile*> &PossibleMoves)
 			{
 				NewArray.Remove(NextTile); // Remove this Tile from  the array of possible moves
 			}
-			/*
-			else // If it is the King
-			{
-				// Set the CurrPiece to the enemy King
-				const AChess_King* CurrPiece = Cast<AChess_King>(EnemyPiece);
-				// If the NextTile is near the enemy King (Black King)
-				if (CurrPiece->GetNeighbors().Contains(NextTile))
-				{
-					NewArray.Remove(NextTile); // Remove this Tile from the possible moves
-				}
-			}
-			*/
 		}
 
 		VirtualUnMove(NextTile, PreviousTile, Killed);
-
-		/*
-		// Restores Tiles to how they originally were
-		NextTile->SetTileStatus(Status);
-		NextTile->SetTileTeam(Team);
-		CurrentTile->SetTileStatus(ETileStatus::OCCUPIED);
-		CurrentTile->SetTileTeam(PieceTeam);
-		*/
+		
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
 	PossibleMoves = MoveTempIfPossible(NewArray);
 }
 
+/*
+ *	@brief	Applies control to the possible moves of a piece
+ *
+ *	@return	Array of legal Tiles in which the piece can move
+ */
 TArray<ATile*> AChess_Piece::GetLegitMoves()
 {
 	// Make an array of possible Tiles to move through
@@ -211,7 +227,11 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
 }
 
 /*
- * Move the selected piece to the new location
+ *	@brief	Move the selected piece to the new location
+ *
+ *	@param	NextTile: Tile where the piece has to go
+ *
+ *	@return	Void
  */
 void AChess_Piece::MovePiece(ATile* NextTile)
 {
@@ -239,11 +259,17 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	NextTile->SetPieceOnTile(this);
 }
 
+/*
+ *	@brief	Hide the killed piece
+ *
+ *	@param	Enemy: reference to the piece to kill
+ *
+ *	@return	Void
+ */
 void AChess_Piece::Kill(AChess_Piece* Enemy) const
 {
-	// Non dovrebbe esserci bisogno di cambiare il puntatore dalla Tile al Piece e metterlo a nullptr
-	// perché intanto lo sovrascrivo con la Move() e faccio puntare la Tile direttamente al nuovo pezzo
-	// sopra di essa
+	// I don't change the pointer of the Tile to the piece above it
+	// because I already overwrite it with the "MovePiece"
 	if (Enemy->GetTeam() == ETeam::WHITE)
 	{
 		GameMode->WhiteTeam.Remove(Enemy);
@@ -258,6 +284,15 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 	GameMode->TurnManager->bIsKill = true;
 }
 
+/*
+ *	@brief	Implement the MOVE but just virtually, not actually in the game
+ *
+ *	@param	NextTile: reference to the Tile where the piece has to go
+ *	@param	PreviousTile: reference to the Tile where the piece started from
+ *	@param	Killed: reference to the Piece to kill
+ *
+ *	@return	Void
+ */
 void AChess_Piece::VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed)
 {
 	// Unlink the previous Tile to the Piece to move
@@ -269,15 +304,11 @@ void AChess_Piece::VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piec
 	{
 		if (Killed->GetTeam() == ETeam::WHITE)
 		{
-			// Killed->SetPieceTile(nullptr);
 			GameMode->WhiteTeam.Remove(Killed);
-			// GameMode->KilledWhiteTeam.Add(Killed);
 		}
 		if (Killed->GetTeam() == ETeam::BLACK)
 		{
-			// Killed->SetPieceTile(nullptr);
 			GameMode->BlackTeam.Remove(Killed);
-			// GameMode->KilledBlackTeam.Add(Killed);
 		}
 	}
 
@@ -287,6 +318,15 @@ void AChess_Piece::VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piec
 	NextTile->SetPieceOnTile(this); // Set the new reference of the Piece above the Tile
 }
 
+/*
+ *	@brief	Implement the MOVE-BACK but just virtually, not actually in the game
+ *
+ *	@param	NextTile: reference to the Tile where the piece has to go
+ *	@param	PreviousTile: reference to the Tile where the piece started from
+ *	@param	Killed: reference to the Piece to kill
+ *
+ *	@return	Void
+ */
 void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed)
 {
 	if (Killed)
@@ -318,12 +358,18 @@ void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Pi
 	this->SetPieceTile(PreviousTile);
 }
 
+/*
+ *	@brief	Used by broadcast event to destruct the Chess_Piece during the "reset game field"
+ *
+ *	@return	Void
+ */
 void AChess_Piece::SelfDestroy()
 {
 	Destroy();
 }
 
 // Called when the game starts or when spawned
+// It Adds the "self destroy" to the broadcast event
 void AChess_Piece::BeginPlay()
 {
 	Super::BeginPlay();
@@ -332,9 +378,11 @@ void AChess_Piece::BeginPlay()
 }
 
 /*
- * Returns an array containing all the pointers to the Tiles on the vertical line of that particular piece
- * However, it returns only the cells into which the piece can go:
- * if it finds an occupied cell along the way, it will not be able to continue afterward
+ *	@brief	Returns an array containing all the pointers to the Tiles on the vertical line of that particular piece
+ *			However, it returns only the cells into which the piece can go:
+ *			if it finds an occupied cell along the way, it will not be able to continue afterward
+ *
+ *	@return	Array of Tiles where the piece can go in the vertical line
  */
 TArray<ATile*> AChess_Piece::GetVerticalLine() const
 {
@@ -391,9 +439,11 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 }
 
 /*
- * Returns an array containing all the pointers to the Tiles on the horizontal line of that particular piece
- * However, it returns only the cells into which the piece can go:
- * if it finds an occupied cell along the way, it will not be able to continue afterward
+ *	@brief	Returns an array containing all the pointers to the Tiles on the horizontal line of that particular piece
+ *			However, it returns only the cells into which the piece can go:
+ *			if it finds an occupied cell along the way, it will not be able to continue afterward
+ *
+ *	@return	Array of Tiles where the piece can go in the horizontal line
  */
 TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 {
@@ -450,9 +500,11 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 }
 
 /*
- * Returns an array containing all the pointers to the Tiles on the diagonal lines of that particular piece
- * However, it returns only the cells into which the piece can go:
- * if it finds an occupied cell along the way, it will not be able to continue afterward
+ *	@brief	Returns an array containing all the pointers to the Tiles on the diagonal lines of that particular piece
+ *			However, it returns only the cells into which the piece can go:
+ *			if it finds an occupied cell along the way, it will not be able to continue afterward
+ *
+ *	@return	Array of Tiles where the piece can go in the diagonals line
  */
 TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 {

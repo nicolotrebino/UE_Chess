@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Pieces/Chess_Queen.h"
 
 AChess_Queen::AChess_Queen()
@@ -17,6 +16,11 @@ AChess_Queen::AChess_Queen()
 	PieceValue = 9;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to compute the PossibleMoves of the Queen
+ *
+ *	@return	Array of Tiles where the Queen can go
+ */
 TArray<ATile*> AChess_Queen::GetPossibleMoves()
 {
 	Super::GetPossibleMoves();
@@ -44,6 +48,14 @@ TArray<ATile*> AChess_Queen::GetPossibleMoves()
 	return PossibleMoves;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to set
+ *			the material for this piece based on its team
+ *
+ *	@param	Index: integer indicates the team of this Queen
+ *
+ *	@return Void
+ */
 void AChess_Queen::SetMaterial(const int32 Index)
 {
 	Super::SetMaterial(Index);
@@ -51,6 +63,7 @@ void AChess_Queen::SetMaterial(const int32 Index)
 	QueenMeshComponent->SetMaterial(0, QueenMaterials[Index]);
 }
 
+// Called when the game starts or when spawned
 void AChess_Queen::BeginPlay()
 {
 	Super::BeginPlay();

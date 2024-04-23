@@ -7,7 +7,7 @@
 #include "Chess_Bishop.generated.h"
 
 /**
- * 
+ *	Chess_Bishop class, derived from Chess_Piece class
  */
 UCLASS()
 class CHESS_API AChess_Bishop : public AChess_Piece
@@ -15,13 +15,17 @@ class CHESS_API AChess_Bishop : public AChess_Piece
 	GENERATED_BODY()
 
 public:
-	// Default constructor
 	AChess_Bishop();
 
+	/*
+	*	Methods inherited from Chess_Piece and
+	*	overridden for the Bishop
+	*/	
 	virtual TArray<ATile*> GetPossibleMoves() override;
 	virtual void SetMaterial(const int32 Index) override;
 
 protected:
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/* 

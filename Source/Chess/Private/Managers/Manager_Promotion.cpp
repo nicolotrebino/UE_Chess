@@ -18,11 +18,23 @@ AManager_Promotion::AManager_Promotion()
 	PromotionWidget = nullptr;
 }
 
+/*
+ *	@brief	Destruct this manager before returning to the main menu
+ *
+ *	@return	Void
+ */
 void AManager_Promotion::SelfDestroy()
 {
 	Destroy();
 }
 
+/*
+ *	@brief	Starts the promotion for the Human Player, brings up the widget for choosing the piece
+ *
+ *	@param	Pawn: reference to the Pawn to promote
+ *
+ *	@return Void
+ */
 void AManager_Promotion::StartPromotion(AChess_Pawn* Pawn)
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -34,6 +46,14 @@ void AManager_Promotion::StartPromotion(AChess_Pawn* Pawn)
 	}
 }
 
+/*
+ *	@brief	It manages the button click for the Human Player
+ *			and the automatic choice for the AI Player
+ *
+ *	@param	SelectedPieceIndex: index or number relating to the piece to spawn in place of the pawn
+ *
+ *	@return Void
+ */
 void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the Chess_GameMode reference
@@ -60,8 +80,6 @@ void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 		break;
 	}
 	
-	// Cpc->UserInterfaceWidget->SetPieceToMove(NewPiece);
-	// TurnManager->MovedPiece = NewPiece;
 	TurnManager->PromotedPiece = NewPiece;
 	CurrentPawn->SetActorHiddenInGame(true);
 	CurrentPawn->SetActorEnableCollision(false);
@@ -78,17 +96,29 @@ void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 	if (PromotionWidget)
 	{
 		PromotionWidget->RemoveFromParent();
-		// Probably I can't destroy the widget directly
-		// Hoping the garbage collector take care of it
+		// I can't destroy the widget directly
+		// Garbage collector take care of it
 		PromotionWidget = nullptr;
 	}
 }
 
+/*
+ *	@brief	Setter for the Pawn that is to be promoted
+ *
+ *	@param	Pawn: reference to the Pawn
+ *
+ *	@return Void
+ */
 void AManager_Promotion::SetCurrentPawn(AChess_Pawn* Pawn)
 {
 	CurrentPawn = Pawn;
 }
 
+/*
+ *	@brief	Getter for the Pawn that is to be promoted
+ *
+ *	@return Reference to the Pawn
+ */
 AChess_Pawn* AManager_Promotion::GetPawn() const
 {
 	return CurrentPawn;

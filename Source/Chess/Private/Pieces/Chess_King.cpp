@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Pieces/Chess_King.h"
 
 #include "Chess_GameMode.h"
@@ -20,6 +19,11 @@ AChess_King::AChess_King()
 	PieceValue = 0;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to compute the PossibleMoves of the King
+ *
+ *	@return	Array of Tiles where the King can go
+ */
 TArray<ATile*> AChess_King::GetPossibleMoves()
 {
 	Super::GetPossibleMoves();
@@ -113,12 +117,17 @@ TArray<ATile*> AChess_King::GetPossibleMoves()
 		}
 	}
 
-	// Check if the Possible Moves founded are legit or not
-	// CheckMobility(PossibleMoves);
-
 	return PossibleMoves;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to set
+ *			the material for this piece based on its team
+ *
+ *	@param	Index: integer indicates the team of this King
+ *
+ *	@return Void
+ */
 void AChess_King::SetMaterial(const int32 Index)
 {
 	Super::SetMaterial(Index);
@@ -126,67 +135,9 @@ void AChess_King::SetMaterial(const int32 Index)
 	KingMeshComponent->SetMaterial(0, KingMaterials[Index]);
 }
 
+// Called when the game starts or when spawned
 void AChess_King::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-TArray<ATile*> AChess_King::GetNeighbors() const
-{
-	const TCHAR CurrLetter = CurrentTile->GetAlgebraicPosition().TileLetter;
-	const uint8 CurrNumber = CurrentTile->GetAlgebraicPosition().TileNumber;
-
-	TArray<ATile*> NeighbourTiles;
-	ATile* Neighbor;
-	
-	if (Utility::IsValidPosition(CurrLetter + 1, CurrNumber))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	if (Utility::IsValidPosition(CurrLetter - 1, CurrNumber))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	if (Utility::IsValidPosition(CurrLetter, CurrNumber + 1))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter, CurrNumber + 1);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	if (Utility::IsValidPosition(CurrLetter, CurrNumber - 1))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	if (Utility::IsValidPosition(CurrLetter + 1, CurrNumber + 1))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber + 1);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	if (Utility::IsValidPosition(CurrLetter + 1, CurrNumber - 1))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber - 1);
-		NeighbourTiles.Add(Neighbor);
-	}
-	
-	if (Utility::IsValidPosition(CurrLetter - 1, CurrNumber + 1))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber + 1);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	if (Utility::IsValidPosition(CurrLetter - 1, CurrNumber - 1))
-	{
-		Neighbor = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber - 1);
-		NeighbourTiles.Add(Neighbor);
-	}
-
-	return NeighbourTiles;
 }
 

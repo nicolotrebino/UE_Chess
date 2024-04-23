@@ -5,6 +5,7 @@
 #include "Chess_GameMode.h"
 #include "Pieces/Chess_King.h"
 
+// Sets default values
 AChessboard::AChessboard()
 {
 	FieldSize = 8;
@@ -14,7 +15,7 @@ AChessboard::AChessboard()
 /*
  *	@brief Return a (x,y) position given a hit (click) on a field tile
  *
- *	@params	Hit
+ *	@param	Hit: the result of a user click
  *
  *	@return	Vector (position of the clicked Tile)
  */
@@ -46,9 +47,9 @@ float AChessboard::GetTileSize() const
 /*
  *	@brief Spawns a single piece on the board with all its game characteristics
  *
- *	@params	CurrentTile: where the piece has to be spawned
- *			Team: team of the piece
- *			Type: the type of the piece to spawn
+ *	@param	CurrentTile: where the piece has to be spawned
+ *	@param	Team: Team of the piece
+ *	@param	Type: the type of the piece to spawn
  *
  *	@return	Reference to the spawned piece
  */
@@ -73,12 +74,9 @@ AChess_Piece* AChessboard::SpawnSinglePiece(ATile* CurrentTile, const ETeam Team
 	return Piece;
 }
 
-/*
- *	@brief	Called when the game starts or when spawned.
- *			It Adds the "self destroy" to the broadcast event, it generates the board, and it spawns the pieces on it	
- *
- *	@return	Void
- */
+// Called when the game starts or when spawned.
+// It Adds the "self destroy" to the broadcast event, it generates the board,
+// and it spawns the pieces on it
 void AChessboard::BeginPlay()
 {
 	Super::BeginPlay();

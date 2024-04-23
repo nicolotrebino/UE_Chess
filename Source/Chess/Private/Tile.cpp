@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Tile.h"
 
 #include "Chess_GameMode.h"
 
+// Sets default values
 ATile::ATile()
 {
 	// Template function that creates a components
@@ -14,8 +14,7 @@ ATile::ATile()
 	// Every actor has a RootComponent that defines the transform in the World
 	SetRootComponent(Scene);
 	StaticMeshComponent->SetupAttachment(Scene);
-
-	// Set default values
+	
 	Status = ETileStatus::EMPTY;
 	Team = ETeam::NONE;
 	AlgebraicPosition = {'A', 0};
@@ -26,7 +25,7 @@ ATile::ATile()
 /*
  *	@brief	Setter for the Tile location
  *
- *	@params	FVector as a location in the game scene
+ *	@param	Location: FVector as a location in the game scene
  *
  *	@return	Void
  */
@@ -49,7 +48,8 @@ FVector ATile::GetTileLocation() const
  *	@brief	Set the Tile position based on the chess Algebraic notation,
  *			with a letter and a number
  *
- *	@params	X and Y to compute the algebraic position and as coordinates in the grid
+ *	@param	X: integer for the X coordinate to compute the algebraic position of a Tile in the grid
+ *	@param	Y: integer for the Y coordinate to compute the algebraic position of a Tile in the grid
  *
  *	@return	Void
  */
@@ -78,7 +78,7 @@ FAlgebraicPosition ATile::GetAlgebraicPosition() const
 /*
  *	@brief	Set the Tile status
  *
- *	@params	Status from the structure TileStatus
+ *	@param	TileStatus: status of the current Tile from the enumeration TileStatus
  *
  *	@return	Void
  */
@@ -90,7 +90,7 @@ void ATile::SetTileStatus(const ETileStatus TileStatus)
 /*
  *	@brief	Get the Tile status
  *
- *	@return	Tile status from the structure TileStatus
+ *	@return	Tile status from the enumeration TileStatus
  */
 ETileStatus ATile::GetTileStatus() const
 {
@@ -100,7 +100,7 @@ ETileStatus ATile::GetTileStatus() const
 /*
  *	@brief	Setter for the Tile team
  *
- *	@params	A team from the structure of team
+ *	@param	TileTeam: team from the enumeration ETeam to set the Team of the Tile "owner" (piece on tile)
  *
  *	@return	Void
  */
@@ -122,7 +122,7 @@ ETeam ATile::GetTileTeam() const
 /*
  *	@brief	Set the Piece above the Tile
  *
- *	@params Reference to the Piece above this Tile
+ *	@param	ChessPiece: reference to the Piece above this Tile
  *
  *	@return	Void
  */
@@ -144,7 +144,7 @@ AChess_Piece* ATile::GetPieceOnTile() const
 /*
  *	@brief	Set the proper Tile material
  *
- *	@params An integer for the index of the proper material in the array of materials
+ *	@param	Index: integer for the index of the proper material in the array of materials
  *
  *	@return	Void
  */
@@ -230,12 +230,8 @@ void ATile::UnsetKillableTile()
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
-/*
- *	@brief	Called when the game starts or when spawned.
- *			It Adds the "self destroy" to the broadcast event
- *
- *	@return	Void
- */
+// Called when the game starts or when spawned
+// It Adds the "self destroy" to the broadcast event
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();

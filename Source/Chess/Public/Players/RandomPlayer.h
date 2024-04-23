@@ -8,20 +8,27 @@
 #include "GameFramework/Pawn.h"
 #include "RandomPlayer.generated.h"
 
+/**
+ * Random player class
+ */
 UCLASS()
 class CHESS_API ARandomPlayer : public APawn, public IPlayerInterface
 {
 	GENERATED_BODY()
 
 public:
-
-	ARandomPlayer(); // Sets default values for this pawn's properties
+	// Sets default values for this pawn's properties
+	ARandomPlayer();
 	
 	UChess_GameInstance* GameInstance; // Chess_GameInstance reference
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/*
+	 *	Methods inherited from PlayerInterface and
+	 *	overridden for the RandomPlayer
+	 */		
 	virtual void OnTurn() override;
 	virtual void OnWin() override;
 	virtual void OnLose() override;

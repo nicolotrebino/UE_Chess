@@ -7,6 +7,7 @@
 #include "Managers/Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
 
+// Sets default values
 AHumanPlayer::AHumanPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -17,34 +18,25 @@ AHumanPlayer::AHumanPlayer()
 	SetRootComponent(Camera); // Set the camera as RootComponent
 	
 	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); // Get the game instance reference
-
-	// Default init values
+	
 	PlayerNumber = -1;
 	Team = WHITE;
 }
 
-/*
- *	@brief	Called when the game starts or when spawned
- *
- *	@return Void
- */
+// Called when the game starts or when spawned
 void AHumanPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-/*
- *	@brief	Called to bind functionality to input
- *
- *	@return Void
- */
+// Called to bind functionality to input
 void AHumanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 /*
- *	@brief	Implements the Human turn
+ *	@brief	Implements the Human player turn
  *
  *	@return Void
  */
@@ -58,7 +50,7 @@ void AHumanPlayer::OnTurn()
 }
 
 /*
- *	@brief	Implements the Human victory
+ *	@brief	Implements the Human player victory
  *
  *	@return Void
  */
@@ -76,7 +68,7 @@ void AHumanPlayer::OnWin()
 }
 
 /*
- *	@brief	Implements the Human defeat
+ *	@brief	Implements the Human player defeat
  *
  *	@return Void
  */

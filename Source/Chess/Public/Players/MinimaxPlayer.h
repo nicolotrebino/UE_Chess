@@ -18,6 +18,9 @@ struct FNextMove
 	ATile* NextTile;
 };
 
+/**
+ * Minimax player class
+ */
 UCLASS()
 class CHESS_API AMinimaxPlayer : public APawn, public IPlayerInterface
 {
@@ -60,18 +63,10 @@ public:
 	 *	Minimax algorithm methods
 	 */
 	int32 EvaluateGrid() const;
-	int32 AlphaBetaMiniMax(int32 D, int32 A, int32 B, bool IsMax);
+	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);
 	FNextMove FindBestMove();
 
 private:
-	/*
-	 *	Minimax + Alpha Beta Pruning values
-	 */
-	int32 BestVal = -50000;
-	int32 Alpha = -50000;
-	int32 Beta = 50000;
-	int32 Depth = 2;
-	
 	/*
 	 *	Arrays to evaluate pieces position
 	 */

@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/Chess_Pawn.h"
 
+// Sets default values
 AMinimaxPlayer::AMinimaxPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -14,38 +15,26 @@ AMinimaxPlayer::AMinimaxPlayer()
 	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
-/*
- *	@brief	Called when the game starts or when spawned
- *
- *	@return Void
- */
+// Called when the game starts or when spawned
 void AMinimaxPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-/*
- *	@brief	Called every frame
- *
- *	@return Void
- */
+// Called every frame
 void AMinimaxPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-/*
- *	@brief	Called to bind functionality to input
- *
- *	@return Void
- */
+// Called to bind functionality to input
 void AMinimaxPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 /*
- *	@brief	Implements the Minimax turn
+ *	@brief	Implements the Minimax player turn
  *
  *	@return Void
  */
@@ -75,7 +64,7 @@ void AMinimaxPlayer::OnTurn()
 }
 
 /*
- *	@brief	Implements the Minimax victory
+ *	@brief	Implements the Minimax player victory
  *
  *	@return Void
  */
@@ -87,7 +76,7 @@ void AMinimaxPlayer::OnWin()
 }
 
 /*
- *	@brief	Implements the Minimax defeat
+ *	@brief	Implements the Minimax player defeat
  *
  *	@return Void
  */
@@ -234,7 +223,7 @@ int32 AMinimaxPlayer::EvaluateGrid() const
  *
  *	@return Integer indicating the evaluation of the grid in that particular state
  */
-int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 D, int32 A, int32 B, bool IsMax)
+int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax)
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
@@ -343,6 +332,12 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 D, int32 A, int32 B, bool IsMax)
  */
 FNextMove AMinimaxPlayer::FindBestMove()
 {
+	// Minimax + Alpha Beta Pruning values 
+	int32 BestVal = -50000;
+	int32 Alpha = -50000;
+	int32 Beta = 50000;
+	int32 Depth = 2;
+	
 	FNextMove BestMove = {nullptr, nullptr};
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 

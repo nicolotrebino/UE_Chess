@@ -18,8 +18,6 @@ AManager_Turn::AManager_Turn()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Checker = nullptr;
-
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
 	PromotedPiece = nullptr;
@@ -37,15 +35,23 @@ AManager_Turn::AManager_Turn()
 	CurrentButtonIndex = 0;
 }
 
+/*
+ *	@brief	Destruct this manager before returning to the main menu
+ *
+ *	@return	Void
+ */
 void AManager_Turn::SelfDestroy()
 {
 	Destroy();
 }
 
+/*
+ *	@brief	Every turn it resets the turn variables
+ *
+ *	@return Void
+ */
 void AManager_Turn::ResetVariables()
 {
-	// Checker = nullptr;
-
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
 	PromotedPiece = nullptr;
@@ -59,6 +65,16 @@ void AManager_Turn::ResetVariables()
 	NextTile = nullptr;
 }
 
+/*
+ *	@brief	Every turn it sets the turn variables
+ *
+ *	@param	PTile: tile where the piece started from before the move
+ *	@param	NTile: tile where the piece has gone after the move
+ *	@param	PieceToMove: piece moved during the turn
+ *	@param	PieceToKill: killed piece during the turn
+ *
+ *	@return Void
+ */
 void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill)
 {
 	PreviousTile = PTile;
@@ -67,10 +83,11 @@ void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* 
 	KilledPiece = PieceToKill;
 }
 
-
 /*
- * Bring back to the default color all the targeted Tiles
- * and empty the TArray with all the pointers to the TargetedTiles
+ *	@brief	Bring back to the default color all the targeted Tiles
+ *			and empty the TArray with all the pointers to the TargetedTiles
+ *			
+ *	@return Void
  */
 void AManager_Turn::ResetTargetedAndKillableTiles()
 {
@@ -90,8 +107,10 @@ void AManager_Turn::ResetTargetedAndKillableTiles()
 }
 
 /*
- * Bring back to the default color the Tile
- * of the SelectedPiece
+ *	@brief	Bring back to the default color the Tile
+ *			of the SelectedPiece
+ *			
+ *	@return Void
  */
 void AManager_Turn::ResetSelectedPiece() const
 {
@@ -101,6 +120,12 @@ void AManager_Turn::ResetSelectedPiece() const
 	}
 }
 
+/*
+ *	@brief	Creates a string, inserts it as a key into a key-value pair
+ *			used to store the state of the board during the game
+ *			
+ *	@return Value key pair with default value of 0
+ */
 TPair<FString, int32> AManager_Turn::SaveGameState() const
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
@@ -132,6 +157,11 @@ TPair<FString, int32> AManager_Turn::SaveGameState() const
 	return Pair;
 }
 
+/*
+ *	@brief	Creates the correct button to insert into the MoveHistory for the move
+ *			
+ *	@return Void
+ */
 void AManager_Turn::DisplayMove()
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
@@ -151,13 +181,11 @@ void AManager_Turn::DisplayMove()
 			i--;
 		}
 	}
-
-	// Creazione del widget del pulsante
+	
 	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
 	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PromotedPiece, PreviousTile, NextTile};
 	MoveHistory.Add(Move);
 	CurrentButtonIndex = GameMode->MoveCounter - 1;
-	// GameMode->MhButtons.Add(Move);
 	
 	// If it is the AI, the move was done by the Human Player
 	if (GameMode->CurrentPlayer)
@@ -180,6 +208,11 @@ void AManager_Turn::DisplayMove()
 	}
 }
 
+/*
+ *	@brief	Creates the correct button to insert into the MoveHistory or the EndGame
+ *			
+ *	@return Void
+ */
 void AManager_Turn::DisplayEndGame() const
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -188,107 +221,115 @@ void AManager_Turn::DisplayEndGame() const
 	if (Container)
 	{
 		UUserWidget* LastButton = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(EndButtonClass);
-		// LastButton->Rename(*FString::Printf(TEXT("EndGame")));
 		Container->AddChild(LastButton);
 	}
 }
 
+/*
+ *	@brief	Linked to the text above the button via blueprint, it creates the correct notation
+ *			to visualize the move just made
+ *			
+ *	@return String that makes the text in the widget
+ */
 FString AManager_Turn::ComputeNotation() const
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-	if (!(NextTile || MovedPiece))
-	{
-		return ""; // Gestione errore
-	}
-
 	FString MoveNomenclature = "";
-	if (MovedPiece->GetType() == EPieceType::PAWN)
+	if (NextTile && MovedPiece)
 	{
-		if (PreviousTile && GameMode->TurnManager->bIsKill)
+		if (MovedPiece->GetType() == EPieceType::PAWN)
 		{
-			MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
-		}
-		if (GameMode->TurnManager->bIsPromotion)
-		{
-			MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d=%c"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber, PromotedPiece->GetNomenclature());
+			if (PreviousTile && GameMode->TurnManager->bIsKill)
+			{
+				MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
+			}
+			if (GameMode->TurnManager->bIsPromotion)
+			{
+				MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d=%c"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber, PromotedPiece->GetNomenclature());
+			}
+			else
+			{
+				MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
+			}
 		}
 		else
 		{
+			MoveNomenclature = FString::Printf(TEXT("%c"), MovedPiece->GetNomenclature());
+			if (GameMode->TurnManager->bIsKill)
+			{
+				MoveNomenclature = MoveNomenclature + "x";
+			}
+			if (MovedPiece->GetType() == EPieceType::ROOK)
+			{
+				TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+			
+				for (AChess_Piece* Piece: Team)
+				{
+					if (Piece->GetType() == EPieceType::ROOK && Piece != MovedPiece)
+					{
+						NextTile->SetTileStatus(ETileStatus::EMPTY);
+						TArray<ATile*> Moves = Piece->GetLegitMoves();
+						NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+						if (Moves.Contains(NextTile))
+						{
+							if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+							{
+								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+							}
+							else
+							{
+								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+							}
+						}
+					}
+				}
+			}
+			if (MovedPiece->GetType() == EPieceType::KNIGHT)
+			{
+				TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+			
+				for (AChess_Piece* Piece: Team)
+				{
+					if (Piece->GetType() == EPieceType::KNIGHT && Piece != MovedPiece)
+					{
+						NextTile->SetTileStatus(ETileStatus::EMPTY);
+						TArray<ATile*> Moves = Piece->GetLegitMoves();
+						NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+						if (Moves.Contains(NextTile))
+						{
+							if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+							{
+								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+							}
+							else
+							{
+								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+							}
+						}
+					}
+				}
+			}
 			MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 		}
-	}
-	else
-	{
-		MoveNomenclature = FString::Printf(TEXT("%c"), MovedPiece->GetNomenclature());
-		if (GameMode->TurnManager->bIsKill)
-		{
-			MoveNomenclature = MoveNomenclature + "x";
-		}
-		if (MovedPiece->GetType() == EPieceType::ROOK)
-		{
-			TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
-			
-			for (AChess_Piece* Piece: Team)
-			{
-				if (Piece->GetType() == EPieceType::ROOK && Piece != MovedPiece)
-				{
-					NextTile->SetTileStatus(ETileStatus::EMPTY);
-					TArray<ATile*> Moves = Piece->GetLegitMoves();
-					NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-					if (Moves.Contains(NextTile))
-					{
-						if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
-						{
-							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
-						}
-						else
-						{
-							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
-						}
-					}
-				}
-			}
-		}
-		if (MovedPiece->GetType() == EPieceType::KNIGHT)
-		{
-			TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
-			
-			for (AChess_Piece* Piece: Team)
-			{
-				if (Piece->GetType() == EPieceType::KNIGHT && Piece != MovedPiece)
-				{
-					NextTile->SetTileStatus(ETileStatus::EMPTY);
-					TArray<ATile*> Moves = Piece->GetLegitMoves();
-					NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-					if (Moves.Contains(NextTile))
-					{
-						if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
-						{
-							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
-						}
-						else
-						{
-							MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
-						}
-					}
-				}
-			}
-		}
-		MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
-	}
 
-	if (GameMode->bIsWhiteKingInCheckMate || GameMode->bIsBlackKingInCheckMate)
-	{
-		MoveNomenclature = MoveNomenclature + "#";
+		if (GameMode->bIsWhiteKingInCheckMate || GameMode->bIsBlackKingInCheckMate)
+		{
+			MoveNomenclature = MoveNomenclature + "#";
+		}
+		else if (GameMode->TurnManager->bIsWhiteKingInCheck || GameMode->TurnManager->bIsBlackKingInCheck)
+		{
+			MoveNomenclature = MoveNomenclature + "+";
+		}
 	}
-	else if (GameMode->TurnManager->bIsWhiteKingInCheck || GameMode->TurnManager->bIsBlackKingInCheck)
-	{
-		MoveNomenclature = MoveNomenclature + "+";
-	} 
 	return MoveNomenclature;
 }
 
+/*
+ *	@brief	Disables replay (normally during the AI turn)
+ *			
+ *	@return Void
+ */
 void AManager_Turn::DisableReplay() const
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -310,6 +351,11 @@ void AManager_Turn::DisableReplay() const
 	}
 }
 
+/*
+ *	@brief	Enables replay (normally during the Human turn)
+ *			
+ *	@return Void
+ */
 void AManager_Turn::EnableReplay()
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -345,6 +391,11 @@ void AManager_Turn::EnableReplay()
 	}
 }
 
+/*
+ *	@brief	Destroys all the buttons in the MoveHistory
+ *			
+ *	@return Void
+ */
 void AManager_Turn::DestroyMoveHistory()
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -362,10 +413,16 @@ void AManager_Turn::DestroyMoveHistory()
 	MoveHistory.Empty();
 }
 
+/*
+ *	@brief	Returns the state of the board to the previous point,
+ *			relating to the move and therefore to the button clicked by the user
+ *
+ *	@param	ClickedIndex: index of the button clicked by the user
+ *			
+ *	@return Void
+ */
 void AManager_Turn::Replay(const int32 ClickedIndex)
 {
-	// int32 i = MoveHistory.Num() - 1;
-	// UScrollBox* MhContainer = Cast<UScrollBox>(WidgetTree->FindWidget("MH_Scroll"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	ResetTargetedAndKillableTiles();
 	ResetSelectedPiece();
@@ -376,7 +433,6 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		{
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].PreviousTile);
 			
-			// Ripristina il pezzo mangiato
 			if (MoveHistory[i].KilledPiece)
 			{
 				MoveHistory[i].KilledPiece->SetActorEnableCollision(true);
@@ -387,18 +443,15 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				if (MoveHistory[i].KilledPiece->GetTeam() == WHITE)
 				{
 					GameMode->WhiteTeam.Add(MoveHistory[i].KilledPiece);
-					// GameMode->KilledWhiteTeam.Remove(MoveHistory[i].KilledPiece);
 				}
 				else
 				{
 					GameMode->BlackTeam.Add(MoveHistory[i].KilledPiece);
-					// GameMode->KilledBlackTeam.Remove(MoveHistory[i].KilledPiece);
 				}
 			}
 
 			if (MoveHistory[i].PromotedPiece)
 			{
-				// MoveHistory[i].PromotedPiece->SelfDestroy();
 				MoveHistory[i].PromotedPiece->SetActorHiddenInGame(true);
 				MoveHistory[i].PromotedPiece->SetActorEnableCollision(false);
 
@@ -416,9 +469,6 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 					GameMode->BlackTeam.Add(MoveHistory[i].MovedPiece);
 				}
 			}
-			
-			// MoveHistory[i].Button->RemoveFromParent();
-			// GameMode->MoveCounter = GameMode->MoveCounter - 1;
 			i--;
 		}
 	}
@@ -429,7 +479,6 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		{
 			if (MoveHistory[i].PromotedPiece)
 			{
-				// MoveHistory[i].MovedPiece->SelfDestroy();
 				MoveHistory[i].MovedPiece->SetActorHiddenInGame(true);
 				MoveHistory[i].MovedPiece->SetActorEnableCollision(false);
 				MoveHistory[i].PromotedPiece->SetActorHiddenInGame(false);
@@ -447,33 +496,27 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				}
 			}
 			
-			// Mangia il pezzo
 			if (MoveHistory[i].KilledPiece)
 			{
 				if (MoveHistory[i].KilledPiece->GetTeam() == ETeam::WHITE)
 				{
 					GameMode->WhiteTeam.Remove(MoveHistory[i].KilledPiece);
-					// GameMode->KilledWhiteTeam.Add(MoveHistory[i].KilledPiece);
 				}
 				else
 				{
 					GameMode->BlackTeam.Remove(MoveHistory[i].KilledPiece);
-					// GameMode->KilledBlackTeam.Add(MoveHistory[i].KilledPiece);
 				}
 				MoveHistory[i].KilledPiece->SetActorHiddenInGame(true);
 				MoveHistory[i].KilledPiece->SetActorEnableCollision(false);
 			}
 			
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
-			
-			// MoveHistory[i].Button->RemoveFromParent();
-			// GameMode->MoveCounter = GameMode->MoveCounter + 1;
 			i++;
 		}
 	}
-	////////// LegalMoves = GameMode->GetAllLegalMoves(); (Mi sa che devi mettere solo Human player però direi solo
-	/// se è il suo turno, controlla bene
-	///
+	
+	// I calculate the legal moves only for white (Human Player) only when
+	// it is his turn, and therefore he can execute the move
 	if ((ClickedIndex % 2) != 0)
 	{
 		GameMode->GetAllLegalMoves(0);

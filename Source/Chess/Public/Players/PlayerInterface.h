@@ -15,7 +15,7 @@ class UPlayerInterface : public UInterface
 };
 
 /**
- * 
+ * Player interface class
  */
 class CHESS_API IPlayerInterface
 {

@@ -29,12 +29,8 @@ void AChess_PlayerController::ClickOnGrid()
 	}
 }
 
-/*
- *	@brief	Called when the game starts or when spawned.
- *			It maps the ChessContext and create the Widget (HUD)
- *
- *	@return Void
- */
+// Called when the game starts or when spawned.
+// It maps the ChessContext and create the Widget (HUD)
 void AChess_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();

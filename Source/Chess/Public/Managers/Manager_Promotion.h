@@ -8,6 +8,9 @@
 
 class AChess_Pawn;
 
+/**
+ *	Class used as manager for the pawn promotion
+ */
 UCLASS()
 class CHESS_API AManager_Promotion : public AActor
 {
@@ -18,12 +21,16 @@ public:
 	AManager_Promotion();
 	void SelfDestroy();
 	
-	/* Manage pawn promotion */
+	/*
+	 * Manage pawn promotion
+	 */
 	void StartPromotion(AChess_Pawn* Pawn);
 	UFUNCTION(BlueprintCallable, Category = "Promotion")
 	void HandleButtonClicked(int32 SelectedPieceIndex); // Called when a button in the widget is clicked
 
-	/* Setter and getter for the pawn to promote */
+	/*
+	 * Setter and getter for the pawn to promote
+	 */
 	void SetCurrentPawn(AChess_Pawn* Pawn);
 	UFUNCTION(BlueprintCallable, Category = "Function")
 	AChess_Pawn* GetPawn() const;
@@ -31,7 +38,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
+	/*
+	 *	Promotion widget
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Promotion")
 	TSubclassOf<UUserWidget> PromotionWidgetClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Promotion")

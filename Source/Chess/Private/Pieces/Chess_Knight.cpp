@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Pieces/Chess_Knight.h"
 
 #include "Chess_GameMode.h"
@@ -20,6 +19,11 @@ AChess_Knight::AChess_Knight()
 	PieceValue = 3;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to compute the PossibleMoves of the Knight
+ *
+ *	@return	Array of Tiles where the Knight can go
+ */
 TArray<ATile*> AChess_Knight::GetPossibleMoves()
 {
 	Super::GetPossibleMoves();
@@ -37,7 +41,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -48,7 +51,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -59,7 +61,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -70,7 +71,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -81,7 +81,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -92,7 +91,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -103,7 +101,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -114,7 +111,6 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
-			// PossibleMove->TargetTile();
 			PossibleMoves.Add(PossibleMove);
 		}
 	}
@@ -122,6 +118,14 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	return PossibleMoves;
 }
 
+/*
+ *	@brief	Method inherited from the parent class to set
+ *			the material for this piece based on its team
+ *
+ *	@param	Index: integer indicates the team of this Knight
+ *
+ *	@return Void
+ */
 void AChess_Knight::SetMaterial(const int32 Index)
 {
 	Super::SetMaterial(Index);
@@ -129,6 +133,7 @@ void AChess_Knight::SetMaterial(const int32 Index)
 	KnightMeshComponent->SetMaterial(0, KnightMaterials[Index]);
 }
 
+// Called when the game starts or when spawned
 void AChess_Knight::BeginPlay()
 {
 	Super::BeginPlay();

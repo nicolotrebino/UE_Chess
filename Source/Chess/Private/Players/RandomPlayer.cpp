@@ -30,6 +30,11 @@ void ARandomPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+/*
+ *	@brief	Implements the Random player turn
+ *
+ *	@return	Void
+ */
 void ARandomPlayer::OnTurn()
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
@@ -56,14 +61,12 @@ void ARandomPlayer::OnTurn()
 					while (RandPlayerMoves.IsEmpty())
 					{
 						RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
-
-						// Continua a generare nuovi indici finché non ottieni uno diverso
+						
 						while (CheckedIndices.Contains(RandPieceIdx))
 						{
 							RandPieceIdx = FMath::Rand() % GameMode->BlackTeam.Num();
 						}
-
-						// Aggiungi il nuovo indice al set
+						
 						CheckedIndices.Add(RandPieceIdx);
 
 						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->MyLegalMoves;
@@ -85,6 +88,11 @@ void ARandomPlayer::OnTurn()
 		}, 3, false);
 }
 
+/*
+ *	@brief	Implements the Random player victory
+ *
+ *	@return	Void
+ */
 void ARandomPlayer::OnWin()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Wins!"));
@@ -92,6 +100,11 @@ void ARandomPlayer::OnWin()
 	GameInstance->IncrementScoreAiPlayer();
 }
 
+/*
+ *	@brief	Implements the Random player defeat
+ *
+ *	@return	Void
+ */
 void ARandomPlayer::OnLose()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
@@ -99,6 +112,11 @@ void ARandomPlayer::OnLose()
 	GameInstance->IncrementScoreHumanPlayer();
 }
 
+/*
+ *	@brief	Implements the draw game
+ *
+ *	@return	Void
+ */
 void ARandomPlayer::OnDraw()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));

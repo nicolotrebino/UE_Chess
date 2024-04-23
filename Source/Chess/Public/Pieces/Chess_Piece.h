@@ -10,6 +10,9 @@
 
 class AChess_GameMode;
 
+/**
+ * Father class for chess pieces
+ */
 UCLASS()
 class CHESS_API AChess_Piece : public AActor
 {
@@ -19,7 +22,9 @@ public:
 	// Sets default values for this actor's properties
 	AChess_Piece();
 
-	/* Setter and getter for the Piece information */
+	/*
+	 * Setter and getter for the Piece information
+	 */
 	TCHAR GetNomenclature() const;
 	virtual void SetTeam(const ETeam Team);
 	virtual ETeam GetTeam();
@@ -31,14 +36,18 @@ public:
 	virtual FVector GetPieceLocation();
 	virtual int32 GetPieceValue() const;
 
-	/* Functions that return legal moves */
-	virtual TArray<ATile*> GetPossibleMoves() { return TArray<ATile*>(); };
+	/*
+	 * Functions that return legal moves
+	 */
+	virtual TArray<ATile*> GetPossibleMoves() { return TArray<ATile*>(); }; // Extended in the children
 	void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves);
 	void CheckKingMobility(TArray<ATile*> &PossibleMoves);
 	TArray<ATile*> GetLegitMoves();
 
-	/* Functions to move the piece and "eat" opponents */
-	virtual void MovePiece(ATile* NextTile);
+	/*
+	 * Functions to move the piece and "eat" opponents
+	 */
+	virtual void MovePiece(ATile* NextTile); // Extended in Chess_Pawn
 	void Kill(AChess_Piece* Enemy) const;
 
 	void VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
@@ -58,7 +67,9 @@ protected:
 	
 	AChess_GameMode* GameMode; // Reference to the Chess_GameMode
 	
-	/* Piece information */
+	/*
+	 * Piece information
+	 */
 	TCHAR Nomenclature; // Capital letter to indicate the Piece for the Algebraic notation
 	ETeam PieceTeam;
 	EPieceType PieceType;
