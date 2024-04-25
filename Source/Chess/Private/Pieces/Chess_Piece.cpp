@@ -6,6 +6,7 @@
 #include "Pieces/Chess_King.h"
 #include "Managers/Manager_Turn.h"
 #include "Utility.h"
+#include "Pieces/Chess_Rook.h"
 
 // Sets default values
 AChess_Piece::AChess_Piece()
@@ -19,6 +20,8 @@ AChess_Piece::AChess_Piece()
 	PieceType = EPieceType::PAWN;
 	CurrentTile = nullptr;
 	PieceValue = 0;
+
+	bAlreadyMoved = false;
 }
 
 /*
@@ -145,17 +148,17 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 	for (ATile* NextTile : PossibleMoves)
 	{
 		AChess_Piece* Killed = NextTile->GetPieceOnTile();
-
-		this->VirtualMove(NextTile, PreviousTile, Killed);
+		
+			this->VirtualMove(NextTile, PreviousTile, Killed);
 	
-		// If the king is now/still in check with the move just made
-		if (GameMode->IsKingInCheck(PieceTeam))
-		{
-			// Avoid doing this move and remove it from the new array of possible (legal) moves created
-			NewArray.Remove(NextTile);
-		}
+			// If the king is now/still in check with the move just made
+			if (GameMode->IsKingInCheck(PieceTeam))
+			{
+				// Avoid doing this move and remove it from the new array of possible (legal) moves created
+				NewArray.Remove(NextTile);
+			}
 
-		this->VirtualUnMove(NextTile, PreviousTile, Killed);
+			this->VirtualUnMove(NextTile, PreviousTile, Killed);
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
@@ -196,11 +199,106 @@ void AChess_Piece::CheckKingMobility(TArray<ATile*> &PossibleMoves)
 		}
 
 		VirtualUnMove(NextTile, PreviousTile, Killed);
-		
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
 	PossibleMoves = MoveTempIfPossible(NewArray);
+}
+
+bool AChess_Piece::CanKingCastleShort() const
+{
+	if (PieceType == EPieceType::KING && !bAlreadyMoved)
+	{
+		if (!PieceTeam) // White
+		{
+			if (GameMode->TileArray[5]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[6]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[7]->GetPieceOnTile() &&
+				!GameMode->TileArray[7]->GetPieceOnTile()->bAlreadyMoved)
+			{
+				if (GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[5]) ||
+					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[6]) ||
+					GameMode->TurnManager->BlackMoves.Contains(CurrentTile))
+				{
+					return false;
+				}
+				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[6]);
+				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[7]->GetPieceOnTile());
+				return true;
+			}
+			return false;
+		}
+		else
+		{
+			if (GameMode->TileArray[61]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[62]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[63]->GetPieceOnTile() &&
+				!GameMode->TileArray[63]->GetPieceOnTile()->bAlreadyMoved)
+			{
+				if (GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[61]) ||
+					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[62]) ||
+					GameMode->TurnManager->WhiteMoves.Contains(CurrentTile))
+				{
+					return false;
+				}
+				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[62]);
+				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[63]->GetPieceOnTile());
+				return true;
+			}
+			return false;
+		}
+	}
+	return false;
+}
+
+bool AChess_Piece::CanKingCastleLong() const
+{
+	if (PieceType == EPieceType::KING && !bAlreadyMoved)
+	{
+		if (!PieceTeam) // White
+		{
+			if (GameMode->TileArray[3]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[2]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[1]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[0]->GetPieceOnTile() &&
+				!GameMode->TileArray[0]->GetPieceOnTile()->bAlreadyMoved)
+			{
+				if (GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[3]) ||
+					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[2]) ||
+					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[1]) ||
+					GameMode->TurnManager->BlackMoves.Contains(CurrentTile))
+				{
+					return false;
+				}
+				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[2]);
+				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[0]->GetPieceOnTile());
+				return true;
+			}
+			return false;
+		}
+		else
+		{
+			if (GameMode->TileArray[59]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[58]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[57]->GetTileStatus() == ETileStatus::EMPTY &&
+				GameMode->TileArray[56]->GetPieceOnTile() &&
+				!GameMode->TileArray[56]->GetPieceOnTile()->bAlreadyMoved)
+			{
+				if (GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[59]) ||
+					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[58]) ||
+					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[57]) ||
+					GameMode->TurnManager->WhiteMoves.Contains(CurrentTile))
+				{
+					return false;
+				}
+				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[58]);
+				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[56]->GetPieceOnTile());
+				return true;
+			}
+			return false;
+		}
+	}
+	return false;
 }
 
 /*
@@ -216,6 +314,30 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
 	if (this->IsA(AChess_King::StaticClass()))
 	{
 		CheckKingMobility(LegitMoves);
+		if (this->CanKingCastleShort())
+		{
+			/*
+			if (GameMode->TurnManager->CastlingTiles.IsValidIndex(0))
+			{
+				LegitMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
+			}
+			*/
+			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)+2]);
+		}
+		if (this->CanKingCastleLong())
+		{
+			/*
+			if (GameMode->TurnManager->CastlingTiles.IsValidIndex(1))
+			{
+				LegitMoves.Add(GameMode->TurnManager->CastlingTiles[1]);
+			}
+			else
+			{
+				LegitMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
+			}
+			*/
+			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)-2]);
+		}
 	}
 	else
 	{
@@ -235,7 +357,66 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
  */
 void AChess_Piece::MovePiece(ATile* NextTile)
 {
-	GameMode->TurnManager->SetTilesAndPieces(this->GetPieceTile(), NextTile, this, NextTile->GetPieceOnTile());
+	// Manage castle
+	if (PieceType == EPieceType::KING)
+	{
+		int32 NextTileIndex = GameMode->TileArray.Find(NextTile);
+		int32 KingTileIndex = GameMode->TileArray.Find(CurrentTile);
+		if (NextTileIndex == KingTileIndex+2 || NextTileIndex == KingTileIndex-2)
+		{
+			if (NextTileIndex > KingTileIndex)
+			{
+				GameMode->TurnManager->bIsCastleShort = true;
+				AChess_Piece* RookToCastle = GameMode->TileArray[KingTileIndex+3]->GetPieceOnTile();
+				if (GameMode->TurnManager->RooksToCastle.Contains(RookToCastle))
+				{
+					GameMode->TurnManager->SetCastleReferences(RookToCastle->GetPieceTile(), RookToCastle);
+					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex-1]);
+				}
+			}
+			else if (NextTileIndex < KingTileIndex)
+			{
+				GameMode->TurnManager->bIsCastleLong = true;
+				AChess_Piece* RookToCastle = GameMode->TileArray[KingTileIndex-4]->GetPieceOnTile();
+				if (GameMode->TurnManager->RooksToCastle.Contains(RookToCastle))
+				{
+					GameMode->TurnManager->SetCastleReferences(RookToCastle->GetPieceTile(), RookToCastle);
+					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex+1]);
+				}
+			}
+			/*
+			if (GameMode->TurnManager->RookToCastle)
+			{
+				if (NextTileIndex > KingTileIndex)
+				{
+					GameMode->TurnManager->bIsCastleShort = true;
+					AChess_Piece* RookToCastle = GameMode->TileArray[KingTileIndex+3]->GetPieceOnTile();
+					GameMode->TurnManager->SetCastleReferences(RookToCastle->GetPieceTile(), RookToCastle);
+					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex-1]);
+				}
+				else if (NextTileIndex < KingTileIndex)
+				{
+					GameMode->TurnManager->bIsCastleLong = true;
+					AChess_Piece* RookToCastle = GameMode->TileArray[KingTileIndex-4]->GetPieceOnTile();
+					GameMode->TurnManager->SetCastleReferences(RookToCastle->GetPieceTile(), RookToCastle);
+					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex+1]);
+				}
+			}
+			// GameMode->TurnManager->RookToCastle = nullptr;
+			*/
+		}
+	}
+	GameMode->TurnManager->RooksToCastle.Empty();
+
+	if (!bAlreadyMoved)
+	{
+		bAlreadyMoved = true;
+		GameMode->TurnManager->SetTilesAndPieces(CurrentTile, NextTile, this, NextTile->GetPieceOnTile(), true);
+	}
+	else
+	{
+		GameMode->TurnManager->SetTilesAndPieces(CurrentTile, NextTile, this, NextTile->GetPieceOnTile(), false);
+	}
 	
 	// UnSelect the Tile under the selected piece
 	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
@@ -283,6 +464,28 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 	Enemy->SetActorEnableCollision(false);
 	GameMode->TurnManager->bIsKill = true;
 }
+
+/*
+void AChess_Piece::Castle(ATile* NextTile)
+{
+	if (this->IsA(AChess_King::StaticClass()))
+	{
+		GameMode->TurnManager->SetCastleReferences(GameMode->TurnManager->RookToCastle->GetPieceTile(), GameMode->TurnManager->RookToCastle);
+		int32 ChosenIndex = GameMode->TileArray.Find(NextTile);
+		int32 KingIndex = GameMode->TileArray.Find(CurrentTile);
+		if (ChosenIndex > KingIndex)
+		{
+			GameMode->TurnManager->bIsCastleShort = true;
+			GameMode->TurnManager->RookToCastle->MovePiece(GameMode->TileArray[ChosenIndex-1]);
+		}
+		else if (ChosenIndex < KingIndex)
+		{
+			GameMode->TurnManager->bIsCastleLong = true;
+			GameMode->TurnManager->RookToCastle->MovePiece(GameMode->TileArray[ChosenIndex+1]);
+		}
+	}
+}
+*/
 
 /*
  *	@brief	Implement the MOVE but just virtually, not actually in the game
@@ -333,12 +536,10 @@ void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Pi
 	{
 		if (Killed->GetTeam() == ETeam::WHITE)
 		{
-			// GameMode->KilledWhiteTeam.Remove(Killed);
 			GameMode->WhiteTeam.Add(Killed);
 		}
 		if (Killed->GetTeam() == ETeam::BLACK)
 		{
-			// GameMode->KilledBlackTeam.Remove(Killed);
 			GameMode->BlackTeam.Add(Killed);
 		}
 		NextTile->SetPieceOnTile(Killed);
@@ -405,7 +606,7 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 		if (bU && Utility::IsValidPosition(ConstLetter, NewNumberUp))
 		{
 			ATile* VerticalTile = GameMode->GetTileAtPosition(ConstLetter, NewNumberUp);
-			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY || VerticalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				VerticalTiles.Add(VerticalTile);
 			}
@@ -422,7 +623,7 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 		if (bD && Utility::IsValidPosition(ConstLetter, NewNumberDown))
 		{
 			ATile* VerticalTile = GameMode->GetTileAtPosition(ConstLetter, NewNumberDown);
-			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY || VerticalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				VerticalTiles.Add(VerticalTile);
 			}
@@ -466,7 +667,7 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 		if (bR && Utility::IsValidPosition(NewLetterRight, ConstNumber))
 		{
 			ATile* HorizontalTile = GameMode->GetTileAtPosition(NewLetterRight, ConstNumber);
-			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY || HorizontalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				HorizontalTiles.Add(HorizontalTile);
 			}
@@ -483,7 +684,7 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 		if (bL && Utility::IsValidPosition(NewLetterLeft, ConstNumber))
 		{
 			ATile* HorizontalTile = GameMode->GetTileAtPosition(NewLetterLeft, ConstNumber);
-			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY || HorizontalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				HorizontalTiles.Add(HorizontalTile);
 			}
@@ -529,7 +730,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bUpR && Utility::IsValidPosition(NewLetterRight, NewNumberUp))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterRight, NewNumberUp);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}
@@ -546,7 +747,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bUpL && Utility::IsValidPosition(NewLetterLeft, NewNumberUp))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterLeft, NewNumberUp);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}
@@ -563,7 +764,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bDownR && Utility::IsValidPosition(NewLetterRight, NewNumberDown))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterRight, NewNumberDown);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}
@@ -580,7 +781,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bDownL && Utility::IsValidPosition(NewLetterLeft, NewNumberDown))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterLeft, NewNumberDown);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}

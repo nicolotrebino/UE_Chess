@@ -6,6 +6,7 @@
 #include "Chess_GameMode.h"
 #include "Managers/Manager_Turn.h"
 #include "Kismet/GameplayStatics.h"
+#include "Pieces/Chess_King.h"
 
 // Sets default values
 AHumanPlayer::AHumanPlayer()
@@ -42,7 +43,7 @@ void AHumanPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
  */
 void AHumanPlayer::OnTurn()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Your Turn"));
 	bIsMyTurn = true;
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -56,7 +57,7 @@ void AHumanPlayer::OnTurn()
  */
 void AHumanPlayer::OnWin()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
 	GameInstance->SetTurnMessage(TEXT("Human Wins!"));
 	GameInstance->IncrementScoreHumanPlayer();
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -74,7 +75,7 @@ void AHumanPlayer::OnWin()
  */
 void AHumanPlayer::OnLose()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Human Loses!"));
 	GameInstance->IncrementScoreAiPlayer();
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
@@ -92,7 +93,7 @@ void AHumanPlayer::OnLose()
  */
 void AHumanPlayer::OnDraw()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
 	// Start the sound for a draw game
@@ -128,6 +129,30 @@ void AHumanPlayer::OnClick()
 				GameMode->TurnManager->SelectedPiece = SelectedPiece = CurrPiece; // Set the Chess Piece selected by the Human Player
 				CurrPiece->GetPieceTile()->SetSelectedTile(); // Select the Tile and set it to SELECTED
 
+				/*
+				if (CurrPiece->IsA(AChess_King::StaticClass()))
+				{
+					if (CurrPiece->CanKingCastleShort())
+					{
+						if (GameMode->TurnManager->CastlingTiles.IsValidIndex(0))
+						{
+							GameMode->TurnManager->CastlingTiles[0]->SetCastleTile();
+						}
+					}
+					if (CurrPiece->CanKingCastleLong())
+					{
+						if (GameMode->TurnManager->CastlingTiles.IsValidIndex(1))
+						{
+							GameMode->TurnManager->CastlingTiles[1]->SetCastleTile();
+						}
+						else
+						{
+							GameMode->TurnManager->CastlingTiles[0]->SetCastleTile();
+						}
+					}
+				}
+				*/
+
 				for (ATile* Tile: CurrPiece->MyLegalMoves)
 				{
 					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
@@ -159,7 +184,7 @@ void AHumanPlayer::OnClick()
 					return;
 				}
 					
-				// Change the turn to Random Player
+				// Change the turn to Ai Player
 				bIsMyTurn = false;
 				GameMode->TurnNextPlayer();
 			}
@@ -168,6 +193,7 @@ void AHumanPlayer::OnClick()
 		// If the human player clicks on a Tile
 		if (ATile* NextTile = Cast<ATile>(Hit.GetActor()))
 		{
+			UE_LOG(LogTemp, Error, TEXT("Tile Status: %d"), NextTile->GetTileStatus());
 			// If the Tile is a target
 			if (NextTile->GetTileStatus() == ETileStatus::TARGET)
 			{
@@ -186,14 +212,29 @@ void AHumanPlayer::OnClick()
 						return;
 					}
 					
-					// Change the turn to Random Player
+					// Change the turn to AI Player
 					bIsMyTurn = false;
 					GameMode->TurnNextPlayer();
 				}
 			}
+			/*
+			else if (NextTile->GetTileStatus() == ETileStatus::CASTLE)
+			{
+				if (SelectedPiece->IsA(AChess_King::StaticClass()))
+				{
+					// Reset all the Tiles in the "global" arrays
+					GameMode->TurnManager->ResetTargetedAndKillableTiles();
+					
+					SelectedPiece->Castle(NextTile);
+					SelectedPiece->MovePiece(NextTile);
 
-			// If the Tile is empty
-			else if (NextTile->GetTileStatus() == ETileStatus::EMPTY)
+					// Change the turn to AI Player
+					bIsMyTurn = false;
+					GameMode->TurnNextPlayer();
+				}
+			}
+			*/
+			else if (NextTile->GetTileStatus() == ETileStatus::EMPTY) // If the Tile is empty
 			{
 				GameMode->TurnManager->ResetTargetedAndKillableTiles(); // Reset array of Targeted Tiles
 				GameMode->TurnManager->ResetSelectedPiece(); // Reset the Selected Piece

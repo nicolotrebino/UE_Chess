@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GameFramework/Actor.h"
+#include "Pieces/Chess_Piece.h"
 #include "Manager_Turn.generated.h"
 
 class AChess_Piece;
@@ -25,6 +26,9 @@ struct FMoveInfo
 	AChess_Piece* PromotedPiece;
 	ATile* PreviousTile;
 	ATile* NextTile;
+	ATile* RookPreviousTile;
+	AChess_Piece* RookCastle;
+	bool bJustMoved;
 };
 
 /**
@@ -43,7 +47,8 @@ public:
 	void ResetVariables();
 	void ResetTargetedAndKillableTiles();
 	void ResetSelectedPiece() const;
-	void SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill);
+	void SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill, bool bIsJustMoved);
+	void SetCastleReferences(ATile* PRookTile, AChess_Piece* RCastle);
 
 	/*
 	 * Game references for a turn
@@ -54,6 +59,10 @@ public:
 	ATile* PreviousTile;
 	ATile* NextTile;
 
+	ATile* RookPreviousTile;
+	AChess_Piece* RookCastle;
+	bool bJustMoved;
+
 	/*
 	 * Game variables for a turn
 	 */
@@ -61,6 +70,9 @@ public:
 	bool bIsPromotion; // If in that turn there was a promotion
 	bool bIsBlackKingInCheck;
 	bool bIsWhiteKingInCheck;
+
+	bool bIsCastleLong;
+	bool bIsCastleShort;
 	
 	TArray<ATile*> WhiteMoves; // Array with White's legal moves in the current turn
 	TArray<ATile*> BlackMoves; // Array with Black's legal moves in the current turn
@@ -71,6 +83,12 @@ public:
 	TArray<ATile*> KillableTiles; // Keeps track of Killable Tiles
 	UPROPERTY(Transient)
 	AChess_Piece* SelectedPiece; // Keeps track of Selected Piece
+
+	/*
+	UPROPERTY(Transient)
+	TArray<ATile*> CastlingTiles;
+	*/
+	TArray<AChess_Piece*> RooksToCastle;
 
 	TPair<FString, int32> SaveGameState() const;
 

@@ -93,6 +93,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* CheckSound;
 	UPROPERTY(EditDefaultsOnly)
+	USoundBase* CastlingSound;
+	UPROPERTY(EditDefaultsOnly)
 	USoundBase* WinSound;
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* LoseSound;

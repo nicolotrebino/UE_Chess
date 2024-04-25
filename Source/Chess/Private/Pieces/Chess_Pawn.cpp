@@ -46,13 +46,13 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 			if (Utility::IsValidPosition(CurrLetter, CurrNumber + 1))
 			{
 				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber + 1);
-				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY || PossibleMove->GetTileStatus() == ETileStatus::CASTLE)
 				{
 					PossibleMoves.Add(PossibleMove);
 					if (Utility::IsValidPosition(CurrLetter, CurrNumber + 2))
 					{
 						PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber + 2);
-						if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+						if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY || PossibleMove->GetTileStatus() == ETileStatus::CASTLE)
 						{
 							PossibleMoves.Add(PossibleMove);
 						}
@@ -65,7 +65,7 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 			if (Utility::IsValidPosition(CurrLetter, CurrNumber + 1))
 			{
 				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber + 1);
-				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY || PossibleMove->GetTileStatus() == ETileStatus::CASTLE)
 				{
 					PossibleMoves.Add(PossibleMove);
 				}
@@ -102,13 +102,13 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 			if (Utility::IsValidPosition(CurrLetter, CurrNumber - 1))
 			{
 				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
-				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY || PossibleMove->GetTileStatus() == ETileStatus::CASTLE)
 				{
 					PossibleMoves.Add(PossibleMove);
 					if (Utility::IsValidPosition(CurrLetter, CurrNumber - 2))
 					{
 						PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 2);
-						if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+						if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY || PossibleMove->GetTileStatus() == ETileStatus::CASTLE)
 						{
 							PossibleMoves.Add(PossibleMove);
 						}
@@ -121,7 +121,7 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 			if (Utility::IsValidPosition(CurrLetter, CurrNumber - 1))
 			{
 				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
-				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
+				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY || PossibleMove->GetTileStatus() == ETileStatus::CASTLE)
 				{
 					// PossibleMove->TargetTile();
 					PossibleMoves.Add(PossibleMove);

@@ -40,7 +40,7 @@ void ARandomPlayer::OnTurn()
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	GameMode->TurnManager->DisableReplay();
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Turn"));
 	GameInstance->SetTurnMessage(TEXT("AI (Random) Turn"));
 
 	// Set a random timer
@@ -70,6 +70,30 @@ void ARandomPlayer::OnTurn()
 						CheckedIndices.Add(RandPieceIdx);
 
 						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->MyLegalMoves;
+
+						/*
+						if (GameMode->BlackTeam[RandPieceIdx]->IsA(AChess_King::StaticClass()))
+						{
+							if (GameMode->BlackTeam[RandPieceIdx]->CanKingCastleShort())
+							{
+								if (GameMode->TurnManager->CastlingTiles.IsValidIndex(0))
+								{
+									RandPlayerMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
+								}
+							}
+							if (GameMode->BlackTeam[RandPieceIdx]->CanKingCastleLong())
+							{
+								if (GameMode->TurnManager->CastlingTiles.IsValidIndex(1))
+								{
+									RandPlayerMoves.Add(GameMode->TurnManager->CastlingTiles[1]);
+								}
+								else
+								{
+									RandPlayerMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
+								}
+							}
+						}
+						*/
 					}
 					
 					// After finding the possible moves, choose one randomly
@@ -78,7 +102,6 @@ void ARandomPlayer::OnTurn()
 					{
 						GameMode->BlackTeam[RandPieceIdx]->Kill(RandPlayerMoves[RandMoveIdx]->GetPieceOnTile());
 					}
-					
 					GameMode->BlackTeam[RandPieceIdx]->MovePiece(RandPlayerMoves[RandMoveIdx]);
 
 					// Change player
@@ -95,7 +118,7 @@ void ARandomPlayer::OnTurn()
  */
 void ARandomPlayer::OnWin()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Wins!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Wins!"));
 	GameInstance->SetTurnMessage(TEXT("AI Wins!"));
 	GameInstance->IncrementScoreAiPlayer();
 }
@@ -107,7 +130,7 @@ void ARandomPlayer::OnWin()
  */
 void ARandomPlayer::OnLose()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
 	GameInstance->IncrementScoreHumanPlayer();
 }
@@ -119,7 +142,7 @@ void ARandomPlayer::OnLose()
  */
 void ARandomPlayer::OnDraw()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 

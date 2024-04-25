@@ -230,6 +230,18 @@ void ATile::UnsetKillableTile()
 	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
 }
 
+void ATile::SetCastleTile()
+{
+	Status = ETileStatus::CASTLE;
+	StaticMeshComponent->SetMaterial(0, SelectMaterial);
+}
+
+void ATile::UnsetCastleTile()
+{
+	Status = ETileStatus::EMPTY;
+	StaticMeshComponent->SetMaterial(0, DefaultMaterials[TileMaterial]);
+}
+
 // Called when the game starts or when spawned
 // It Adds the "self destroy" to the broadcast event
 void ATile::BeginPlay()

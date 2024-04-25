@@ -39,6 +39,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber + 2);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+		PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -49,6 +50,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter + 1, CurrNumber - 2);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -59,6 +61,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber + 2);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -69,6 +72,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter - 1, CurrNumber - 2);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -79,6 +83,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter + 2, CurrNumber +1);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -89,6 +94,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter + 2, CurrNumber - 1);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -99,6 +105,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter - 2, CurrNumber + 1);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);
@@ -109,6 +116,7 @@ TArray<ATile*> AChess_Knight::GetPossibleMoves()
 	{
 		PossibleMove = GameMode->GetTileAtPosition(CurrLetter - 2, CurrNumber - 1);
 		if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY ||
+			PossibleMove->GetTileStatus() == ETileStatus::CASTLE ||
 			(PossibleMove->GetTileStatus() == ETileStatus::OCCUPIED && PossibleMove->GetTileTeam() != this->PieceTeam))
 		{
 			PossibleMoves.Add(PossibleMove);

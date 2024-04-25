@@ -11,6 +11,7 @@ enum class ETileStatus : uint8
 	OCCUPIED		UMETA(DisplayName = "Occupied"),
 	TARGET			UMETA(DysplayName = "Target"),
 	KILLABLE		UMETA(DisplayName = "Killable"),
+	CASTLE			UMETA(DisplayName = "Castle"),
 };
 
 UENUM()

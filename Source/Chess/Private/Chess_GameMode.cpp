@@ -38,6 +38,7 @@ AChess_GameMode::AChess_GameMode()
 	MoveSound = nullptr;
 	KillSound = nullptr;
 	CheckSound = nullptr;
+	CastlingSound = nullptr;
 	WinSound = nullptr;
 	LoseSound = nullptr;
 	DrawSound = nullptr;
@@ -280,6 +281,10 @@ void AChess_GameMode::TurnNextPlayer()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, CheckSound, FVector(0, 0, 0));
 	}
+	else if (bEnableSound && (TurnManager->bIsCastleLong || TurnManager->bIsCastleShort) && CastlingSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, CastlingSound, FVector(0, 0, 0));
+	}
 	else if (bEnableSound && TurnManager->bIsKill && KillSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, KillSound, FVector(0, 0, 0));
@@ -292,6 +297,8 @@ void AChess_GameMode::TurnNextPlayer()
 	TurnManager->DisplayMove(); // The move just made is displayed in the MoveHistory
 	
 	MoveCounter += 1; // Increment the number of moves
+
+	UpdateScores();
 
 	// Reset turn variables
 	TurnManager->ResetVariables();

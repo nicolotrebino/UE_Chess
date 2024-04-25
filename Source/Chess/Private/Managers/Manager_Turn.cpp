@@ -21,11 +21,21 @@ AManager_Turn::AManager_Turn()
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
 	PromotedPiece = nullptr;
-	
+
+	RookPreviousTile = nullptr;
+	RookCastle = nullptr;
+
+	bJustMoved = false;
+
 	bIsKill = false;
 	bIsPromotion = false;
 	bIsBlackKingInCheck = false;
 	bIsWhiteKingInCheck = false;
+
+	bIsCastleLong = false;
+	bIsCastleShort = false;
+
+	// RookToCastle = nullptr;
 
 	PreviousTile = nullptr;
 	NextTile = nullptr;
@@ -55,6 +65,11 @@ void AManager_Turn::ResetVariables()
 	MovedPiece = nullptr;
 	KilledPiece = nullptr;
 	PromotedPiece = nullptr;
+
+	RookPreviousTile = nullptr;
+	RookCastle = nullptr;
+
+	bJustMoved = false;
 	
 	bIsKill = false;
 	bIsPromotion = false;
@@ -63,6 +78,11 @@ void AManager_Turn::ResetVariables()
 
 	PreviousTile = nullptr;
 	NextTile = nullptr;
+
+	bIsCastleLong = false;
+	bIsCastleShort = false;
+	
+	// RookToCastle = nullptr;
 }
 
 /*
@@ -75,12 +95,19 @@ void AManager_Turn::ResetVariables()
  *
  *	@return Void
  */
-void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill)
+void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* PieceToMove, AChess_Piece* PieceToKill, bool bIsJustMoved)
 {
 	PreviousTile = PTile;
 	NextTile = NTile;
 	MovedPiece = PieceToMove;
 	KilledPiece = PieceToKill;
+	bJustMoved = bIsJustMoved;
+}
+
+void AManager_Turn::SetCastleReferences(ATile* PRookTile, AChess_Piece* RCastle)
+{
+	RookPreviousTile = PRookTile;
+	RookCastle= RCastle;
 }
 
 /*
@@ -104,6 +131,14 @@ void AManager_Turn::ResetTargetedAndKillableTiles()
 		Tile->UnsetKillableTile(); // Make it OCCUPIED and with the default material
 	}
 	KillableTiles.Empty();
+
+	/*
+	for (ATile* Tile: CastlingTiles)
+	{
+		Tile->UnsetCastleTile();
+	}
+	CastlingTiles.Empty();
+	*/
 }
 
 /*
@@ -183,7 +218,7 @@ void AManager_Turn::DisplayMove()
 	}
 	
 	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
-	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PromotedPiece, PreviousTile, NextTile};
+	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PromotedPiece, PreviousTile, NextTile, RookPreviousTile, RookCastle, bJustMoved};
 	MoveHistory.Add(Move);
 	CurrentButtonIndex = GameMode->MoveCounter - 1;
 	
@@ -238,89 +273,99 @@ FString AManager_Turn::ComputeNotation() const
 	FString MoveNomenclature = "";
 	if (NextTile && MovedPiece)
 	{
-		if (MovedPiece->GetType() == EPieceType::PAWN)
+		if (bIsCastleLong)
 		{
-			if (PreviousTile && GameMode->TurnManager->bIsKill)
-			{
-				MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
-			}
-			if (GameMode->TurnManager->bIsPromotion)
-			{
-				MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d=%c"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber, PromotedPiece->GetNomenclature());
-			}
-			else
-			{
-				MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
-			}
+			MoveNomenclature = "O-O-O";
+		}
+		else if (bIsCastleShort)
+		{
+			MoveNomenclature = "O-O";
 		}
 		else
 		{
-			MoveNomenclature = FString::Printf(TEXT("%c"), MovedPiece->GetNomenclature());
-			if (GameMode->TurnManager->bIsKill)
+			if (MovedPiece->GetType() == EPieceType::PAWN)
 			{
-				MoveNomenclature = MoveNomenclature + "x";
-			}
-			if (MovedPiece->GetType() == EPieceType::ROOK)
-			{
-				TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
-			
-				for (AChess_Piece* Piece: Team)
+				if (PreviousTile && GameMode->TurnManager->bIsKill)
 				{
-					if (Piece->GetType() == EPieceType::ROOK && Piece != MovedPiece)
+					MoveNomenclature = FString::Printf(TEXT("%cx"), PreviousTile->GetAlgebraicPosition().TileLetter);
+				}
+				if (GameMode->TurnManager->bIsPromotion)
+				{
+					MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d=%c"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber, PromotedPiece->GetNomenclature());
+				}
+				else
+				{
+					MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
+				}
+			}
+			else
+			{
+				MoveNomenclature = FString::Printf(TEXT("%c"), MovedPiece->GetNomenclature());
+				if (GameMode->TurnManager->bIsKill)
+				{
+					MoveNomenclature = MoveNomenclature + "x";
+				}
+				if (MovedPiece->GetType() == EPieceType::ROOK)
+				{
+					TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+				
+					for (AChess_Piece* Piece: Team)
 					{
-						NextTile->SetTileStatus(ETileStatus::EMPTY);
-						TArray<ATile*> Moves = Piece->GetLegitMoves();
-						NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-						if (Moves.Contains(NextTile))
+						if (Piece->GetType() == EPieceType::ROOK && Piece != MovedPiece)
 						{
-							if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+							NextTile->SetTileStatus(ETileStatus::EMPTY);
+							TArray<ATile*> Moves = Piece->GetLegitMoves();
+							NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+							if (Moves.Contains(NextTile))
 							{
-								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
-							}
-							else
-							{
-								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+								if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+								}
+								else
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+								}
 							}
 						}
 					}
 				}
-			}
-			if (MovedPiece->GetType() == EPieceType::KNIGHT)
-			{
-				TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
-			
-				for (AChess_Piece* Piece: Team)
+				if (MovedPiece->GetType() == EPieceType::KNIGHT)
 				{
-					if (Piece->GetType() == EPieceType::KNIGHT && Piece != MovedPiece)
+					TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+				
+					for (AChess_Piece* Piece: Team)
 					{
-						NextTile->SetTileStatus(ETileStatus::EMPTY);
-						TArray<ATile*> Moves = Piece->GetLegitMoves();
-						NextTile->SetTileStatus(ETileStatus::OCCUPIED);
-						if (Moves.Contains(NextTile))
+						if (Piece->GetType() == EPieceType::KNIGHT && Piece != MovedPiece)
 						{
-							if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+							NextTile->SetTileStatus(ETileStatus::EMPTY);
+							TArray<ATile*> Moves = Piece->GetLegitMoves();
+							NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+							if (Moves.Contains(NextTile))
 							{
-								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
-							}
-							else
-							{
-								MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+								if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+								}
+								else
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+								}
 							}
 						}
 					}
 				}
+				MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 			}
-			MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 		}
-
-		if (GameMode->bIsWhiteKingInCheckMate || GameMode->bIsBlackKingInCheckMate)
-		{
-			MoveNomenclature = MoveNomenclature + "#";
-		}
-		else if (GameMode->TurnManager->bIsWhiteKingInCheck || GameMode->TurnManager->bIsBlackKingInCheck)
-		{
-			MoveNomenclature = MoveNomenclature + "+";
-		}
+	}
+	if (GameMode->bIsWhiteKingInCheckMate || GameMode->bIsBlackKingInCheckMate)
+	{
+		MoveNomenclature = MoveNomenclature + "#";
+	}
+	else if (GameMode->TurnManager->bIsWhiteKingInCheck || GameMode->TurnManager->bIsBlackKingInCheck)
+	{
+		MoveNomenclature = MoveNomenclature + "+";
 	}
 	return MoveNomenclature;
 }
@@ -432,7 +477,8 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		while (i > 0 && i > ClickedIndex)
 		{
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].PreviousTile);
-			
+
+			// Manage kill
 			if (MoveHistory[i].KilledPiece)
 			{
 				MoveHistory[i].KilledPiece->SetActorEnableCollision(true);
@@ -450,6 +496,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				}
 			}
 
+			// Manage promotion
 			if (MoveHistory[i].PromotedPiece)
 			{
 				MoveHistory[i].PromotedPiece->SetActorHiddenInGame(true);
@@ -469,6 +516,21 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 					GameMode->BlackTeam.Add(MoveHistory[i].MovedPiece);
 				}
 			}
+
+			// Manage castle
+			if (MoveHistory[i].RookCastle && MoveHistory[i].RookPreviousTile)
+			{
+				MoveHistory[i].RookCastle->MovePiece(MoveHistory[i].RookPreviousTile);
+				MoveHistory[i].RookCastle->bAlreadyMoved = false;
+			}
+
+			// Manage first move
+			if (MoveHistory[i].bJustMoved) 
+			{
+				MoveHistory[i].MovedPiece->bAlreadyMoved = false;
+			}
+			GameMode->TurnManager->ResetVariables();
+			GameMode->GetAllLegalMoves(i%2);
 			i--;
 		}
 	}
@@ -509,18 +571,44 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				MoveHistory[i].KilledPiece->SetActorHiddenInGame(true);
 				MoveHistory[i].KilledPiece->SetActorEnableCollision(false);
 			}
+
+			// Manage castle
+			if (MoveHistory[i].RookCastle && MoveHistory[i].RookPreviousTile)
+			{
+				int32 PreviousTileIndex = GameMode->TileArray.Find(MoveHistory[i].RookPreviousTile);
+				int32 KingIndex = GameMode->TileArray.Find(MoveHistory[i].NextTile);
+				if (PreviousTileIndex > KingIndex)
+				{
+					MoveHistory[i].RookCastle->MovePiece(GameMode->TileArray[KingIndex-1]);
+				}
+				else if (PreviousTileIndex < KingIndex)
+				{
+					MoveHistory[i].RookCastle->MovePiece(GameMode->TileArray[KingIndex+1]);
+				}
+			}
+
+			/*
+			if (MoveHistory[i].bJustMoved) 
+			{
+				MoveHistory[i].MovedPiece->bAlreadyMoved = true;
+			}
+			*/
 			
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
+			GameMode->TurnManager->ResetVariables();
+			GameMode->GetAllLegalMoves(i%2);
 			i++;
 		}
 	}
-	
+
+	/*
 	// I calculate the legal moves only for white (Human Player) only when
 	// it is his turn, and therefore he can execute the move
 	if ((ClickedIndex % 2) != 0)
 	{
 		GameMode->GetAllLegalMoves(0);
 	}
+	*/
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
 }

@@ -42,6 +42,10 @@ public:
 	virtual TArray<ATile*> GetPossibleMoves() { return TArray<ATile*>(); }; // Extended in the children
 	void PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves);
 	void CheckKingMobility(TArray<ATile*> &PossibleMoves);
+
+	bool CanKingCastleShort() const;
+	bool CanKingCastleLong() const;
+	
 	TArray<ATile*> GetLegitMoves();
 
 	/*
@@ -49,6 +53,8 @@ public:
 	 */
 	virtual void MovePiece(ATile* NextTile); // Extended in Chess_Pawn
 	void Kill(AChess_Piece* Enemy) const;
+
+	// void Castle(ATile* NextTile);
 
 	void VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
 	void VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
@@ -60,6 +66,8 @@ public:
 	void SelfDestroy(); // Destroy a ChessPiece actor
 
 	TArray<ATile*> MyLegalMoves;
+
+	bool bAlreadyMoved;
 
 protected:
 	// Called when the game starts or when spawned

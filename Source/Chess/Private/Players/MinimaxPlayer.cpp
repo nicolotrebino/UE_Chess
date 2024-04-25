@@ -40,7 +40,7 @@ void AMinimaxPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
  */
 void AMinimaxPlayer::OnTurn()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	GameMode->TurnManager->DisableReplay(); // Disable the replay during the Minimax turn
 	
@@ -70,7 +70,7 @@ void AMinimaxPlayer::OnTurn()
  */
 void AMinimaxPlayer::OnWin()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Wins!"));
 	GameInstance->SetTurnMessage(TEXT("AI Wins!"));
 	GameInstance->IncrementScoreAiPlayer();
 }
@@ -82,7 +82,7 @@ void AMinimaxPlayer::OnWin()
  */
 void AMinimaxPlayer::OnLose()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
 	GameInstance->IncrementScoreHumanPlayer();
 }
@@ -94,7 +94,7 @@ void AMinimaxPlayer::OnLose()
  */
 void AMinimaxPlayer::OnDraw()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Loses!"));
 	GameInstance->SetTurnMessage(TEXT("Draw game!"));
 }
 
@@ -106,7 +106,6 @@ void AMinimaxPlayer::OnDraw()
  */
 int32 AMinimaxPlayer::EvaluateGrid() const
 {
-	int32 GridValue = 0;
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
 	int32 BlackValue = 0;
@@ -207,7 +206,7 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 		}
 	}
 
-	GridValue = BlackValue - WhiteValue;
+	int32 GridValue = BlackValue - WhiteValue;
 	return GridValue;
 }
 
@@ -395,7 +394,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 		}
 	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AI (Minimax) bestVal = %d "), BestVal));
 	return BestMove;
 }
 
