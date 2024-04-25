@@ -161,7 +161,7 @@ void AManager_Turn::ResetSelectedPiece() const
  *			
  *	@return Value key pair with default value of 0
  */
-TPair<FString, int32> AManager_Turn::SaveGameState() const
+TPair<FString, int32> AManager_Turn::ComputeGameState() const
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 	TPair<FString, int32> Pair;
@@ -530,7 +530,16 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				MoveHistory[i].MovedPiece->bAlreadyMoved = false;
 			}
 			GameMode->TurnManager->ResetVariables();
-			GameMode->GetAllLegalMoves(i%2);
+			// GameMode->GetAllLegalMoves(i%2);
+
+			if ((i % 2) == 0)
+			{
+				GameMode->GetAllLegalMoves(0);
+			}
+			else
+			{
+				GameMode->GetAllLegalMoves(1);
+			}
 			i--;
 		}
 	}
@@ -596,7 +605,15 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
 			GameMode->TurnManager->ResetVariables();
-			GameMode->GetAllLegalMoves(i%2);
+			// GameMode->GetAllLegalMoves(i%2);
+			if ((i % 2) == 0)
+			{
+				GameMode->GetAllLegalMoves(0);
+			}
+			else
+			{
+				GameMode->GetAllLegalMoves(1);
+			}
 			i++;
 		}
 	}
@@ -609,6 +626,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		GameMode->GetAllLegalMoves(0);
 	}
 	*/
+	
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
 }

@@ -116,32 +116,49 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 
 	GameMode->GetAllLegalMoves(0);
 	GameMode->GetAllLegalMoves(1);
-
-	// Mobility
-	WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num(); // Human
-	BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num(); // AI
 	
 	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
 	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
 
+	/*
+	 *	Manage endgames
+	 */
+	if (GameMode->BlackTeam.Num() == 1 && GameMode->WhiteTeam.Num() == 1) // Draw (King vs King)
+	{
+		GameMode->bIsGameOver = true;
+		return 0;
+	}
+
+	TPair<FString, int32> CurrentState = GameMode->TurnManager->ComputeGameState();
+	CurrentState.Value = 2;
+	if (GameMode->GameStates.Contains(CurrentState)) // Draw for repetition
+	{
+		GameMode->bIsGameOver = true;
+		return 0;
+	}
+	
 	if (GameMode->TurnManager->BlackMoves.IsEmpty())
 	{
-		if (GameMode->TurnManager->bIsBlackKingInCheck)
+		if (GameMode->TurnManager->bIsBlackKingInCheck)	// White wins
 		{
 			GameMode->bIsGameOver = true;
 			return -30000;
 		}
-		return 0;
+		return 0; // Draw
 	}
 	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
 	{
-		if (GameMode->TurnManager->bIsWhiteKingInCheck)
+		if (GameMode->TurnManager->bIsWhiteKingInCheck) // Black wins
 		{
 			GameMode->bIsGameOver = true;
 			return 30000;
 		}
-		return 0;
+		return 0; // Draw
 	}
+
+	// Mobility
+	WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num(); // Human
+	BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num(); // AI
 
 	// Position and material
 	for (int32 i = 0; i < GameMode->TileArray.Num(); i++)

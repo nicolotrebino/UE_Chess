@@ -121,6 +121,7 @@ void AHumanPlayer::OnClick()
 		// If the human player clicks on a ChessPiece
 		if (AChess_Piece* CurrPiece = Cast<AChess_Piece>(Hit.GetActor()))
 		{
+			UE_LOG(LogTemp, Error, TEXT("Tile Status: %d; Tile team: %d"), CurrPiece->GetPieceTile()->GetTileStatus(), CurrPiece->GetPieceTile()->GetTileTeam());
 			// If the Chess Piece has the color of the Human Player's team (WHITE)
 			if (CurrPiece->GetTeam() == Team)
 			{
@@ -145,6 +146,7 @@ void AHumanPlayer::OnClick()
 			}
 			else if (CurrPiece->GetPieceTile()->GetTileStatus() == ETileStatus::KILLABLE)
 			{
+				UE_LOG(LogTemp, Error, TEXT("Tile Status: %d; Tile team: %d"), CurrPiece->GetPieceTile()->GetTileStatus(), CurrPiece->GetPieceTile()->GetTileTeam());
 				ATile* NextTile = CurrPiece->GetPieceTile();
 
 				SelectedPiece->Kill(CurrPiece);
@@ -170,7 +172,7 @@ void AHumanPlayer::OnClick()
 		// If the human player clicks on a Tile
 		if (ATile* NextTile = Cast<ATile>(Hit.GetActor()))
 		{
-			UE_LOG(LogTemp, Error, TEXT("Tile Status: %d"), NextTile->GetTileStatus());
+			UE_LOG(LogTemp, Error, TEXT("Tile Status: %d; Tile team: %d"), NextTile->GetTileStatus(), NextTile->GetTileTeam());
 			// If the Tile is a target
 			if (NextTile->GetTileStatus() == ETileStatus::TARGET)
 			{
@@ -197,6 +199,7 @@ void AHumanPlayer::OnClick()
 			}
 			else if (NextTile->GetTileStatus() == ETileStatus::EMPTY) // If the Tile is empty
 			{
+				UE_LOG(LogTemp, Error, TEXT("Tile Status: %d; Tile team: %d"), NextTile->GetTileStatus(), NextTile->GetTileTeam());
 				GameMode->TurnManager->ResetTargetedAndKillableTiles(); // Reset array of Targeted Tiles
 				GameMode->TurnManager->ResetSelectedPiece(); // Reset the Selected Piece
 			}

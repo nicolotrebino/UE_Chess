@@ -90,7 +90,7 @@ public:
 	*/
 	TArray<AChess_Piece*> RooksToCastle;
 
-	TPair<FString, int32> SaveGameState() const;
+	TPair<FString, int32> ComputeGameState() const;
 
 	/*
 	 * Manage MoveHistory

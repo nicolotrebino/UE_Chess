@@ -256,7 +256,7 @@ void AChess_GameMode::TurnNextPlayer()
 
 	// Check if the same arrangement of pieces on the board does not occur 3 times during the game,
 	// otherwise it is a draw
-	TPair<FString, int32> CurrentState = TurnManager->SaveGameState(); // Value = 0
+	TPair<FString, int32> CurrentState = TurnManager->ComputeGameState(); // Value = 0
 	if (GameStates.Contains(CurrentState))
 	{
 		CurrentState.Value++; // Value = 1

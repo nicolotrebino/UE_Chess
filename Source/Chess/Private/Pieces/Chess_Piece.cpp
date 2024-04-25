@@ -440,7 +440,7 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 void AChess_Piece::VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed)
 {
 	// Unlink the previous Tile to the Piece to move
-	PreviousTile->SetTileTeam(NONE);
+	PreviousTile->SetTileTeam(ETeam::NONE);
 	PreviousTile->SetTileStatus(ETileStatus::EMPTY);
 	PreviousTile->SetPieceOnTile(nullptr);
 
@@ -491,7 +491,7 @@ void AChess_Piece::VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Pi
 	else
 	{
 		NextTile->SetPieceOnTile(nullptr);
-		NextTile->SetTileTeam(NONE);
+		NextTile->SetTileTeam(ETeam::NONE);
 		NextTile->SetTileStatus(ETileStatus::EMPTY);
 	}
 	PreviousTile->SetPieceOnTile(this);
