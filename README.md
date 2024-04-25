@@ -2,17 +2,19 @@
 
 Chess game in Unreal Engine 5.2 for a university project of the "Programming and Analysis of Algorithms" course.
 
-## Built with
+## General information
+
+### Built with
 - Unreal Engine
 - Rider (Jet Brains)
 - C++
 - UE Blueprints (only for UI or where strictly necessary
 
-## Requirements
+### Requirements
 - Unreal Engine 5.2
 - Visual Studio or Rider
 
-## Usage
+### Usage
 This is the complete game of chess, the only move not allowed (not yet implemented) is the en passant (pawn promotion and castle are implemented).
 It is a single-player game; the human player will only be able to play with the white team and consequently, the AI will always play with the black team.
 There are two main difficulties:
@@ -21,7 +23,7 @@ Difficult, the AI will play by evaluating the tree of possible moves, choosing t
 The replay of the moves made during the game is also implemented, with the possibility of changing one of your moves during your turn.
 NB: It is also possible to disable the replay to increase the difficulty.
 
-## For the university course
+## Addition for the university course
 
 ### UML
 
