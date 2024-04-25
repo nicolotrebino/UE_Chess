@@ -33,7 +33,7 @@ NB: It is also possible to disable the replay to increase the difficulty.
 From the main menu, you can conveniently start the game with the desired mode or exit the game.
 In the settings, you can increase the difficulty by disabling the replay and adding background music.
 
-** LINK IMMAGINE **
+![Game UI](README_assets/MainMenu.png)
 
 ### Game UI
 During the game it will be possible, thanks to the user interface, to view the score of the match, the entire history of the moves made, and various buttons that introduce some additional features.
@@ -41,12 +41,12 @@ At the bottom left the "new game" button resets the board making you start the g
 At the top right, starting from the left, you can disable all sounds, return to the main menu, and exit the game.
 NB: the entire UI during the game will only be interactable during your turn.
 
-** LINK IMMAGINE ** 
+![Game UI](README_assets/GameUI.png)
 
 ### Human player
 The human player will be assigned the white team by default. The possible moves are displayed on the board based on the piece you want to move.
 
-** LINK IMMAGINE **
+![Game UI](README_assets/Game.png)
 
 ### Random player
 As already mentioned, this is the simplest mode where the AI will play with random moves
