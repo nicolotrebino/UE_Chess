@@ -532,6 +532,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			GameMode->TurnManager->ResetVariables();
 			// GameMode->GetAllLegalMoves(i%2);
 
+			/*
 			if ((i % 2) == 0)
 			{
 				GameMode->GetAllLegalMoves(0);
@@ -540,6 +541,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			{
 				GameMode->GetAllLegalMoves(1);
 			}
+			*/
 			i--;
 		}
 	}
@@ -606,6 +608,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
 			GameMode->TurnManager->ResetVariables();
 			// GameMode->GetAllLegalMoves(i%2);
+			/*
 			if ((i % 2) == 0)
 			{
 				GameMode->GetAllLegalMoves(0);
@@ -614,6 +617,7 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 			{
 				GameMode->GetAllLegalMoves(1);
 			}
+			*/
 			i++;
 		}
 	}
@@ -626,6 +630,8 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		GameMode->GetAllLegalMoves(0);
 	}
 	*/
+	GameMode->GetAllLegalMoves(0);
+	GameMode->GetAllLegalMoves(1);
 	
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;
