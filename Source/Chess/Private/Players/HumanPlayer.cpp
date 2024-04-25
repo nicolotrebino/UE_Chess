@@ -129,30 +129,6 @@ void AHumanPlayer::OnClick()
 				GameMode->TurnManager->SelectedPiece = SelectedPiece = CurrPiece; // Set the Chess Piece selected by the Human Player
 				CurrPiece->GetPieceTile()->SetSelectedTile(); // Select the Tile and set it to SELECTED
 
-				/*
-				if (CurrPiece->IsA(AChess_King::StaticClass()))
-				{
-					if (CurrPiece->CanKingCastleShort())
-					{
-						if (GameMode->TurnManager->CastlingTiles.IsValidIndex(0))
-						{
-							GameMode->TurnManager->CastlingTiles[0]->SetCastleTile();
-						}
-					}
-					if (CurrPiece->CanKingCastleLong())
-					{
-						if (GameMode->TurnManager->CastlingTiles.IsValidIndex(1))
-						{
-							GameMode->TurnManager->CastlingTiles[1]->SetCastleTile();
-						}
-						else
-						{
-							GameMode->TurnManager->CastlingTiles[0]->SetCastleTile();
-						}
-					}
-				}
-				*/
-
 				for (ATile* Tile: CurrPiece->MyLegalMoves)
 				{
 					if (Tile->GetTileStatus() == ETileStatus::OCCUPIED)
@@ -175,6 +151,7 @@ void AHumanPlayer::OnClick()
 
 				// Reset all the Tiles in the "global" arrays
 				GameMode->TurnManager->ResetTargetedAndKillableTiles();
+				GameMode->TurnManager->ResetSelectedPiece(); // Reset the Selected Piece
 
 				// Move the selected piece
 				SelectedPiece->MovePiece(NextTile);
@@ -203,6 +180,7 @@ void AHumanPlayer::OnClick()
 				{
 					// Reset all the Tiles in the "global" arrays
 					GameMode->TurnManager->ResetTargetedAndKillableTiles();
+					GameMode->TurnManager->ResetSelectedPiece(); // Reset the Selected Piece
 					
 					// Move the selected piece
 					SelectedPiece->MovePiece(NextTile);
@@ -217,23 +195,6 @@ void AHumanPlayer::OnClick()
 					GameMode->TurnNextPlayer();
 				}
 			}
-			/*
-			else if (NextTile->GetTileStatus() == ETileStatus::CASTLE)
-			{
-				if (SelectedPiece->IsA(AChess_King::StaticClass()))
-				{
-					// Reset all the Tiles in the "global" arrays
-					GameMode->TurnManager->ResetTargetedAndKillableTiles();
-					
-					SelectedPiece->Castle(NextTile);
-					SelectedPiece->MovePiece(NextTile);
-
-					// Change the turn to AI Player
-					bIsMyTurn = false;
-					GameMode->TurnNextPlayer();
-				}
-			}
-			*/
 			else if (NextTile->GetTileStatus() == ETileStatus::EMPTY) // If the Tile is empty
 			{
 				GameMode->TurnManager->ResetTargetedAndKillableTiles(); // Reset array of Targeted Tiles

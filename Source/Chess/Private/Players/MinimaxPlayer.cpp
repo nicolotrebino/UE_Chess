@@ -51,12 +51,15 @@ void AMinimaxPlayer::OnTurn()
 		{
 			FNextMove NextMove = FindBestMove();
 
-			if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
+			if (NextMove.NextTile && NextMove.PieceToMove)
 			{
-				NextMove.PieceToMove->Kill(NextMove.NextTile->GetPieceOnTile());
-			}
+				if (NextMove.NextTile->GetTileStatus() == ETileStatus::OCCUPIED)
+				{
+					NextMove.PieceToMove->Kill(NextMove.NextTile->GetPieceOnTile());
+				}
 			
-			NextMove.PieceToMove->MovePiece(NextMove.NextTile);
+				NextMove.PieceToMove->MovePiece(NextMove.NextTile);
+			}
 			
 			// Change player
 			GameMode->TurnNextPlayer();

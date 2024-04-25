@@ -59,9 +59,6 @@ public:
 	void SetKillableTile();
 	void UnsetKillableTile();
 
-	void SetCastleTile();
-	void UnsetCastleTile();
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

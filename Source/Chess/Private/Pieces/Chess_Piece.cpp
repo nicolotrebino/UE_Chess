@@ -6,7 +6,6 @@
 #include "Pieces/Chess_King.h"
 #include "Managers/Manager_Turn.h"
 #include "Utility.h"
-#include "Pieces/Chess_Rook.h"
 
 // Sets default values
 AChess_Piece::AChess_Piece()
@@ -149,16 +148,16 @@ void AChess_Piece::PossibleMovesCheckControl(TArray<ATile*>& PossibleMoves)
 	{
 		AChess_Piece* Killed = NextTile->GetPieceOnTile();
 		
-			this->VirtualMove(NextTile, PreviousTile, Killed);
-	
-			// If the king is now/still in check with the move just made
-			if (GameMode->IsKingInCheck(PieceTeam))
-			{
-				// Avoid doing this move and remove it from the new array of possible (legal) moves created
-				NewArray.Remove(NextTile);
-			}
+		this->VirtualMove(NextTile, PreviousTile, Killed);
 
-			this->VirtualUnMove(NextTile, PreviousTile, Killed);
+		// If the king is now/still in check with the move just made
+		if (GameMode->IsKingInCheck(PieceTeam))
+		{
+			// Avoid doing this move and remove it from the new array of possible (legal) moves created
+			NewArray.Remove(NextTile);
+		}
+
+		this->VirtualUnMove(NextTile, PreviousTile, Killed);
 	}
 
 	// Move, if it is possible, the New Array (modified) into the old PossibleMoves array
@@ -316,26 +315,10 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
 		CheckKingMobility(LegitMoves);
 		if (this->CanKingCastleShort())
 		{
-			/*
-			if (GameMode->TurnManager->CastlingTiles.IsValidIndex(0))
-			{
-				LegitMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
-			}
-			*/
 			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)+2]);
 		}
 		if (this->CanKingCastleLong())
 		{
-			/*
-			if (GameMode->TurnManager->CastlingTiles.IsValidIndex(1))
-			{
-				LegitMoves.Add(GameMode->TurnManager->CastlingTiles[1]);
-			}
-			else
-			{
-				LegitMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
-			}
-			*/
 			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)-2]);
 		}
 	}
@@ -384,26 +367,6 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex+1]);
 				}
 			}
-			/*
-			if (GameMode->TurnManager->RookToCastle)
-			{
-				if (NextTileIndex > KingTileIndex)
-				{
-					GameMode->TurnManager->bIsCastleShort = true;
-					AChess_Piece* RookToCastle = GameMode->TileArray[KingTileIndex+3]->GetPieceOnTile();
-					GameMode->TurnManager->SetCastleReferences(RookToCastle->GetPieceTile(), RookToCastle);
-					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex-1]);
-				}
-				else if (NextTileIndex < KingTileIndex)
-				{
-					GameMode->TurnManager->bIsCastleLong = true;
-					AChess_Piece* RookToCastle = GameMode->TileArray[KingTileIndex-4]->GetPieceOnTile();
-					GameMode->TurnManager->SetCastleReferences(RookToCastle->GetPieceTile(), RookToCastle);
-					RookToCastle->MovePiece(GameMode->TileArray[NextTileIndex+1]);
-				}
-			}
-			// GameMode->TurnManager->RookToCastle = nullptr;
-			*/
 		}
 	}
 	GameMode->TurnManager->RooksToCastle.Empty();
@@ -422,7 +385,7 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
 	this->GetPieceTile()->SetTileTeam(ETeam::NONE);
 	this->GetPieceTile()->SetPieceOnTile(nullptr);
-	this->GetPieceTile()->UnsetSelectedTile();
+	// this->GetPieceTile()->UnsetSelectedTile();
 	
 	// Set the next Location and Rotation of the ChessPiece
 	const FVector SetLocation = NextTile->GetTileLocation() + FVector (0,0,0.1);
@@ -464,28 +427,6 @@ void AChess_Piece::Kill(AChess_Piece* Enemy) const
 	Enemy->SetActorEnableCollision(false);
 	GameMode->TurnManager->bIsKill = true;
 }
-
-/*
-void AChess_Piece::Castle(ATile* NextTile)
-{
-	if (this->IsA(AChess_King::StaticClass()))
-	{
-		GameMode->TurnManager->SetCastleReferences(GameMode->TurnManager->RookToCastle->GetPieceTile(), GameMode->TurnManager->RookToCastle);
-		int32 ChosenIndex = GameMode->TileArray.Find(NextTile);
-		int32 KingIndex = GameMode->TileArray.Find(CurrentTile);
-		if (ChosenIndex > KingIndex)
-		{
-			GameMode->TurnManager->bIsCastleShort = true;
-			GameMode->TurnManager->RookToCastle->MovePiece(GameMode->TileArray[ChosenIndex-1]);
-		}
-		else if (ChosenIndex < KingIndex)
-		{
-			GameMode->TurnManager->bIsCastleLong = true;
-			GameMode->TurnManager->RookToCastle->MovePiece(GameMode->TileArray[ChosenIndex+1]);
-		}
-	}
-}
-*/
 
 /*
  *	@brief	Implement the MOVE but just virtually, not actually in the game
@@ -606,7 +547,7 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 		if (bU && Utility::IsValidPosition(ConstLetter, NewNumberUp))
 		{
 			ATile* VerticalTile = GameMode->GetTileAtPosition(ConstLetter, NewNumberUp);
-			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY || VerticalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				VerticalTiles.Add(VerticalTile);
 			}
@@ -623,7 +564,7 @@ TArray<ATile*> AChess_Piece::GetVerticalLine() const
 		if (bD && Utility::IsValidPosition(ConstLetter, NewNumberDown))
 		{
 			ATile* VerticalTile = GameMode->GetTileAtPosition(ConstLetter, NewNumberDown);
-			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY || VerticalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (VerticalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				VerticalTiles.Add(VerticalTile);
 			}
@@ -667,7 +608,7 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 		if (bR && Utility::IsValidPosition(NewLetterRight, ConstNumber))
 		{
 			ATile* HorizontalTile = GameMode->GetTileAtPosition(NewLetterRight, ConstNumber);
-			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY || HorizontalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				HorizontalTiles.Add(HorizontalTile);
 			}
@@ -684,7 +625,7 @@ TArray<ATile*> AChess_Piece::GetHorizontalLine() const
 		if (bL && Utility::IsValidPosition(NewLetterLeft, ConstNumber))
 		{
 			ATile* HorizontalTile = GameMode->GetTileAtPosition(NewLetterLeft, ConstNumber);
-			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY || HorizontalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (HorizontalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				HorizontalTiles.Add(HorizontalTile);
 			}
@@ -730,7 +671,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bUpR && Utility::IsValidPosition(NewLetterRight, NewNumberUp))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterRight, NewNumberUp);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}
@@ -747,7 +688,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bUpL && Utility::IsValidPosition(NewLetterLeft, NewNumberUp))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterLeft, NewNumberUp);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}
@@ -764,7 +705,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bDownR && Utility::IsValidPosition(NewLetterRight, NewNumberDown))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterRight, NewNumberDown);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}
@@ -781,7 +722,7 @@ TArray<ATile*> AChess_Piece::GetDiagonalLine() const
 		if (bDownL && Utility::IsValidPosition(NewLetterLeft, NewNumberDown))
 		{
 			ATile* DiagonalTile = GameMode->GetTileAtPosition(NewLetterLeft, NewNumberDown);
-			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY || DiagonalTile->GetTileStatus() == ETileStatus::CASTLE)
+			if (DiagonalTile->GetTileStatus() == ETileStatus::EMPTY)
 			{
 				DiagonalTiles.Add(DiagonalTile);
 			}

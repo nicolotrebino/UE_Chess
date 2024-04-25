@@ -70,30 +70,6 @@ void ARandomPlayer::OnTurn()
 						CheckedIndices.Add(RandPieceIdx);
 
 						RandPlayerMoves = GameMode->BlackTeam[RandPieceIdx]->MyLegalMoves;
-
-						/*
-						if (GameMode->BlackTeam[RandPieceIdx]->IsA(AChess_King::StaticClass()))
-						{
-							if (GameMode->BlackTeam[RandPieceIdx]->CanKingCastleShort())
-							{
-								if (GameMode->TurnManager->CastlingTiles.IsValidIndex(0))
-								{
-									RandPlayerMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
-								}
-							}
-							if (GameMode->BlackTeam[RandPieceIdx]->CanKingCastleLong())
-							{
-								if (GameMode->TurnManager->CastlingTiles.IsValidIndex(1))
-								{
-									RandPlayerMoves.Add(GameMode->TurnManager->CastlingTiles[1]);
-								}
-								else
-								{
-									RandPlayerMoves.Add(GameMode->TurnManager->CastlingTiles[0]);
-								}
-							}
-						}
-						*/
 					}
 					
 					// After finding the possible moves, choose one randomly

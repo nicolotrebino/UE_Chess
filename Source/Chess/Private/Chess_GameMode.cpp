@@ -299,8 +299,6 @@ void AChess_GameMode::TurnNextPlayer()
 	
 	MoveCounter += 1; // Increment the number of moves
 
-	UpdateScores();
-
 	// Reset turn variables
 	TurnManager->ResetVariables();
 	bInReplay = false;
