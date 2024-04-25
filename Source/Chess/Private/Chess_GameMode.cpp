@@ -191,7 +191,8 @@ void AChess_GameMode::TurnNextPlayer()
 	TurnManager->bIsWhiteKingInCheck = IsKingInCheck(WHITE);
 	
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
-	
+
+	GetAllLegalMoves(!CurrentPlayer);
 	GetAllLegalMoves(CurrentPlayer);
 
 	// Check the Draw for only kings on the field
