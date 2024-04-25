@@ -62,3 +62,11 @@ The evaluation function was created also thanks to some sources found on the web
 The move history can be consulted during the game and shows the player all the moves made up to that point using the official Algebraic Notation used in chess.
 By clicking on each move the state of the board is brought back to the moment of the move.
 You can only modify your moves, so you will be allowed to continue the game only at a previous time when it was your turn.
+
+<table>
+  <tr>
+    <td><img src="README_assets/ReplayHuman.png" alt="Replay Human" title="Here you can change the move made previously and restart the game"></td>
+    <td><img src="README_assets/ReplayAI.png" alt="Replay AI" title="The game cannot restart from here"></td>
+  </tr>
+</table>
+
