@@ -35,8 +35,6 @@ AManager_Turn::AManager_Turn()
 	bIsCastleLong = false;
 	bIsCastleShort = false;
 
-	// RookToCastle = nullptr;
-
 	PreviousTile = nullptr;
 	NextTile = nullptr;
 
@@ -81,12 +79,10 @@ void AManager_Turn::ResetVariables()
 
 	bIsCastleLong = false;
 	bIsCastleShort = false;
-	
-	// RookToCastle = nullptr;
 }
 
 /*
- *	@brief	Every turn it sets the turn variables
+ *	@brief	Sets the turn variables
  *
  *	@param	PTile: tile where the piece started from before the move
  *	@param	NTile: tile where the piece has gone after the move
@@ -104,6 +100,14 @@ void AManager_Turn::SetTilesAndPieces(ATile* PTile, ATile* NTile, AChess_Piece* 
 	bJustMoved = bIsJustMoved;
 }
 
+/*
+ *	@brief	Sets the castle variables
+ *
+ *	@param	PRookTile: tile where the rook to castle started from
+ *	@param	RCastle: the rook to castle
+ *
+ *	@return	Void
+ */
 void AManager_Turn::SetCastleReferences(ATile* PRookTile, AChess_Piece* RCastle)
 {
 	RookPreviousTile = PRookTile;
@@ -131,14 +135,6 @@ void AManager_Turn::ResetTargetedAndKillableTiles()
 		Tile->UnsetKillableTile(); // Make it OCCUPIED and with the default material
 	}
 	KillableTiles.Empty();
-
-	/*
-	for (ATile* Tile: CastlingTiles)
-	{
-		Tile->UnsetCastleTile();
-	}
-	CastlingTiles.Empty();
-	*/
 }
 
 /*
@@ -216,7 +212,8 @@ void AManager_Turn::DisplayMove()
 			i--;
 		}
 	}
-	
+
+	// Create a button, create a new struct for the move, assign the button to the structure, and add it to the array
 	UUserWidget* ButtonWidget = Cpc->UserInterfaceWidget->WidgetTree->ConstructWidget<UUserWidget>(MhButtonClass);
 	FMoveInfo Move = {ButtonWidget, MovedPiece, KilledPiece, PromotedPiece, PreviousTile, NextTile, RookPreviousTile, RookCastle, bJustMoved};
 	MoveHistory.Add(Move);
@@ -530,18 +527,6 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 				MoveHistory[i].MovedPiece->bAlreadyMoved = false;
 			}
 			GameMode->TurnManager->ResetVariables();
-			// GameMode->GetAllLegalMoves(i%2);
-
-			/*
-			if ((i % 2) == 0)
-			{
-				GameMode->GetAllLegalMoves(0);
-			}
-			else
-			{
-				GameMode->GetAllLegalMoves(1);
-			}
-			*/
 			i--;
 		}
 	}
@@ -597,39 +582,13 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 					MoveHistory[i].RookCastle->MovePiece(GameMode->TileArray[KingIndex+1]);
 				}
 			}
-
-			/*
-			if (MoveHistory[i].bJustMoved) 
-			{
-				MoveHistory[i].MovedPiece->bAlreadyMoved = true;
-			}
-			*/
 			
 			MoveHistory[i].MovedPiece->MovePiece(MoveHistory[i].NextTile);
 			GameMode->TurnManager->ResetVariables();
-			// GameMode->GetAllLegalMoves(i%2);
-			/*
-			if ((i % 2) == 0)
-			{
-				GameMode->GetAllLegalMoves(0);
-			}
-			else
-			{
-				GameMode->GetAllLegalMoves(1);
-			}
-			*/
 			i++;
 		}
 	}
-
-	/*
-	// I calculate the legal moves only for white (Human Player) only when
-	// it is his turn, and therefore he can execute the move
-	if ((ClickedIndex % 2) != 0)
-	{
-		GameMode->GetAllLegalMoves(0);
-	}
-	*/
+	
 	GameMode->GetAllLegalMoves(0);
 	GameMode->GetAllLegalMoves(1);
 	

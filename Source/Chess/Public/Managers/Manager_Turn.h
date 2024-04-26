@@ -83,11 +83,7 @@ public:
 	TArray<ATile*> KillableTiles; // Keeps track of Killable Tiles
 	UPROPERTY(Transient)
 	AChess_Piece* SelectedPiece; // Keeps track of Selected Piece
-
-	/*
-	UPROPERTY(Transient)
-	TArray<ATile*> CastlingTiles;
-	*/
+	
 	TArray<AChess_Piece*> RooksToCastle;
 
 	TPair<FString, int32> ComputeGameState() const;

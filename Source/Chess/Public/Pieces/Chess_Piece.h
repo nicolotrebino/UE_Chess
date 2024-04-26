@@ -54,8 +54,6 @@ public:
 	virtual void MovePiece(ATile* NextTile); // Extended in Chess_Pawn
 	void Kill(AChess_Piece* Enemy) const;
 
-	// void Castle(ATile* NextTile);
-
 	void VirtualMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
 	void VirtualUnMove(ATile* NextTile, ATile* PreviousTile, AChess_Piece* Killed);
 

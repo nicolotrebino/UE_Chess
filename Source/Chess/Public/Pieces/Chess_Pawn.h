@@ -6,8 +6,6 @@
 #include "Chess_Piece.h"
 #include "Chess_Pawn.generated.h"
 
-class UManager_PromotionHUD;
-
 /**
  *	Chess_Pawn class, derived from Chess_Piece class
  */

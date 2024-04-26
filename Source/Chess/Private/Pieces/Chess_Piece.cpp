@@ -204,6 +204,14 @@ void AChess_Piece::CheckKingMobility(TArray<ATile*> &PossibleMoves)
 	PossibleMoves = MoveTempIfPossible(NewArray);
 }
 
+/*
+ *	@brief	Check if the king can proceed with short castling at that moment.
+ *			Check if it has never been moved, if there are no pieces between it and the rook (on the king's side),
+ *			if that rook has never been moved, if it is not in check at that moment
+ *			and if the tiles it has to cross are not they are aimed at by enemy pieces.
+ *
+ *	@return	True if the king can castle, false otherwise
+ */
 bool AChess_Piece::CanKingCastleShort() const
 {
 	if (PieceType == EPieceType::KING && !bAlreadyMoved)
@@ -221,7 +229,7 @@ bool AChess_Piece::CanKingCastleShort() const
 				{
 					return false;
 				}
-				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[6]);
+				// Add to an array the rooks I can castle with that turn
 				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[7]->GetPieceOnTile());
 				return true;
 			}
@@ -240,7 +248,7 @@ bool AChess_Piece::CanKingCastleShort() const
 				{
 					return false;
 				}
-				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[62]);
+				// Add to an array the rooks I can castle with that turn
 				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[63]->GetPieceOnTile());
 				return true;
 			}
@@ -250,6 +258,14 @@ bool AChess_Piece::CanKingCastleShort() const
 	return false;
 }
 
+/*
+ *	@brief	Check if the king can proceed with long castling at that moment.
+ *			Check if it has never been moved, if there are no pieces between it and the rook (on the queen's side),
+ *			if that rook has never been moved, if it is not in check at that moment
+ *			and if the tiles it has to cross are not they are aimed at by enemy pieces.
+ *
+ *	@return	True if the king can castle, false otherwise
+ */
 bool AChess_Piece::CanKingCastleLong() const
 {
 	if (PieceType == EPieceType::KING && !bAlreadyMoved)
@@ -269,7 +285,7 @@ bool AChess_Piece::CanKingCastleLong() const
 				{
 					return false;
 				}
-				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[2]);
+				// Add to an array the rooks I can castle with that turn
 				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[0]->GetPieceOnTile());
 				return true;
 			}
@@ -290,7 +306,7 @@ bool AChess_Piece::CanKingCastleLong() const
 				{
 					return false;
 				}
-				// GameMode->TurnManager->CastlingTiles.Add(GameMode->TileArray[58]);
+				// Add to an array the rooks I can castle with that turn
 				GameMode->TurnManager->RooksToCastle.Add(GameMode->TileArray[56]->GetPieceOnTile());
 				return true;
 			}
@@ -312,12 +328,12 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
 	
 	if (this->IsA(AChess_King::StaticClass()))
 	{
-		CheckKingMobility(LegitMoves);
-		if (this->CanKingCastleShort())
+		CheckKingMobility(LegitMoves); // Check if the king can move to the possible tiles
+		if (this->CanKingCastleShort()) // Check if the king can castle short
 		{
 			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)+2]);
 		}
-		if (this->CanKingCastleLong())
+		if (this->CanKingCastleLong()) // Check if the king can castle long
 		{
 			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)-2]);
 		}
@@ -371,6 +387,7 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	}
 	GameMode->TurnManager->RooksToCastle.Empty();
 
+	// Manage each piece first move (used also for the replay)
 	if (!bAlreadyMoved)
 	{
 		bAlreadyMoved = true;
@@ -385,7 +402,6 @@ void AChess_Piece::MovePiece(ATile* NextTile)
 	this->GetPieceTile()->SetTileStatus(ETileStatus::EMPTY);
 	this->GetPieceTile()->SetTileTeam(ETeam::NONE);
 	this->GetPieceTile()->SetPieceOnTile(nullptr);
-	// this->GetPieceTile()->UnsetSelectedTile();
 	
 	// Set the next Location and Rotation of the ChessPiece
 	const FVector SetLocation = NextTile->GetTileLocation() + FVector (0,0,0.1);

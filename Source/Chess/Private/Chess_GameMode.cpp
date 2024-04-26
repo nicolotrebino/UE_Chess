@@ -50,7 +50,7 @@ AChess_GameMode::AChess_GameMode()
 /*
  *	@brief	Called when the game starts or when spawned.
  *			It creates Chessboard, TurnManager, PawnManager, AiPlayer; set camera settings and manage Players.
- *			Then start the match.
+ *			Then it starts the match.
  *
  *	@return	Void
  */
@@ -102,7 +102,7 @@ void AChess_GameMode::BeginPlay()
  *			moves for each piece of the current player
  *	@param	Player for whom it is necessary to calculate legal moves
  *
- *	@return	void
+ *	@return	Void
  */
 void AChess_GameMode::GetAllLegalMoves(const int32 Player)
 {

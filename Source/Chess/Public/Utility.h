@@ -33,7 +33,7 @@ enum EPieceType: uint8
 };
 
 /**
- * Utility abstract class with static methods
+ * Utility class with static methods
  */
 class CHESS_API Utility
 {

@@ -156,11 +156,15 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 		return 0; // Draw
 	}
 
-	// Mobility
+	/*
+	 *	Mobility
+	 */
 	WhiteValue += 10 * GameMode->TurnManager->WhiteMoves.Num(); // Human
 	BlackValue += 10 * GameMode->TurnManager->BlackMoves.Num(); // AI
 
-	// Position and material
+	/*
+	 *	Position and material
+	 */
 	for (int32 i = 0; i < GameMode->TileArray.Num(); i++)
 	{
 		if (AChess_Piece* Piece = GameMode->TileArray[i]->GetPieceOnTile())

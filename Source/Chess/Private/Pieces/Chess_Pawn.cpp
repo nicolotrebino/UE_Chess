@@ -123,7 +123,6 @@ TArray<ATile*> AChess_Pawn::GetPossibleMoves()
 				ATile* PossibleMove = GameMode->GetTileAtPosition(CurrLetter, CurrNumber - 1);
 				if (PossibleMove->GetTileStatus() == ETileStatus::EMPTY)
 				{
-					// PossibleMove->TargetTile();
 					PossibleMoves.Add(PossibleMove);
 				}
 			}
@@ -209,12 +208,12 @@ void AChess_Pawn::MovePiece(ATile* NextTile)
 
 			if (AMinimaxPlayer* Player = Cast<AMinimaxPlayer>(GameMode->Players[GameMode->CurrentPlayer]))
 			{
-				PromotionManager->HandleButtonClicked(1); // Always for the Queen
+				PromotionManager->HandleButtonClicked(1); // Minimax: always for the Queen
 			}
 			if (ARandomPlayer* Player = Cast<ARandomPlayer>(GameMode->Players[GameMode->CurrentPlayer]))
 			{
 				const int32 RandomNumber = FMath::RandRange(0, 3);
-				PromotionManager->HandleButtonClicked(RandomNumber);
+				PromotionManager->HandleButtonClicked(RandomNumber); // Random: chose randomly
 			}
 		}
 	}
