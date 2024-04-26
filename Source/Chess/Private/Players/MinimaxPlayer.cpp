@@ -107,60 +107,13 @@ void AMinimaxPlayer::OnDraw()
  *
  *	@return Integer indicating the evaluation of the grid in that particular state
  */
-int32 AMinimaxPlayer::EvaluateGrid()
+int32 AMinimaxPlayer::EvaluateGrid() const
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
 	int32 BlackValue = 0;
 	int32 WhiteValue = 0;
-
-	GameMode->GetAllLegalMoves(0);
-	GameMode->GetAllLegalMoves(1);
 	
-	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(WHITE);
-	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(BLACK);
-
-	/*
-	 *	Manage endgames
-	 */
-	if (GameMode->BlackTeam.Num() == 1 && GameMode->WhiteTeam.Num() == 1) // Draw (King vs King)
-	{
-		// GameMode->bIsGameOver = true;
-		bIsFinalNode = true;
-		return 0;
-	}
-
-	TPair<FString, int32> CurrentState = GameMode->TurnManager->ComputeGameState();
-	CurrentState.Value = 2;
-	if (GameMode->GameStates.Contains(CurrentState)) // Draw for repetition
-	{
-		// GameMode->bIsGameOver = true;
-		bIsFinalNode = true;
-		return 0;
-	}
-	if (GameMode->TurnManager->BlackMoves.IsEmpty())
-	{
-		if (GameMode->TurnManager->bIsBlackKingInCheck)	// White wins
-		{
-			// GameMode->bIsGameOver = true;
-			bIsFinalNode = true;
-			return -30000;
-		}
-		bIsFinalNode = true;
-		return 0; // Draw
-	}
-	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
-	{
-		if (GameMode->TurnManager->bIsWhiteKingInCheck) // Black wins
-		{
-			// GameMode->bIsGameOver = true;
-			bIsFinalNode = true;
-			return 30000;
-		}
-		bIsFinalNode = true;
-		return 0; // Draw
-	}
-
 	/*
 	 *	Mobility
 	 */
@@ -255,16 +208,52 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-	if (Depth == 0 || bIsFinalNode) return EvaluateGrid();
+	GameMode->GetAllLegalMoves(0);
+	GameMode->GetAllLegalMoves(1);
 
-	if (IsMax)
+	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
+	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
+	
+	if (GameMode->BlackTeam.Num() == 1 && GameMode->WhiteTeam.Num() == 1) // Draw (King vs King)
+	{
+		return 0;
+	}
+	
+	TPair<FString, int32> CurrentState = GameMode->TurnManager->ComputeGameState();
+	CurrentState.Value = 2;
+	if (GameMode->GameStates.Contains(CurrentState)) // Draw for repetition
+	{
+		return 0;
+	}
+	
+	if (GameMode->TurnManager->BlackMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsBlackKingInCheck)	// White wins
+		{
+			return -30000;
+		}
+		return 0; // Draw
+	}
+	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
+	{
+		if (GameMode->TurnManager->bIsWhiteKingInCheck) // Black wins
+		{
+			return 30000;
+		}
+		return 0; // Draw
+	}
+
+	if (Depth == 0) return EvaluateGrid();
+
+	if (IsMax) // AI
 	{
 		int32 Best = -50000;
-
+		
 		TArray<AChess_Piece*> AiTeam = GameMode->BlackTeam;
 		for (AChess_Piece* Piece: AiTeam)
 		{
 			ATile* PreviousTile = Piece->GetPieceTile();
+			
 			for (ATile* Tile: Piece->GetLegitMoves())
 			{
 				AChess_Piece* Killed = Tile->GetPieceOnTile();
@@ -284,7 +273,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				}
 				
 				Best = FMath::Max(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, false));
-				bIsFinalNode = false;
 
 				if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
 				{
@@ -303,16 +291,15 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 		}
 		return Best;
 	}
-	else
+	else // Human
 	{
 		int32 Best = 50000;
-
-		// Human player
+		
 		TArray<AChess_Piece*> HumanTeam = GameMode->WhiteTeam;
 		for (AChess_Piece* Piece: HumanTeam)
 		{
 			ATile* PreviousTile = Piece->GetPieceTile();
-
+			
 			for (ATile* Tile: Piece->GetLegitMoves())
 			{
 				AChess_Piece* Killed = Tile->GetPieceOnTile();
@@ -332,7 +319,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				}
 				
 				Best = FMath::Min(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, true));
-				bIsFinalNode = false;
 
 				if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
 				{
@@ -385,6 +371,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	for (AChess_Piece* Piece: AiTeam)
 	{
 		ATile* PreviousTile = Piece->GetPieceTile();
+		
 		for (ATile* Tile: Piece->GetLegitMoves())
 		{
 			AChess_Piece* Killed = Tile->GetPieceOnTile();
