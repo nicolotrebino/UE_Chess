@@ -105,8 +105,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString ComputeNotation() const;
 
-	void DisableReplay() const;
-	void EnableReplay();
+	void DisableUserInterface() const;
+	void EnableUserInterface();
 
 	void DestroyMoveHistory();
 

@@ -62,9 +62,11 @@ public:
 	/*
 	 *	Minimax algorithm methods
 	 */
-	int32 EvaluateGrid() const;
+	int32 EvaluateGrid();
 	int32 AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, bool IsMax);
 	FNextMove FindBestMove();
+
+	bool bIsFinalNode = false;
 
 private:
 	/*

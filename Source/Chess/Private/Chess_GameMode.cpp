@@ -202,7 +202,7 @@ void AChess_GameMode::TurnNextPlayer()
 		bIsDraw = true;
 		TurnManager->DisplayMove();
 		TurnManager->DisplayEndGame();
-		TurnManager->EnableReplay();
+		TurnManager->EnableUserInterface();
 		Players[WHITE]->OnDraw();
 		return;
 	}
@@ -216,7 +216,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsWhiteKingInCheckMate = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
-			TurnManager->EnableReplay();
+			TurnManager->EnableUserInterface();
 			Players[WHITE]->OnLose(); // White lost
 		}
 		else // If the white king is not in check
@@ -225,7 +225,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsDraw = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
-			TurnManager->EnableReplay();
+			TurnManager->EnableUserInterface();
 			Players[WHITE]->OnDraw(); // Draw game
 		}
 		return;
@@ -239,7 +239,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsBlackKingInCheckMate = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
-			TurnManager->EnableReplay();
+			TurnManager->EnableUserInterface();
 			Players[WHITE]->OnWin(); // Black won
 		}
 		else // If the black king is not in check
@@ -248,7 +248,7 @@ void AChess_GameMode::TurnNextPlayer()
 			bIsDraw = true;
 			TurnManager->DisplayMove();
 			TurnManager->DisplayEndGame();
-			TurnManager->EnableReplay();
+			TurnManager->EnableUserInterface();
 			Players[WHITE]->OnDraw(); // Draw game
 		}
 		return;
@@ -269,7 +269,7 @@ void AChess_GameMode::TurnNextPlayer()
 				bIsDraw = true;
 				TurnManager->DisplayMove();
 				TurnManager->DisplayEndGame();
-				TurnManager->EnableReplay();
+				TurnManager->EnableUserInterface();
 				Players[WHITE]->OnDraw();
 				return;
 			}

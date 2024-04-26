@@ -41,6 +41,12 @@ void AManager_Promotion::StartPromotion()
 
 	if (Cpc)
 	{
+		AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the Chess_GameMode reference
+		for (AChess_Piece* Piece: GameMode->WhiteTeam)
+		{
+			Piece->SetActorEnableCollision(false);
+		}
+		GameMode->TurnManager->DisableUserInterface();
 		PromotionWidget = CreateWidget<UUserWidget>(Cpc, PromotionWidgetClass);
 		PromotionWidget->AddToViewport();
 	}
@@ -96,6 +102,11 @@ void AManager_Promotion::HandleButtonClicked(const int32 SelectedPieceIndex)
 	if (PromotionWidget)
 	{
 		PromotionWidget->RemoveFromParent();
+		for (AChess_Piece* Piece: GameMode->WhiteTeam)
+		{
+			Piece->SetActorEnableCollision(true);
+		}
+		GameMode->TurnManager->EnableUserInterface();
 		// I can't destroy the widget directly
 		// Garbage collector take care of it
 		PromotionWidget = nullptr;

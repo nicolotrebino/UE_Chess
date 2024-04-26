@@ -47,7 +47,7 @@ void AHumanPlayer::OnTurn()
 	bIsMyTurn = true;
 	GameInstance->SetTurnMessage(TEXT("Human Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode()); // Get the reference to the Chess_GameMode
-	GameMode->TurnManager->EnableReplay();
+	GameMode->TurnManager->EnableUserInterface();
 }
 
 /*

@@ -42,7 +42,7 @@ void AMinimaxPlayer::OnTurn()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Minimax) Turn"));
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
-	GameMode->TurnManager->DisableReplay(); // Disable the replay during the Minimax turn
+	GameMode->TurnManager->DisableUserInterface(); // Disable the replay during the Minimax turn
 	
 	GameInstance->SetTurnMessage(TEXT("AI (Minimax) Turn"));
 
@@ -107,7 +107,7 @@ void AMinimaxPlayer::OnDraw()
  *
  *	@return Integer indicating the evaluation of the grid in that particular state
  */
-int32 AMinimaxPlayer::EvaluateGrid() const
+int32 AMinimaxPlayer::EvaluateGrid()
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
@@ -125,7 +125,8 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	 */
 	if (GameMode->BlackTeam.Num() == 1 && GameMode->WhiteTeam.Num() == 1) // Draw (King vs King)
 	{
-		GameMode->bIsGameOver = true;
+		// GameMode->bIsGameOver = true;
+		bIsFinalNode = true;
 		return 0;
 	}
 
@@ -133,26 +134,30 @@ int32 AMinimaxPlayer::EvaluateGrid() const
 	CurrentState.Value = 2;
 	if (GameMode->GameStates.Contains(CurrentState)) // Draw for repetition
 	{
-		GameMode->bIsGameOver = true;
+		// GameMode->bIsGameOver = true;
+		bIsFinalNode = true;
 		return 0;
 	}
-	
 	if (GameMode->TurnManager->BlackMoves.IsEmpty())
 	{
 		if (GameMode->TurnManager->bIsBlackKingInCheck)	// White wins
 		{
-			GameMode->bIsGameOver = true;
+			// GameMode->bIsGameOver = true;
+			bIsFinalNode = true;
 			return -30000;
 		}
+		bIsFinalNode = true;
 		return 0; // Draw
 	}
 	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
 	{
 		if (GameMode->TurnManager->bIsWhiteKingInCheck) // Black wins
 		{
-			GameMode->bIsGameOver = true;
+			// GameMode->bIsGameOver = true;
+			bIsFinalNode = true;
 			return 30000;
 		}
+		bIsFinalNode = true;
 		return 0; // Draw
 	}
 
@@ -250,7 +255,7 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-	if (Depth == 0 || GameMode->bIsGameOver) return EvaluateGrid();
+	if (Depth == 0 || bIsFinalNode) return EvaluateGrid();
 
 	if (IsMax)
 	{
@@ -279,6 +284,7 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				}
 				
 				Best = FMath::Max(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, false));
+				bIsFinalNode = false;
 
 				if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
 				{
@@ -326,6 +332,7 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 				}
 				
 				Best = FMath::Min(Best, AlphaBetaMiniMax(Depth - 1, Alpha, Beta, true));
+				bIsFinalNode = false;
 
 				if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
 				{
@@ -397,6 +404,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 			}
 			
 			int32 MoveVal = AlphaBetaMiniMax(Depth, Alpha, Beta, false);
+			UE_LOG(LogTemp, Warning, TEXT("Valore mossa: %i"), MoveVal);
 
 			if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
 			{
@@ -409,7 +417,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 
 			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 
-			if (MoveVal > BestVal || (MoveVal == BestVal && (FMath::Rand() % 2 == 1)))
+			if (MoveVal > BestVal)
 			{
 				BestMove.PieceToMove = Piece;
 				BestMove.NextTile = Tile;

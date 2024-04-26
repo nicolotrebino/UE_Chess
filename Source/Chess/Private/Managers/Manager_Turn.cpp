@@ -368,11 +368,12 @@ FString AManager_Turn::ComputeNotation() const
 }
 
 /*
- *	@brief	Disables replay (normally during the AI turn)
+ *	@brief	Disables the use of "Move History" and the "Return to main menu" and "New game" buttons
+ *			(normally during the AI turn)
  *			
  *	@return Void
  */
-void AManager_Turn::DisableReplay() const
+void AManager_Turn::DisableUserInterface() const
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
@@ -394,11 +395,12 @@ void AManager_Turn::DisableReplay() const
 }
 
 /*
- *	@brief	Enables replay (normally during the Human turn)
+ *	@brief	Enables the use of "Move History" and the "Return to main menu" and "New game" buttons
+ *			(normally during the Human turn)
  *			
  *	@return Void
  */
-void AManager_Turn::EnableReplay()
+void AManager_Turn::EnableUserInterface()
 {
 	AChess_PlayerController* Cpc = Cast<AChess_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
