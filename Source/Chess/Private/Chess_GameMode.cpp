@@ -208,7 +208,7 @@ void AChess_GameMode::TurnNextPlayer()
 	}
 
 	// For Human Player
-	if (TurnManager->WhiteMoves.IsEmpty()) // If white has no more moves available
+	if (TurnManager->WhiteMoves.IsEmpty() && !CurrentPlayer) // If white has no more moves available
 	{
 		if (TurnManager->bIsWhiteKingInCheck) // If the white king is in check
 		{
@@ -231,7 +231,7 @@ void AChess_GameMode::TurnNextPlayer()
 		return;
 	}
 	// For AI Player
-	if (TurnManager->BlackMoves.IsEmpty()) // If black has no more moves available
+	if (TurnManager->BlackMoves.IsEmpty() && CurrentPlayer) // If black has no more moves available
 	{
 		if (TurnManager->bIsBlackKingInCheck) // If the black king is in check
 		{
