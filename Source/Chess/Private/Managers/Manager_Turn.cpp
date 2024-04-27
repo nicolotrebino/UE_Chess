@@ -298,11 +298,61 @@ FString AManager_Turn::ComputeNotation() const
 			else
 			{
 				MoveNomenclature = FString::Printf(TEXT("%c"), MovedPiece->GetNomenclature());
-				if (GameMode->TurnManager->bIsKill)
+				if (MovedPiece->GetType() == EPieceType::QUEEN) // Ambiguous queen moves
 				{
-					MoveNomenclature = MoveNomenclature + "x";
+					TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+				
+					for (AChess_Piece* Piece: Team)
+					{
+						if (Piece->GetType() == EPieceType::QUEEN && Piece != MovedPiece)
+						{
+							NextTile->SetTileStatus(ETileStatus::EMPTY);
+							PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
+							TArray<ATile*> Moves = Piece->GetPossibleMoves();
+							NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+							PreviousTile->SetTileStatus(ETileStatus::EMPTY);
+							if (Moves.Contains(NextTile))
+							{
+								if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+								}
+								else
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+								}
+							}
+						}
+					}
 				}
-				if (MovedPiece->GetType() == EPieceType::ROOK)
+				if (MovedPiece->GetType() == EPieceType::BISHOP) // Ambiguous bishop moves
+				{
+					TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
+				
+					for (AChess_Piece* Piece: Team)
+					{
+						if (Piece->GetType() == EPieceType::BISHOP && Piece != MovedPiece)
+						{
+							NextTile->SetTileStatus(ETileStatus::EMPTY);
+							PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
+							TArray<ATile*> Moves = Piece->GetPossibleMoves();
+							NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+							PreviousTile->SetTileStatus(ETileStatus::EMPTY);
+							if (Moves.Contains(NextTile))
+							{
+								if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%i"), PreviousTile->GetAlgebraicPosition().TileNumber);
+								}
+								else
+								{
+									MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c"), PreviousTile->GetAlgebraicPosition().TileLetter);
+								}
+							}
+						}
+					}
+				}
+				if (MovedPiece->GetType() == EPieceType::ROOK) // Ambiguous rook moves
 				{
 					TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
 				
@@ -311,8 +361,10 @@ FString AManager_Turn::ComputeNotation() const
 						if (Piece->GetType() == EPieceType::ROOK && Piece != MovedPiece)
 						{
 							NextTile->SetTileStatus(ETileStatus::EMPTY);
-							TArray<ATile*> Moves = Piece->GetLegitMoves();
+							PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
+							TArray<ATile*> Moves = Piece->GetPossibleMoves();
 							NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+							PreviousTile->SetTileStatus(ETileStatus::EMPTY);
 							if (Moves.Contains(NextTile))
 							{
 								if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
@@ -327,7 +379,7 @@ FString AManager_Turn::ComputeNotation() const
 						}
 					}
 				}
-				if (MovedPiece->GetType() == EPieceType::KNIGHT)
+				if (MovedPiece->GetType() == EPieceType::KNIGHT) // Ambiguous knight moves
 				{
 					TArray<AChess_Piece*> Team = (MovedPiece->GetTeam() == ETeam::WHITE) ? GameMode->WhiteTeam : GameMode->BlackTeam;
 				
@@ -336,8 +388,10 @@ FString AManager_Turn::ComputeNotation() const
 						if (Piece->GetType() == EPieceType::KNIGHT && Piece != MovedPiece)
 						{
 							NextTile->SetTileStatus(ETileStatus::EMPTY);
-							TArray<ATile*> Moves = Piece->GetLegitMoves();
+							PreviousTile->SetTileStatus(ETileStatus::OCCUPIED);
+							TArray<ATile*> Moves = Piece->GetPossibleMoves();
 							NextTile->SetTileStatus(ETileStatus::OCCUPIED);
+							PreviousTile->SetTileStatus(ETileStatus::EMPTY);
 							if (Moves.Contains(NextTile))
 							{
 								if (PreviousTile->GetAlgebraicPosition().TileLetter == Piece->GetPieceTile()->GetAlgebraicPosition().TileLetter)
@@ -351,6 +405,10 @@ FString AManager_Turn::ComputeNotation() const
 							}
 						}
 					}
+				}
+				if (GameMode->TurnManager->bIsKill)
+				{
+					MoveNomenclature = MoveNomenclature + "x";
 				}
 				MoveNomenclature = MoveNomenclature + FString::Printf(TEXT("%c%d"), NextTile->GetAlgebraicPosition().TileLetter, NextTile->GetAlgebraicPosition().TileNumber);
 			}
@@ -591,8 +649,8 @@ void AManager_Turn::Replay(const int32 ClickedIndex)
 		}
 	}
 	
-	GameMode->GetAllLegalMoves(0);
 	GameMode->GetAllLegalMoves(1);
+	GameMode->GetAllLegalMoves(0);
 	
 	GameMode->UpdateScores();
 	CurrentButtonIndex = ClickedIndex;

@@ -225,7 +225,7 @@ bool AChess_Piece::CanKingCastleShort() const
 			{
 				if (GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[5]) ||
 					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[6]) ||
-					GameMode->TurnManager->BlackMoves.Contains(CurrentTile))
+					GameMode->IsKingInCheck(WHITE))
 				{
 					return false;
 				}
@@ -235,7 +235,7 @@ bool AChess_Piece::CanKingCastleShort() const
 			}
 			return false;
 		}
-		else
+		else // Black
 		{
 			if (GameMode->TileArray[61]->GetTileStatus() == ETileStatus::EMPTY &&
 				GameMode->TileArray[62]->GetTileStatus() == ETileStatus::EMPTY &&
@@ -244,7 +244,7 @@ bool AChess_Piece::CanKingCastleShort() const
 			{
 				if (GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[61]) ||
 					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[62]) ||
-					GameMode->TurnManager->WhiteMoves.Contains(CurrentTile))
+					GameMode->IsKingInCheck(BLACK))
 				{
 					return false;
 				}
@@ -281,7 +281,7 @@ bool AChess_Piece::CanKingCastleLong() const
 				if (GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[3]) ||
 					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[2]) ||
 					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[1]) ||
-					GameMode->TurnManager->BlackMoves.Contains(CurrentTile))
+					GameMode->IsKingInCheck(WHITE))
 				{
 					return false;
 				}
@@ -291,7 +291,7 @@ bool AChess_Piece::CanKingCastleLong() const
 			}
 			return false;
 		}
-		else
+		else // Black
 		{
 			if (GameMode->TileArray[59]->GetTileStatus() == ETileStatus::EMPTY &&
 				GameMode->TileArray[58]->GetTileStatus() == ETileStatus::EMPTY &&
@@ -302,7 +302,7 @@ bool AChess_Piece::CanKingCastleLong() const
 				if (GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[59]) ||
 					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[58]) ||
 					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[57]) ||
-					GameMode->TurnManager->WhiteMoves.Contains(CurrentTile))
+					GameMode->IsKingInCheck(BLACK))
 				{
 					return false;
 				}
@@ -331,11 +331,17 @@ TArray<ATile*> AChess_Piece::GetLegitMoves()
 		CheckKingMobility(LegitMoves); // Check if the king can move to the possible tiles
 		if (this->CanKingCastleShort()) // Check if the king can castle short
 		{
-			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)+2]);
+			if (GameMode->TileArray.IsValidIndex(GameMode->TileArray.Find(CurrentTile)+2))
+			{
+				LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)+2]);
+			}
 		}
 		if (this->CanKingCastleLong()) // Check if the king can castle long
 		{
-			LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)-2]);
+			if (GameMode->TileArray.IsValidIndex(GameMode->TileArray.Find(CurrentTile)-2))
+			{
+				LegitMoves.Add(GameMode->TileArray[GameMode->TileArray.Find(CurrentTile)-2]);
+			}
 		}
 	}
 	else

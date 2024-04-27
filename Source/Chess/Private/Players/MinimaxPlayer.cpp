@@ -208,8 +208,8 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 {
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
-	GameMode->GetAllLegalMoves(0);
-	GameMode->GetAllLegalMoves(1);
+	GameMode->GetAllLegalMoves(!IsMax);
+	GameMode->GetAllLegalMoves(IsMax);
 
 	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
 	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
