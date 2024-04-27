@@ -29,8 +29,6 @@ NB: It is also possible to disable the replay to increase the difficulty.
 
 ![UML](README_assets/UML.png)
 
-### Pieces assets
-
 ## Project's insights
 
 ### Main menu
