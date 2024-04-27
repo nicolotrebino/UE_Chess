@@ -404,7 +404,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 
 			Piece->VirtualUnMove(Tile, PreviousTile, Killed);
 
-			if (MoveVal > BestVal)
+			if (MoveVal > BestVal || (MoveVal == BestVal && (FMath::Rand() % 2 == 1)))
 			{
 				BestMove.PieceToMove = Piece;
 				BestMove.NextTile = Tile;
