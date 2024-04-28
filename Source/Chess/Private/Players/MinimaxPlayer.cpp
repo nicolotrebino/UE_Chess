@@ -210,9 +210,6 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 
 	GameMode->GetAllLegalMoves(!IsMax);
 	GameMode->GetAllLegalMoves(IsMax);
-
-	GameMode->TurnManager->bIsBlackKingInCheck = GameMode->IsKingInCheck(BLACK);
-	GameMode->TurnManager->bIsWhiteKingInCheck = GameMode->IsKingInCheck(WHITE);
 	
 	if (GameMode->BlackTeam.Num() == 1 && GameMode->WhiteTeam.Num() == 1) // Draw (King vs King)
 	{
@@ -226,17 +223,17 @@ int32 AMinimaxPlayer::AlphaBetaMiniMax(int32 Depth, int32 Alpha, int32 Beta, boo
 		return 0;
 	}
 	
-	if (GameMode->TurnManager->BlackMoves.IsEmpty())
+	if (GameMode->TurnManager->BlackMoves.IsEmpty() && IsMax)
 	{
-		if (GameMode->TurnManager->bIsBlackKingInCheck)	// White wins
+		if (GameMode->IsKingInCheck(BLACK))	// White wins
 		{
 			return -30000;
 		}
 		return 0; // Draw
 	}
-	if (GameMode->TurnManager->WhiteMoves.IsEmpty())
+	if (GameMode->TurnManager->WhiteMoves.IsEmpty() && !IsMax)
 	{
-		if (GameMode->TurnManager->bIsWhiteKingInCheck) // Black wins
+		if (GameMode->IsKingInCheck(WHITE)) // Black wins
 		{
 			return 30000;
 		}
@@ -391,7 +388,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 			}
 			
 			int32 MoveVal = AlphaBetaMiniMax(Depth, Alpha, Beta, false);
-			UE_LOG(LogTemp, Warning, TEXT("Valore mossa: %i"), MoveVal);
+			// UE_LOG(LogTemp, Warning, TEXT("Valore mossa: %i"), MoveVal);
 
 			if (bIsVirtualPromotion && NewQueen && Piece == PiecePromoted)
 			{

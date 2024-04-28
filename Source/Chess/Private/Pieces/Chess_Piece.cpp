@@ -280,7 +280,6 @@ bool AChess_Piece::CanKingCastleLong() const
 			{
 				if (GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[3]) ||
 					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[2]) ||
-					GameMode->TurnManager->BlackMoves.Contains(GameMode->TileArray[1]) ||
 					GameMode->IsKingInCheck(WHITE))
 				{
 					return false;
@@ -301,7 +300,6 @@ bool AChess_Piece::CanKingCastleLong() const
 			{
 				if (GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[59]) ||
 					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[58]) ||
-					GameMode->TurnManager->WhiteMoves.Contains(GameMode->TileArray[57]) ||
 					GameMode->IsKingInCheck(BLACK))
 				{
 					return false;
