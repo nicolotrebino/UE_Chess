@@ -121,7 +121,7 @@ void AHumanPlayer::OnClick()
 		// If the human player clicks on a ChessPiece
 		if (AChess_Piece* CurrPiece = Cast<AChess_Piece>(Hit.GetActor()))
 		{
-			UE_LOG(LogTemp, Error, TEXT("Tile Status: %d; Tile team: %d"), CurrPiece->GetPieceTile()->GetTileStatus(), CurrPiece->GetPieceTile()->GetTileTeam());
+			// UE_LOG(LogTemp, Error, TEXT("Tile Status: %d; Tile team: %d"), CurrPiece->GetPieceTile()->GetTileStatus(), CurrPiece->GetPieceTile()->GetTileTeam());
 			// If the Chess Piece has the color of the Human Player's team (WHITE)
 			if (CurrPiece->GetTeam() == Team)
 			{

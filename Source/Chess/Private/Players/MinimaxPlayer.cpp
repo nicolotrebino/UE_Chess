@@ -355,7 +355,7 @@ FNextMove AMinimaxPlayer::FindBestMove()
 	AChess_GameMode* GameMode = Cast<AChess_GameMode>(GetWorld()->GetAuthGameMode());
 
 	// Dynamic depth based on the number of pieces on the Chessboard
-	if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 5 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() <= 15)
+	if (GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() >= 5 && GameMode->BlackTeam.Num() + GameMode->WhiteTeam.Num() <= 10)
 	{
 		Depth = 3;
 	}
